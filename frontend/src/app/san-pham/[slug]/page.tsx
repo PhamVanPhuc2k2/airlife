@@ -86,7 +86,9 @@ export default async function Page({ params }: Props) {
         </Link>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      {/* grid-cols-1 (= minmax(0, 1fr)): chưa khai báo cột thì lưới tự tạo cột rộng theo nội dung,
+          hàng ngày khởi hành cuộn ngang (BookingBox) sẽ kéo cả trang rộng ra trên điện thoại */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Gallery images={[p.image_url, ...p.gallery]} alt={p.name} />
         <div className="space-y-5">
           <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700">
@@ -123,7 +125,7 @@ export default async function Page({ params }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="rounded-card bg-surface p-6 shadow-sm ring-1 ring-ink/[0.07]">
           <h2 className="text-xl font-bold">{booking ? "Chi tiết" : "Mô tả sản phẩm"}</h2>
           <div

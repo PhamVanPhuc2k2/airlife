@@ -2,6 +2,7 @@ import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { api, qs } from "./api";
 import type {
+  BookingPage,
   CommentPage,
   LibraryPage,
   MediaPage,
@@ -117,6 +118,16 @@ export function ordersOptions() {
     queryKey: ["me", "orders"],
     queryFn: ({ pageParam, signal }) =>
       api<OrderPage>(`/me/orders?${qs({ cursor: pageParam })}`, { signal }),
+    initialPageParam: "",
+    getNextPageParam: (last) => last.next_cursor || undefined,
+  });
+}
+
+export function bookingsOptions() {
+  return infiniteQueryOptions({
+    queryKey: ["me", "bookings"],
+    queryFn: ({ pageParam, signal }) =>
+      api<BookingPage>(`/me/bookings?${qs({ cursor: pageParam })}`, { signal }),
     initialPageParam: "",
     getNextPageParam: (last) => last.next_cursor || undefined,
   });

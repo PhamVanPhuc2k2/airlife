@@ -101,6 +101,44 @@ func (q *Queries) UpsertChannel(ctx context.Context, arg UpsertChannelParams) (u
 	return id, err
 }
 
+const upsertDeparture = `-- name: UpsertDeparture :one
+INSERT INTO departures (product_id, depart_date, return_date)
+VALUES ($1, $2, $3)
+ON CONFLICT (product_id, depart_date) DO UPDATE SET return_date = EXCLUDED.return_date
+RETURNING id
+`
+
+type UpsertDepartureParams struct {
+	ProductID  uuid.UUID
+	DepartDate time.Time
+	ReturnDate *time.Time
+}
+
+// Lịch khởi hành mẫu: đã có thì giữ nguyên (không đụng số chỗ đã giữ khi thử)
+func (q *Queries) UpsertDeparture(ctx context.Context, arg UpsertDepartureParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, upsertDeparture, arg.ProductID, arg.DepartDate, arg.ReturnDate)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const upsertDepartureSeats = `-- name: UpsertDepartureSeats :exec
+INSERT INTO departure_seats (departure_id, fare_id, capacity)
+VALUES ($1, $2, $3)
+ON CONFLICT (departure_id, fare_id) DO NOTHING
+`
+
+type UpsertDepartureSeatsParams struct {
+	DepartureID uuid.UUID
+	FareID      uuid.UUID
+	Capacity    int32
+}
+
+func (q *Queries) UpsertDepartureSeats(ctx context.Context, arg UpsertDepartureSeatsParams) error {
+	_, err := q.db.Exec(ctx, upsertDepartureSeats, arg.DepartureID, arg.FareID, arg.Capacity)
+	return err
+}
+
 const upsertMedia = `-- name: UpsertMedia :exec
 INSERT INTO media (slug, kind, category_slug, channel_id, title, description, group_label,
                    genre_label, tags, youtube_id, thumbnail_url, duration_seconds,
@@ -290,6 +328,40 @@ func (q *Queries) UpsertProduct(ctx context.Context, arg UpsertProductParams) (u
 		arg.RatingCount,
 		arg.SoldCount,
 		arg.PublishedAt,
+	)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const upsertProductFare = `-- name: UpsertProductFare :one
+INSERT INTO product_fares (product_id, code, label, description, adult_price, child_price, sort_order)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (product_id, code) DO UPDATE
+SET label = EXCLUDED.label, description = EXCLUDED.description, adult_price = EXCLUDED.adult_price,
+    child_price = EXCLUDED.child_price, sort_order = EXCLUDED.sort_order
+RETURNING id
+`
+
+type UpsertProductFareParams struct {
+	ProductID   uuid.UUID
+	Code        string
+	Label       string
+	Description string
+	AdultPrice  int64
+	ChildPrice  int64
+	SortOrder   int16
+}
+
+func (q *Queries) UpsertProductFare(ctx context.Context, arg UpsertProductFareParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, upsertProductFare,
+		arg.ProductID,
+		arg.Code,
+		arg.Label,
+		arg.Description,
+		arg.AdultPrice,
+		arg.ChildPrice,
+		arg.SortOrder,
 	)
 	var id uuid.UUID
 	err := row.Scan(&id)

@@ -1,6 +1,6 @@
 # Bài 7.11: Gắn bán hàng vào các trang có sẵn; nghiệm thu Phần 07
 
-> [← Bài trước](10-thanh-toan-va-don-hang.md) · [Mục lục](../README.md)
+> [← Bài trước](10-thanh-toan-va-don-hang.md) · [Mục lục](../README.md) · [Phần 08 →](../08-ve-va-tour/01-schema-va-lich-khoi-hanh.md)
 
 ## Mục tiêu
 
@@ -668,7 +668,7 @@ Dọn tài khoản thử như bài 7.06, rồi:
 git add . && git commit -m "Bán hàng: trang sản phẩm, giỏ hàng, thanh toán, đơn hàng"
 ```
 
-Đến đây xong Phần 07.
+Đến đây xong Phần 07. Tiếp theo: [Phần 08 →](../08-ve-va-tour/01-schema-va-lich-khoi-hanh.md)
 
 ## Hay gặp lỗi
 

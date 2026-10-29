@@ -276,3 +276,60 @@ export type OrderSummary = {
 };
 
 export type OrderPage = { items: OrderSummary[]; next_cursor?: string };
+
+// Đặt vé, tour (Phần 08) -----------------------------------------------------------------------
+
+export type Fare = {
+  id: string;
+  code: string;
+  label: string;
+  description: string;
+  adult_price: number;
+  child_price: number;
+};
+
+export type Departure = {
+  id: string;
+  depart_date: string; // "2026-11-14"
+  return_date: string | null;
+  seats: { fare_id: string; left: number }[];
+};
+
+export type Availability = { fares: Fare[]; departures: Departure[] };
+
+export type BookingStatus = "held" | "awaiting_payment" | "confirmed" | "cancelled" | "expired";
+
+export type Booking = {
+  code: string;
+  status: BookingStatus;
+  expires_at: string;
+  expires_in: number; // giây giữ chỗ còn lại, server tính
+  product: { slug: string; name: string; tag: string; image_url: string };
+  fare_label: string;
+  depart_date: string;
+  return_date: string | null;
+  adults: number;
+  children: number;
+  adult_price: number;
+  child_price: number;
+  total: number;
+  contact: { name: string; phone: string; email: string } | null;
+  passengers: { kind: "adult" | "child"; full_name: string; birth_date: string }[];
+  created_at: string;
+};
+
+export type BookingSummary = {
+  code: string;
+  status: BookingStatus;
+  expires_at: string;
+  product_name: string;
+  product_image: string;
+  fare_label: string;
+  depart_date: string;
+  adults: number;
+  children: number;
+  total: number;
+  created_at: string;
+};
+
+export type BookingPage = { items: BookingSummary[]; next_cursor?: string };

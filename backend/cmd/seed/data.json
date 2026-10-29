@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài). Người dùng mẫu (seed-*@airlife.local) không đăng nhập được (mật khẩu ngẫu nhiên). Trả lời bình luận là câu mẫu. Sản phẩm: biến thể, tồn kho, cách nhận hàng là dữ liệu mẫu tự đặt (mockup chỉ có một giá).",
+  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài). Người dùng mẫu (seed-*@airlife.local) không đăng nhập được (mật khẩu ngẫu nhiên). Trả lời bình luận là câu mẫu. Sản phẩm: biến thể, tồn kho, cách nhận hàng là dữ liệu mẫu tự đặt (mockup chỉ có một giá). Vé, tour: hạng dịch vụ, giá trẻ em, số chỗ, lịch khởi hành là dữ liệu mẫu tự đặt; ngày khởi hành tính từ ngày chạy seed.",
   "categories": [
     {
       "slug": "xem",
@@ -1044,7 +1044,31 @@
         "hang-dong-cuoi-troi"
       ],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 1890000,
+            "child_price": 1390000,
+            "capacity": 20
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 2690000,
+            "child_price": 1990000,
+            "capacity": 8
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 7,
+        "trip_days": 1,
+        "count": 12
+      }
     },
     {
       "slug": "fast-track-an-ninh-dua-don",
@@ -1101,7 +1125,31 @@
         "review-hang-thuong-gia-5-hang-bay"
       ],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "pho-thong",
+            "label": "Phổ thông",
+            "description": "Hành lý xách tay 7kg, ký gửi 23kg",
+            "adult_price": 1590000,
+            "child_price": 1190000,
+            "capacity": 30
+          },
+          {
+            "code": "thuong-gia",
+            "label": "Thương gia",
+            "description": "Phòng chờ thương gia, hành lý 40kg, làm thủ tục ưu tiên",
+            "adult_price": 4290000,
+            "child_price": 3290000,
+            "capacity": 8
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 2,
+        "trip_days": 3,
+        "count": 30
+      }
     },
     {
       "slug": "ve-tphcm-phu-quoc-mot-chieu",
@@ -1120,7 +1168,31 @@
       "published_days_ago": 13.5,
       "media": [],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "pho-thong",
+            "label": "Phổ thông",
+            "description": "Hành lý xách tay 7kg, ký gửi 23kg",
+            "adult_price": 890000,
+            "child_price": 690000,
+            "capacity": 30
+          },
+          {
+            "code": "thuong-gia",
+            "label": "Thương gia",
+            "description": "Phòng chờ thương gia, hành lý 40kg, làm thủ tục ưu tiên",
+            "adult_price": 2390000,
+            "child_price": 1890000,
+            "capacity": 6
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 2,
+        "trip_days": 0,
+        "count": 30
+      }
     },
     {
       "slug": "ve-ha-noi-osaka-khu-hoi",
@@ -1141,7 +1213,31 @@
         "mua-thu-kyoto-trong-5-ngay"
       ],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "pho-thong",
+            "label": "Phổ thông",
+            "description": "Hành lý xách tay 7kg, ký gửi 23kg",
+            "adult_price": 6900000,
+            "child_price": 5200000,
+            "capacity": 20
+          },
+          {
+            "code": "thuong-gia",
+            "label": "Thương gia",
+            "description": "Phòng chờ thương gia, hành lý 40kg, làm thủ tục ưu tiên",
+            "adult_price": 18900000,
+            "child_price": 14500000,
+            "capacity": 4
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 7,
+        "trip_days": 6,
+        "count": 12
+      }
     },
     {
       "slug": "tour-nhat-ban-mua-la-do-5n4d",
@@ -1163,7 +1259,31 @@
         "mot-minh-di-nhat-tap-14"
       ],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 18900000,
+            "child_price": 14900000,
+            "capacity": 20
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 24900000,
+            "child_price": 19900000,
+            "capacity": 6
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 14,
+        "trip_days": 4,
+        "count": 6
+      }
     },
     {
       "slug": "combo-phu-quoc-3n2d-resort-5-sao",
@@ -1182,7 +1302,31 @@
       "published_days_ago": 18.0,
       "media": [],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 4290000,
+            "child_price": 2990000,
+            "capacity": 16
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 5990000,
+            "child_price": 4190000,
+            "capacity": 6
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 3,
+        "trip_days": 2,
+        "count": 25
+      }
     },
     {
       "slug": "tour-da-lat-san-may-3n2d",
@@ -1201,7 +1345,31 @@
       "published_days_ago": 19.5,
       "media": [],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 2490000,
+            "child_price": 1790000,
+            "capacity": 20
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 3490000,
+            "child_price": 2490000,
+            "capacity": 8
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 7,
+        "trip_days": 2,
+        "count": 12
+      }
     },
     {
       "slug": "tour-han-quoc-seoul-nami-5n4d",
@@ -1220,7 +1388,31 @@
       "published_days_ago": 21.0,
       "media": [],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 12900000,
+            "child_price": 9900000,
+            "capacity": 20
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 16900000,
+            "child_price": 12900000,
+            "capacity": 6
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 14,
+        "trip_days": 4,
+        "count": 6
+      }
     },
     {
       "slug": "combo-da-nang-4n3d-khach-san-bien",
@@ -1239,7 +1431,31 @@
       "published_days_ago": 22.5,
       "media": [],
       "delivery_methods": [],
-      "variants": []
+      "variants": [],
+      "booking": {
+        "fares": [
+          {
+            "code": "tieu-chuan",
+            "label": "Tiêu chuẩn",
+            "description": "Khách sạn 3–4 sao, xe đoàn, hướng dẫn viên",
+            "adult_price": 3690000,
+            "child_price": 2590000,
+            "capacity": 16
+          },
+          {
+            "code": "cao-cap",
+            "label": "Cao cấp",
+            "description": "Khách sạn 5 sao, xe riêng, hướng dẫn viên riêng",
+            "adult_price": 4990000,
+            "child_price": 3490000,
+            "capacity": 6
+          }
+        ],
+        "first_in_days": 2,
+        "every_days": 3,
+        "trip_days": 3,
+        "count": 25
+      }
     }
   ]
 }

@@ -4,7 +4,6 @@ package order
 
 import (
 	"context"
-	"crypto/rand"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -25,6 +24,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/pagination"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/refcode"
 )
 
 const (
@@ -32,9 +32,7 @@ const (
 	// Giao tận nhà: 30.000₫, miễn phí cho đơn từ 300.000₫ (theo mockup). Các cách khác miễn phí.
 	homeShippingFee    = 30_000
 	freeShippingFrom   = 300_000
-	ordersPerHour      = 10                                // chặn đặt đơn rác hàng loạt (COD không mất tiền nên dễ bị phá)
-	codeAlphabet       = "23456789ABCDEFGHJKMNPQRSTUVWXYZ" // bỏ 0/O, 1/I/L: đọc qua điện thoại không nhầm
-	codeLength         = 8
+	ordersPerHour      = 10 // chặn đặt đơn rác hàng loạt (COD không mất tiền nên dễ bị phá)
 	maxIdempotencyKey  = 100
 	minIdempotencyKey  = 8
 	maxFlightDaysAhead = 365
@@ -217,7 +215,7 @@ func (s *Service) Checkout(ctx context.Context, userID uuid.UUID, key string, in
 			shipping = homeShippingFee
 		}
 		o = Order{
-			Code: newCode(), Status: "pending", PaymentMethod: "cod", DeliveryMethod: in.DeliveryMethod,
+			Code: refcode.New("AL-"), Status: "pending", PaymentMethod: "cod", DeliveryMethod: in.DeliveryMethod,
 			RecipientName: in.RecipientName, Phone: in.Phone, FlightCode: nilIfEmpty(in.FlightCode),
 			FlightDate: nilIfEmpty(in.FlightDate), Address: nilIfEmpty(in.Address), Note: in.Note,
 			Subtotal: c.Subtotal, ShippingFee: shipping, Total: c.Subtotal + shipping,
@@ -464,17 +462,6 @@ func validate(in CheckoutInput) (CheckoutInput, error) {
 
 func hasProblem(c cart.Cart) bool {
 	return slices.ContainsFunc(c.Lines, func(l cart.Line) bool { return l.Problem != "" })
-}
-
-// newCode: "AL-" + 8 ký tự ngẫu nhiên (31^8 ≈ 850 tỉ mã). Trùng mã thì CreateOrder lỗi UNIQUE và
-// khách bấm đặt lại; xác suất quá nhỏ để đáng viết vòng lặp thử lại.
-func newCode() string {
-	b := make([]byte, codeLength)
-	_, _ = rand.Read(b) // crypto/rand.Read không trả lỗi trên Linux (Go ≥ 1.24 panic nếu hỏng)
-	for i := range b {
-		b[i] = codeAlphabet[int(b[i])%len(codeAlphabet)]
-	}
-	return "AL-" + string(b)
 }
 
 func nilIfEmpty(s string) *string {

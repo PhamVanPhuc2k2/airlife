@@ -15,6 +15,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/booking"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
@@ -85,6 +86,7 @@ func run() error {
 	var wg sync.WaitGroup
 	jobErr := make(chan error, 1)
 	wg.Go(func() { flushViewsLoop(loopCtx, log, mediaSvc) })
+	wg.Go(func() { expireBookingsLoop(loopCtx, log, booking.NewService(pool)) })
 	wg.Go(func() {
 		// prefetch 5: mỗi lúc xử lý tối đa 5 thư chưa xong
 		if err := queue.Consume(loopCtx, mq, mail.Queue, 5, log, mail.Handle(smtp)); err != nil {
@@ -139,6 +141,29 @@ func flushViewsLoop(ctx context.Context, log *slog.Logger, svc *media.Service) {
 			return
 		case <-ticker.C:
 			flush(ctx)
+		}
+	}
+}
+
+// expireBookingsLoop: 30 giây một lần, huỷ các đơn giữ chỗ quá hạn và trả ghế (Phần 08).
+// Đơn quá hạn mà vòng này chưa kịp xử lý thì API vẫn coi là hết hạn (booking.Get), nên khách không
+// thấy đơn "còn giữ" quá 20 phút; chỉ có ghế được trả muộn tối đa 30 giây.
+func expireBookingsLoop(ctx context.Context, log *slog.Logger, svc *booking.Service) {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			n, err := svc.ExpireDue(ctx)
+			if err != nil {
+				log.ErrorContext(ctx, "trả ghế đơn quá hạn lỗi", "err", err)
+				continue
+			}
+			if n > 0 {
+				log.InfoContext(ctx, "đã trả ghế đơn giữ chỗ quá hạn", "dong_ghe", n)
+			}
 		}
 	}
 }

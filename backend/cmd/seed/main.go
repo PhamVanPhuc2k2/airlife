@@ -108,6 +108,13 @@ type seedData struct {
 			OldPrice *int64 `json:"old_price"`
 			Stock    int32  `json:"stock"`
 		} `json:"variants"`
+		Booking *struct {
+			Fares       []seedFare `json:"fares"`
+			FirstInDays int        `json:"first_in_days"` // chuyến đầu sau mấy ngày (tính từ hôm chạy seed)
+			EveryDays   int        `json:"every_days"`    // mấy ngày một chuyến
+			TripDays    int        `json:"trip_days"`     // số ngày chuyến đi; 0 = vé một chiều (không có ngày về)
+			Count       int        `json:"count"`         // số chuyến
+		} `json:"booking"`
 	} `json:"products"`
 	Users []struct {
 		Key         string `json:"key"`
@@ -122,6 +129,16 @@ type seedData struct {
 		Likes    int32   `json:"likes"`
 		HoursAgo float64 `json:"hours_ago"`
 	} `json:"comments"`
+}
+
+// seedFare: một hạng dịch vụ của vé, tour, kèm số chỗ mỗi chuyến (Phần 08)
+type seedFare struct {
+	Code        string `json:"code"`
+	Label       string `json:"label"`
+	Description string `json:"description"`
+	AdultPrice  int64  `json:"adult_price"`
+	ChildPrice  int64  `json:"child_price"`
+	Capacity    int32  `json:"capacity"`
 }
 
 // Id cố định cho bình luận mẫu: uuid v5 sinh từ khoá ("c1", "r2"…). Cùng khoá luôn ra cùng id,
@@ -287,6 +304,12 @@ func seedProducts(ctx context.Context, q *db.Queries, data seedData, channelIDs 
 				return fmt.Errorf("biến thể %s/%s: %w", p.Slug, v.Label, err)
 			}
 		}
+		if p.Booking != nil {
+			if err := seedDepartures(ctx, q, id, p.Booking.Fares, p.Booking.FirstInDays,
+				p.Booking.EveryDays, p.Booking.TripDays, p.Booking.Count, now); err != nil {
+				return fmt.Errorf("lịch khởi hành %s: %w", p.Slug, err)
+			}
+		}
 		for i, slug := range p.Media {
 			mediaID, err := q.GetMediaIDBySlug(ctx, slug)
 			if err != nil {
@@ -294,6 +317,48 @@ func seedProducts(ctx context.Context, q *db.Queries, data seedData, channelIDs 
 			}
 			if err := q.UpsertMediaProduct(ctx, db.UpsertMediaProductParams{
 				MediaID: mediaID, ProductID: id, SortOrder: int16(i), //nolint:gosec // như trên
+			}); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// seedDepartures nạp hạng dịch vụ và lịch khởi hành của vé, tour (Phần 08). Ngày khởi hành tính
+// từ hôm chạy seed; chạy lại vào hôm khác thì thêm ngày mới, ngày cũ (và số chỗ đã giữ) giữ nguyên.
+func seedDepartures(
+	ctx context.Context, q *db.Queries, productID uuid.UUID, fares []seedFare,
+	firstInDays, everyDays, tripDays, count int, now time.Time,
+) error {
+	fareIDs := make([]uuid.UUID, len(fares))
+	for i, f := range fares {
+		id, err := q.UpsertProductFare(ctx, db.UpsertProductFareParams{
+			ProductID: productID, Code: f.Code, Label: f.Label, Description: f.Description,
+			AdultPrice: f.AdultPrice, ChildPrice: f.ChildPrice, SortOrder: int16(i), //nolint:gosec // vài hạng
+		})
+		if err != nil {
+			return err
+		}
+		fareIDs[i] = id
+	}
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	for n := range count {
+		depart := today.AddDate(0, 0, firstInDays+n*everyDays)
+		var ret *time.Time
+		if tripDays > 0 {
+			r := depart.AddDate(0, 0, tripDays)
+			ret = &r
+		}
+		depID, err := q.UpsertDeparture(ctx, db.UpsertDepartureParams{
+			ProductID: productID, DepartDate: depart, ReturnDate: ret,
+		})
+		if err != nil {
+			return err
+		}
+		for i, f := range fares {
+			if err := q.UpsertDepartureSeats(ctx, db.UpsertDepartureSeatsParams{
+				DepartureID: depID, FareID: fareIDs[i], Capacity: f.Capacity,
 			}); err != nil {
 				return err
 			}

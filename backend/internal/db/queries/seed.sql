@@ -93,3 +93,23 @@ SET label = EXCLUDED.label, price = EXCLUDED.price, old_price = EXCLUDED.old_pri
 INSERT INTO media_products (media_id, product_id, sort_order)
 VALUES ($1, $2, $3)
 ON CONFLICT (media_id, product_id) DO UPDATE SET sort_order = EXCLUDED.sort_order;
+
+-- name: UpsertProductFare :one
+INSERT INTO product_fares (product_id, code, label, description, adult_price, child_price, sort_order)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (product_id, code) DO UPDATE
+SET label = EXCLUDED.label, description = EXCLUDED.description, adult_price = EXCLUDED.adult_price,
+    child_price = EXCLUDED.child_price, sort_order = EXCLUDED.sort_order
+RETURNING id;
+
+-- Lịch khởi hành mẫu: đã có thì giữ nguyên (không đụng số chỗ đã giữ khi thử)
+-- name: UpsertDeparture :one
+INSERT INTO departures (product_id, depart_date, return_date)
+VALUES ($1, $2, $3)
+ON CONFLICT (product_id, depart_date) DO UPDATE SET return_date = EXCLUDED.return_date
+RETURNING id;
+
+-- name: UpsertDepartureSeats :exec
+INSERT INTO departure_seats (departure_id, fare_id, capacity)
+VALUES ($1, $2, $3)
+ON CONFLICT (departure_id, fare_id) DO NOTHING;

@@ -5,6 +5,7 @@ import { ContinueWatching } from "@/components/account/ContinueWatching";
 import { FollowingChannels } from "@/components/account/FollowingChannels";
 import { LibraryStats } from "@/components/account/LibraryStats";
 import { ProfileCard } from "@/components/account/ProfileCard";
+import { BookingList } from "@/components/booking/BookingList";
 import { OrderList } from "@/components/shop/OrderList";
 
 export const metadata: Metadata = { title: "Bạn", robots: { index: false } };
@@ -28,6 +29,17 @@ export default function Page() {
           </Link>
         </div>
         <OrderList limit={3} />
+      </section>
+      <section aria-labelledby="dat-cho">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 id="dat-cho" className="text-xl font-bold">
+            Vé và tour đã đặt
+          </h2>
+          <Link href="/dat-cho" className="text-sm font-semibold text-brand-700">
+            Xem tất cả
+          </Link>
+        </div>
+        <BookingList limit={3} />
       </section>
       <ContinueWatching />
       <FollowingChannels />

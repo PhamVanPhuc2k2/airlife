@@ -10,6 +10,40 @@ import (
 	"github.com/google/uuid"
 )
 
+type Booking struct {
+	ID             uuid.UUID
+	Code           string
+	UserID         uuid.UUID
+	DepartureID    uuid.UUID
+	FareID         uuid.UUID
+	Status         string
+	ExpiresAt      time.Time
+	Adults         int16
+	Children       int16
+	ProductSlug    string
+	ProductName    string
+	FareLabel      string
+	DepartDate     time.Time
+	ReturnDate     *time.Time
+	AdultPrice     int64
+	ChildPrice     int64
+	Total          int64
+	ContactName    *string
+	ContactPhone   *string
+	ContactEmail   *string
+	IdempotencyKey string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+type BookingPassenger struct {
+	BookingID uuid.UUID
+	Position  int16
+	Kind      string
+	FullName  string
+	BirthDate time.Time
+}
+
 type CartItem struct {
 	UserID    uuid.UUID
 	VariantID uuid.UUID
@@ -71,6 +105,21 @@ type CommentLike struct {
 	CommentID uuid.UUID
 	UserID    uuid.UUID
 	CreatedAt time.Time
+}
+
+type Departure struct {
+	ID         uuid.UUID
+	ProductID  uuid.UUID
+	DepartDate time.Time
+	ReturnDate *time.Time
+	Status     string
+}
+
+type DepartureSeat struct {
+	DepartureID uuid.UUID
+	FareID      uuid.UUID
+	Capacity    int32
+	Taken       int32
 }
 
 type Favorite struct {
@@ -203,6 +252,17 @@ type Product struct {
 	PublishedAt     time.Time
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+}
+
+type ProductFare struct {
+	ID          uuid.UUID
+	ProductID   uuid.UUID
+	Code        string
+	Label       string
+	Description string
+	AdultPrice  int64
+	ChildPrice  int64
+	SortOrder   int16
 }
 
 type ProductVariant struct {

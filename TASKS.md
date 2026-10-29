@@ -151,7 +151,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] `channels` (loại kênh, `verified`, `followers_count`) + `channel_followers` (khoá chính ghép, Phần 05)
 - [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
 - [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); ✓ `media_products` (Phần 07)
-- [ ] ✓ `products` (`kind` goods/booking, chuyên mục + chip lọc, giá "từ", giá cũ, rating, đã bán, cách nhận hàng) + `product_variants` (MỘT thuộc tính: nhãn, giá, tồn kho; chốt với khách 29/10/2026) (Phần 07); còn lịch khởi hành, hạng dịch vụ cho vé & tour (Phần 08)
+- [ ] ✓ `products` (`kind` goods/booking, chuyên mục + chip lọc, giá "từ", giá cũ, rating, đã bán, cách nhận hàng) + `product_variants` (MỘT thuộc tính: nhãn, giá, tồn kho; chốt với khách 29/10/2026) (Phần 07); ✓ `product_fares` (hạng dịch vụ, giá trẻ em), `departures` + `departure_seats` (sức chứa/đã lấy, CHECK không bán quá), `bookings` + `booking_passengers` (Phần 08)
 - [ ] ✓ `cart_items` (không cần bảng `carts`: mỗi người một giỏ), `orders` (mã AL-…, idempotency key, CHECK theo cách nhận hàng), `order_items` (snapshot tên/giá) (Phần 07); còn `payments` (Phần 09)
 - [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
@@ -175,7 +175,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] **Categories**: danh sách, chi tiết kèm chip lọc (cache Redis 10 phút)
 - [ ] **Media**: ✓ danh sách (lọc chuyên mục/chip/line-up, sắp mới/xem nhiều, phân trang con trỏ), chi tiết, gợi ý liên quan, lượt xem (Redis + worker, mỗi IP 1 lượt/30 phút); còn lưu tiến độ xem (cần đăng nhập)
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
-- [ ] **Products**: ✓ danh sách (chuyên mục, chip, kênh; mới nhất / bán chạy; phân trang con trỏ), chi tiết (biến thể, video có sản phẩm, gợi ý), sản phẩm trong video, yêu thích (Phần 07); còn lịch khởi hành cho vé & tour (Phần 08), đánh giá sản phẩm thật (hiện rating là số mẫu)
+- [ ] **Products**: ✓ danh sách (chuyên mục, chip, kênh; mới nhất / bán chạy; phân trang con trỏ), chi tiết (biến thể, video có sản phẩm, gợi ý), sản phẩm trong video, yêu thích (Phần 07); ✓ lịch khởi hành, số chỗ (`/products/{slug}/departures`), giữ chỗ 20 phút, hành khách, huỷ (Phần 08); còn em bé dưới 2 tuổi, giá theo mùa/ngày cao điểm; đánh giá sản phẩm thật (hiện rating là số mẫu)
 - [x] **Cart & Orders**: giỏ (khách: preview, gộp khi đăng nhập bằng GREATEST), đặt hàng COD (trừ kho có điều kiện, idempotency key, bắt xác minh email, 10 đơn/giờ), lịch sử, huỷ đơn chờ xác nhận (trả kho) (Phần 07). Chuyển trạng thái confirmed/delivering/completed ở trang quản trị (Phần 12)
 - [ ] **Payment**: tích hợp cổng VNPay/MoMo/ZaloPay, webhook IPN, đối soát
 - [x] **Channels**: chi tiết kênh, nội dung của kênh (`/media?channel=`), theo dõi/bỏ theo dõi (transaction, bấm 2 lần chỉ tính 1), `/me/following`
@@ -200,12 +200,13 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Counter lượt xem (✓), lượt thích; flush về PostgreSQL theo lô (✓ lượt xem)
 - [ ] Session/refresh token, blacklist token khi logout
 - [ ] Rate limit theo IP/user
-- [ ] Lock phân tán khi giữ chỗ vé/tour
+- [x] ~~Lock phân tán khi giữ chỗ vé/tour~~ → giữ chỗ trong PostgreSQL (UPDATE có điều kiện + worker trả chỗ), chốt với khách 29/10/2026 (Phần 08). Mỗi người tối đa 2 đơn đang giữ
 
 ### 2.6 RabbitMQ & worker
 - [x] Hàng đợi job (`pkg/queue`): mỗi loại job có queue chính, `.retry` (chờ 30s rồi tự quay lại), `.dead` (lỗi quá 5 lần); publisher confirms; consumer ack thủ công, prefetch
 - [ ] Job gửi email (`internal/mail`, queue `email.send`): ✓ mẫu xác minh email, đặt lại mật khẩu (HTML + chữ thường); ✓ dev gửi qua SMTP vào **Mailpit** (thay MailHog đã ngừng phát triển từ 2020); ✓ mẫu xác nhận đơn hàng (Phần 07); còn gửi qua Resend ở production, logo ảnh trong thư
 - [ ] Job: kiểm tra định kỳ video YouTube còn hoạt động (bị xóa, chuyển riêng tư, chặn nhúng) → ẩn và báo admin
+- [x] Job: hết hạn đơn giữ chỗ quá 20 phút và trả chỗ, 30 giây/lần (worker, Phần 08)
 - [ ] Job: xử lý webhook thanh toán → cập nhật đơn → gửi thông báo
 - [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
 - [ ] Job: gửi notification khi kênh theo dõi có nội dung mới
@@ -275,12 +276,13 @@ Bảng dựa trên `data/content.json` của mockup:
 | `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ, số liệu, tiếp tục xem, kênh theo dõi; còn chuyến bay (Phần 10), đơn hàng (Phần 07) |
 | `suu-tap.html` | `/suu-tap`, `/suu-tap/playlist/[id]` | ✓ Tab Playlist, Đã lưu, Yêu thích, Đã xem; trang playlist |
 | `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận, Lưu, thêm vào playlist, xem tiếp từ chỗ dừng; còn sản phẩm gắn video |
-| `san-pham.html?id=` | `/san-pham/[slug]` | ✓ Hàng hoá: bộ ảnh, biến thể, số lượng, giỏ, yêu thích, JSON-LD (Phần 07); còn vé/tour chọn ngày, số khách (Phần 08) |
+| `san-pham.html?id=` | `/san-pham/[slug]` | ✓ Hàng hoá: bộ ảnh, biến thể, số lượng, giỏ, yêu thích, JSON-LD (Phần 07); ✓ vé/tour: chọn ngày, hạng, số khách, giữ chỗ (Phần 08) |
 | `kenh.html?id=` | `/kenh/[slug]` | ✓ Ảnh bìa, thông tin, theo dõi, lưới nội dung của kênh; còn tab sản phẩm của kênh doanh nghiệp (Phần 07) |
 | `lien-he.html` | `/lien-he` | Form liên hệ |
 | `tim-kiem.html?q=` | `/tim-kiem` | Kết quả gộp nhiều loại |
 | (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | ✓ `/dang-nhap`, `/dang-ky`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh-email` (react-hook-form + zod, lỗi theo từng ô, chống open redirect) |
 | (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang`, `/don-hang/[code]` | ✓ Giỏ, thanh toán COD, đơn hàng (Phần 07); thanh toán online Phần 09 |
+| (mới) | `/dat-cho`, `/dat-cho/[code]` | ✓ Đơn đặt vé, tour: đếm ngược giữ chỗ, hành khách, huỷ (Phần 08); thanh toán Phần 09 |
 
 - [ ] Làm lần lượt từng trang trên, mỗi trang: UI pixel-perfect theo mockup → nối API bằng TanStack Query → loading/error/empty state → responsive
 - [ ] Player: ✓ YouTube IFrame Player API, mini player điều khiển bằng icon Player Airlife (phát/dừng, tua 10s, tắt tiếng, thanh đường băng theo thời gian thật), ✓ gửi lượt xem khi bắt đầu phát; còn nhớ tiến độ xem (cần đăng nhập)

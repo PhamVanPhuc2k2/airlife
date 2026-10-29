@@ -16,5 +16,5 @@ export function proxy(request: NextRequest) {
 
 // Chỉ chạy cho các trang cần đăng nhập
 export const config = {
-  matcher: ["/ban/:path*", "/suu-tap/:path*", "/thanh-toan", "/don-hang/:path*"],
+  matcher: ["/ban/:path*", "/suu-tap/:path*", "/thanh-toan", "/don-hang/:path*", "/dat-cho/:path*"],
 };

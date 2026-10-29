@@ -18,6 +18,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/auth"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/booking"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/cart"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/category"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/channel"
@@ -109,6 +110,7 @@ func (s *Server) Handler() (http.Handler, error) {
 	productSvc := product.NewService(q)
 	productH := product.NewHandler(productSvc, s.deps.Log)
 	cartH := cart.NewHandler(cart.NewService(q), s.deps.Log)
+	bookingH := booking.NewHandler(booking.NewService(s.deps.DB), s.deps.Log)
 	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, productSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
@@ -178,6 +180,7 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/products/{slug}", productH.Get)
 		r.Get("/media/{slug}/products", productH.ByMedia)
 		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
+		r.Get("/products/{slug}/departures", bookingH.Availability)
 
 		// Thư viện cá nhân (trang Bạn, Sưu tập): mọi route đều cần đăng nhập
 		r.Route("/me", func(r chi.Router) {
@@ -218,6 +221,12 @@ func (s *Server) Handler() (http.Handler, error) {
 			r.Post("/orders", orderH.Checkout)
 			r.Get("/orders/{code}", orderH.Get)
 			r.Post("/orders/{code}/cancel", orderH.Cancel)
+
+			r.Get("/bookings", bookingH.List)
+			r.Post("/bookings", bookingH.Hold)
+			r.Get("/bookings/{code}", bookingH.Get)
+			r.Put("/bookings/{code}/details", bookingH.SetDetails)
+			r.Post("/bookings/{code}/cancel", bookingH.Cancel)
 		})
 
 		r.Get("/media/{slug}/comments", commentH.List("media"))

@@ -229,11 +229,25 @@ mục; đặt chỗ ở Phần 08.
 | [7.10](07-ban-hang/10-thanh-toan-va-don-hang.md) | Thanh toán và đơn hàng |
 | [7.11](07-ban-hang/11-gan-vao-trang-va-nghiem-thu.md) | Gắn bán hàng vào các trang có sẵn; nghiệm thu Phần 07 |
 
+### Phần 08: Vé và tour
+
+Vé bay, tour theo lịch khởi hành và hạng dịch vụ. Giữ chỗ 20 phút ngay trong PostgreSQL (lấy chỗ có điều
+kiện, không dùng khoá Redis), giới hạn đơn đang giữ, hành khách với họ tên không dấu và tuổi tính theo
+ngày khởi hành, worker trả chỗ khi hết hạn, trang giữ chỗ có đồng hồ đếm ngược.
+
+| Bài | Nội dung |
+|---|---|
+| [8.01](08-ve-va-tour/01-schema-va-lich-khoi-hanh.md) | Schema đặt vé, tour và lịch khởi hành mẫu |
+| [8.02](08-ve-va-tour/02-giu-cho.md) | Module đặt chỗ: lịch khởi hành, giữ chỗ 20 phút |
+| [8.03](08-ve-va-tour/03-hanh-khach-va-huy.md) | Hành khách, tên không dấu, tuổi theo ngày bay, huỷ đơn |
+| [8.04](08-ve-va-tour/04-tra-cho-va-thu-api.md) | Worker trả chỗ, nối route, thử toàn bộ API |
+| [8.05](08-ve-va-tour/05-frontend-chon-chuyen.md) | Frontend: chọn ngày, hạng, số khách |
+| [8.06](08-ve-va-tour/06-trang-giu-cho-va-nghiem-thu.md) | Trang giữ chỗ: đếm ngược, hành khách; nghiệm thu Phần 08 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 08 ve-va-tour | Lịch khởi hành, hạng dịch vụ, giữ chỗ bằng lock Redis |
 | 09 thanh-toan | Cổng thanh toán, webhook |
 | 10 tien-ich | Chuyến bay, thời tiết, Flightradar |
 | 11 y-kien | Trải nghiệm, khảo sát, góp ý, Turnstile |
