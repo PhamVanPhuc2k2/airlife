@@ -42,6 +42,8 @@ container, không cần cài lên máy.
 
 Cần trên máy: **Docker** + Docker Compose v2, **make**, **git**. Thêm **Go 1.27.3** để editor
 gợi ý code và để chạy `go build` kiểm tra nhanh ở các bài 0.03–0.09 (trước khi có Dockerfile).
+Node.js **không** cần trên máy: frontend cài gói và chạy trong container Node 24.22.1.
+**Đừng** chạy `npm install` trên máy (xem bài 1.02).
 
 ```bash
 docker --version && docker compose version && make --version && git --version && go version
@@ -101,11 +103,20 @@ thống trong Docker; `/readyz` báo đủ ba dịch vụ; `make migrate`, `make
 | [0.11](00-nen-mong/11-lint-vuln-makefile.md) | golangci-lint, govulncheck, Makefile |
 | [0.12](00-nen-mong/12-migration-dau-tien.md) | Migration đầu tiên: tìm kiếm tiếng Việt không dấu |
 
+### Phần 01: Thương hiệu và giao diện (đang viết)
+
+Logo Airlife, khung Next.js chạy trong Docker, theme Tailwind, layout chung (header, menu, footer, mini player).
+
+| Bài | Nội dung |
+|---|---|
+| [1.01](01-thuong-hieu-va-giao-dien/01-logo-va-favicon.md) | Logo Airlife và favicon |
+| [1.02](01-thuong-hieu-va-giao-dien/02-khung-nextjs-trong-docker.md) | Khung Next.js chạy trong Docker |
+| [1.03](01-thuong-hieu-va-giao-dien/03-theme-tailwind-va-font.md) | Theme Tailwind và font Be Vietnam Pro |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 01 thuong-hieu-va-giao-dien | Logo Airlife, theme Tailwind, khung Next.js, layout chung (header, menu, footer, mini player) |
 | 02 noi-dung-xem-nghe | Danh mục, media từ YouTube, Player, lượt xem |
 | 03 tin-tuc-va-line-up | Tin tức, line-up phim theo tháng |
 | 04 kenh-va-binh-luan | Kênh, theo dõi, bình luận |

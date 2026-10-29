@@ -1,6 +1,6 @@
 # Bài 0.12: Migration đầu tiên: tìm kiếm tiếng Việt không dấu
 
-> [← Bài trước](11-lint-vuln-makefile.md) · [Mục lục](../README.md)
+> [← Bài trước](11-lint-vuln-makefile.md) · [Mục lục](../README.md) · [Phần 01 →](../01-thuong-hieu-va-giao-dien/01-logo-va-favicon.md)
 
 ## Mục tiêu
 

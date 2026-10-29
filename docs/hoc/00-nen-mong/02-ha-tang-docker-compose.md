@@ -142,6 +142,7 @@ RABBITMQ_PASSWORD=airlife
 RABBITMQ_UI_PORT=15672
 
 API_PORT=8080
+FRONTEND_PORT=3000
 ```
 
 Docker Compose tự đọc file `.env` nằm **cùng thư mục** với `docker-compose.yml`. Muốn đổi thì

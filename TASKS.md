@@ -43,9 +43,9 @@ airlife/
 ## Giai đoạn 1: Chuẩn bị & thiết kế hệ thống
 
 ### 1.1 Brand & tài sản
-- [ ] Xuất logo từ `Brand Airlife.pdf` ra SVG (bản ngang, bản chỉ icon máy bay, bản trên nền tối, bản đơn sắc), PNG cho OG image
-- [ ] Tạo favicon (`.ico`, `icon.svg`, `apple-touch-icon.png`) từ icon cánh máy bay
-- [ ] Xác nhận bản quyền font FS Magistral cho web (woff2); nếu không có, chọn font thay thế cho body (Be Vietnam Pro như mockup) và chỉ dùng FS Magistral cho logo/heading
+- [x] Xuất logo từ `Brand Airlife.pdf` ra SVG (tách lệnh vẽ vector trong PDF): `frontend/public/brand/` có logo đầy đủ, wordmark (không slogan), biểu tượng; mỗi loại có bản nền tối. Ảnh Open Graph 1200×630
+- [x] Favicon `favicon.ico` (16/32/48), `icon.svg`, `apple-icon.png` 180×180 trong `frontend/src/app/` (Next.js tự nhận)
+- [x] Font web: **Be Vietnam Pro** (chốt, chưa có bản quyền FS Magistral cho web). Logo vẫn đúng font gốc vì chữ trong logo đã là nét vẽ
 - [ ] Đổi toàn bộ bảng màu mockup (xanh sky/indigo + cam san hô) sang bảng màu Airlife: tím `#6C3C8B` làm primary, gradient cam làm accent (giá, CTA mua hàng, thanh Player)
 - [ ] Sinh thang màu `brand-50…900` từ `#6C3C8B` và `accent-50…900` từ `#F8AC3F`, kiểm tra tương phản WCAG AA cho chữ trên nền
 - [ ] Thay mọi chữ "SKYLINE"/"Skyline Media"/`skyline.vn` trong nội dung mẫu thành Airlife
@@ -80,8 +80,8 @@ airlife/
 | PostgreSQL | bản vá mới nhất của **18.x** | Không dùng 19 (mới RC); 14.x hết hỗ trợ 12/11/2026 |
 | Redis, RabbitMQ | bản ổn định mới nhất | Kiểm tra trang security advisory trước khi chốt |
 
-- [ ] Cố định phiên bản: `.nvmrc` + `"engines"` trong `package.json`; dòng `go` và `toolchain` trong `go.mod` (✓ backend xong); commit lockfile (`package-lock.json`/`pnpm-lock.yaml`, `go.sum`)
-- [ ] Docker image ghi rõ phiên bản patch (vd. `node:24.22.1-alpine`, `golang:1.27.3`, `postgres:18.x`), không dùng tag `latest`
+- [x] Cố định phiên bản: `.nvmrc` + `"engines"` trong `package.json`, `--save-exact` cho mọi gói npm; dòng `go` và `toolchain` trong `go.mod`; commit lockfile (`package-lock.json`, `go.sum`)
+- [x] Docker image ghi rõ phiên bản patch (`node:24.22.1-alpine3.23`, `golang:1.27.3-alpine3.23`, `postgres:18.6-alpine`, `redis:8.10.3-alpine`, `rabbitmq:4.4.0-management-alpine`, `migrate/migrate:v4.20.1`), không dùng tag `latest`
 - [ ] CI chạy `npm audit --audit-level=high` và `govulncheck ./...`; build fail nếu có lỗ hổng mức high/critical
 - [ ] Bật Dependabot hoặc Renovate để tự tạo PR khi có bản vá mới
 - [ ] Đăng ký theo dõi thông báo bảo mật: nodejs.org security, Next.js GitHub advisories, golang-announce, PostgreSQL security
@@ -226,15 +226,15 @@ Bảng dựa trên `data/content.json` của mockup:
 ## Giai đoạn 3: Frontend (Next.js)
 
 ### 3.1 Khởi tạo
-- [ ] `create-next-app` (TypeScript, App Router, ESLint), cài `tailwindcss@3.4.17`, `postcss`, `autoprefixer`
+- [x] Dựng Next.js 16.4.3 bằng tay (không dùng `create-next-app` vì nó cài Tailwind v4): React 19.3.1, TypeScript 5.9.3, ESLint 9 + `eslint-config-next`, `tailwindcss@3.4.17`, `postcss`, `autoprefixer`. Chạy trong Docker (`frontend/Dockerfile` target `dev`/`runner`, service `frontend` ở cổng 3000)
 - [ ] Cài `zustand`, `@tanstack/react-query`, `@tanstack/react-query-devtools`
 - [ ] Cài Radix UI primitives (dropdown-menu, dialog, tabs, popover, tooltip, slider, toast) và `@marsidev/react-turnstile`
-- [ ] Prettier + `prettier-plugin-tailwindcss`
-- [ ] `tailwind.config.ts`: chuyển `skyline/scss/_variables.scss` sang theme Airlife (màu brand tím, accent gradient cam, `surface`, `ink`, `muted`, radius 16/10, shadow sm/md/lg/brand, breakpoints 400/767/992/1024/1280/1536, kích thước header 64, topnav 52, sidebar 232/76, tabbar 62, player 68)
-- [ ] Font qua `next/font` (FS Magistral local + Be Vietnam Pro)
+- [x] Prettier + `prettier-plugin-tailwindcss`
+- [x] `tailwind.config.ts`: theme Airlife từ `skyline/scss/_variables.scss` (thang màu brand tím / accent cam 50–950 đã kiểm tra tương phản WCAG, surface, ink, overlay, runway; radius card 16/10; shadow sm/md/lg/brand; gradient brand/accent/hero/glow; screens xs 400 + mặc định; spacing header/topnav/sidebar/tabbar/player)
+- [x] Font qua `next/font/google` (Be Vietnam Pro, subset vietnamese, tự host)
 - [ ] i18n VI/EN (`next-intl`), route `/[locale]/...`, nút chuyển ngôn ngữ như site cũ
 - [ ] API client (`fetch` wrapper có refresh token tự động), `QueryClientProvider`, hydrate dữ liệu SSR
-- [ ] Biến môi trường, `next.config` cho domain ảnh (custom domain R2, `i.ytimg.com`)
+- [ ] Biến môi trường (✓ `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`), `next.config` cho domain ảnh (✓ `i.ytimg.com`; còn custom domain R2)
 
 ### 3.2 Store Zustand
 - [ ] `useAuthStore`: user hiện tại, trạng thái đăng nhập

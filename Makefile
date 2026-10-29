@@ -1,13 +1,16 @@
 # Lệnh tắt cho dev. Mọi thứ chạy trong Docker, máy chỉ cần Docker + make.
 # Chạy từ gốc repo: make <lệnh>. Xem danh sách: make help
 
-COMPOSE     := docker compose
+COMPOSE      := docker compose
+# Chạy lệnh npm trong container frontend mới.
+FRONTEND_RUN := $(COMPOSE) run --rm --no-deps frontend
 # Chạy một lệnh trong container api mới (không cần api đang chạy, không kéo theo DB).
-BACKEND_RUN := $(COMPOSE) run --rm --no-deps api
-GOLANGCI    := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
-GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
+BACKEND_RUN  := $(COMPOSE) run --rm --no-deps api
+GOLANGCI     := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
+GOVULNCHECK  := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 
-.PHONY: help up down restart logs ps psql migrate migrate-down migrate-new lint fmt vuln tidy
+.PHONY: help up down restart logs ps psql migrate migrate-down migrate-new lint fmt vuln tidy \
+        npm fe-lint fe-typecheck fe-format fe-audit
 
 help: ## Liệt kê các lệnh
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-14s %s\n", $$1, $$2}'
@@ -51,3 +54,18 @@ vuln: ## Quét lỗ hổng bảo mật trong code Go và thư viện
 
 tidy: ## go mod tidy (sau khi thêm/bớt import)
 	$(BACKEND_RUN) go mod tidy
+
+npm: ## Chạy lệnh npm cho frontend: make npm c="install --save-exact zustand@5.0.16"
+	$(FRONTEND_RUN) npm $(c)
+
+fe-lint: ## ESLint cho frontend
+	$(FRONTEND_RUN) npm run lint
+
+fe-typecheck: ## Kiểm tra kiểu TypeScript cho frontend
+	$(FRONTEND_RUN) npm run typecheck
+
+fe-format: ## Prettier: định dạng code frontend (sắp xếp class Tailwind)
+	$(FRONTEND_RUN) npm run format
+
+fe-audit: ## Quét lỗ hổng các gói npm (mức high trở lên)
+	$(FRONTEND_RUN) npm audit --audit-level=high
