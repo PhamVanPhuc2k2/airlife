@@ -1,0 +1,130 @@
+# Môi trường dev: mọi thứ chạy trong Docker.
+#   make up      → chạy hết (hạ tầng + api + worker), api ở http://localhost:8080
+#   make logs    → xem log
+#   make down    → tắt
+#
+# api và worker chạy bằng air bên trong container, code mount từ ./backend vào:
+# sửa file .go trên máy là container tự build và chạy lại.
+#
+# Mật khẩu, cổng: đọc từ file .env ở gốc repo (Compose tự đọc), không có thì dùng mặc định.
+name: airlife
+
+x-backend: &backend
+  build:
+    context: ./backend
+    target: dev
+  # Chạy bằng UID/GID của bạn để file sinh ra trong backend/tmp không thuộc root.
+  user: "${UID:-1000}:${GID:-1000}"
+  restart: unless-stopped
+  volumes:
+    - ./backend:/app
+    - go-mod:/go/pkg/mod # thư viện Go đã tải, giữ lại giữa các lần chạy
+    - go-cache:/go/cache # cache build, lần sau build nhanh hơn
+  # backend/.env được mount vào /app/.env cùng với code, viper tự đọc lúc khởi động
+  # (sửa xong: make restart s=api). Không dùng env_file: biến nạp kiểu đó chỉ cập nhật khi
+  # tạo lại container, và lại đè lên giá trị mới trong file, rất dễ nhầm.
+  #
+  # Địa chỉ hạ tầng đặt ở đây (không đặt trong backend/.env) để luôn khớp với mật khẩu
+  # của các service bên dưới. Trong mạng Docker, gọi nhau bằng tên service: postgres, redis…
+  environment:
+    POSTGRES_URL: postgres://${POSTGRES_USER:-airlife}:${POSTGRES_PASSWORD:-airlife}@postgres:5432/${POSTGRES_DB:-airlife}?sslmode=disable
+    REDIS_ADDR: redis:6379
+    REDIS_PASSWORD: ${REDIS_PASSWORD:-airlife}
+    RABBITMQ_URL: amqp://${RABBITMQ_USER:-airlife}:${RABBITMQ_PASSWORD:-airlife}@rabbitmq:5672/
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+
+services:
+  api:
+    <<: *backend
+    command: ["air", "-c", ".air.api.toml"]
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 30 # lần đầu air phải build, có thể mất gần một phút
+      start_period: 10s
+
+  worker:
+    <<: *backend
+    command: ["air", "-c", ".air.worker.toml"]
+
+  # Chạy migration: make migrate. profiles: ["tools"] để `docker compose up` không tự chạy nó.
+  migrate:
+    image: migrate/migrate:v4.20.1
+    profiles: ["tools"]
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./backend/migrations:/migrations
+    entrypoint:
+      - migrate
+      - -path=/migrations
+      - -database=postgres://${POSTGRES_USER:-airlife}:${POSTGRES_PASSWORD:-airlife}@postgres:5432/${POSTGRES_DB:-airlife}?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airlife}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airlife}
+      POSTGRES_DB: ${POSTGRES_DB:-airlife}
+    # 127.0.0.1: chỉ máy bạn kết nối được (cho DBeaver, TablePlus…), máy khác trong mạng LAN thì không.
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Postgres 18 lưu dữ liệu theo thư mục con có số phiên bản, nên mount vào /var/lib/postgresql
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:8.10.3-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-airlife}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-airlife}
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a $${REDIS_PASSWORD} --no-auth-warning ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4.4.0-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-airlife}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-airlife}
+    ports:
+      - "127.0.0.1:${RABBITMQ_UI_PORT:-15672}:15672" # trang quản trị: http://localhost:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  go-mod:
+  go-cache:

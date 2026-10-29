@@ -1,0 +1,24 @@
+# Hot reload cho API: sửa file .go → air build lại và chạy lại.
+# Chạy: cd backend && air -c .air.api.toml
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/api ./cmd/api"
+  entrypoint = ["./tmp/api"]
+  include_ext = ["go"]
+  include_dir = ["cmd", "internal", "pkg"]
+  # Không theo dõi cmd/worker: sửa worker không cần build lại api.
+  exclude_dir = ["tmp", "migrations", "cmd/worker"]
+  # Chờ 500ms sau lần lưu cuối mới build, tránh build nhiều lần khi lưu hàng loạt file.
+  delay = 500
+  # Gửi SIGINT để api tắt êm (graceful shutdown) trước khi chạy bản mới.
+  send_interrupt = true
+  kill_delay = "5s"
+  stop_on_error = true
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = true

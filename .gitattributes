@@ -1,0 +1,21 @@
+# Mặc định: git tự chuẩn hoá xuống LF khi lưu vào repo.
+* text=auto eol=lf
+
+# File chạy trong container Linux: bắt buộc LF.
+# Dính CRLF (clone trên Windows) là gặp "exec format error" khi build Docker.
+*.sh   text eol=lf
+*.go   text eol=lf
+*.sql  text eol=lf
+Makefile text eol=lf
+
+# File nhị phân: không đụng vào.
+*.png  binary
+*.jpg  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.woff2 binary
+
+# File sinh tự động: GitHub thu gọn khi xem diff.
+go.sum            linguist-generated=true
+package-lock.json linguist-generated=true

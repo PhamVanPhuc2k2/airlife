@@ -1,0 +1,3 @@
+DROP FUNCTION IF EXISTS immutable_unaccent(text);
+DROP EXTENSION IF EXISTS pg_trgm;
+DROP EXTENSION IF EXISTS unaccent;

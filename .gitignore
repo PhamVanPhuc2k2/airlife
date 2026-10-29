@@ -1,0 +1,24 @@
+# Hệ điều hành / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Biến môi trường (chỉ commit file *.example)
+.env
+.env.*
+!.env.example
+
+# Backend
+backend/tmp/
+backend/bin/
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+*.tsbuildinfo
+
+# Log
+*.log

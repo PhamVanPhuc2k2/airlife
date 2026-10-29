@@ -1,0 +1,34 @@
+# Cấu hình golangci-lint v2 (định dạng v1 không dùng được với v2).
+# Chạy: cd backend && golangci-lint run ./...
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  # standard = errcheck, govet, ineffassign, staticcheck, unused
+  default: standard
+  enable:
+    - bodyclose      # quên đóng resp.Body khi gọi HTTP ra ngoài (YouTube, Resend…) → rò kết nối
+    - errorlint      # so sánh lỗi bằng == thay vì errors.Is/As → hỏng khi lỗi bị bọc
+    - gosec          # lỗi bảo mật: SQL ghép chuỗi, quyền file, random yếu…
+    - misspell
+    - noctx          # tạo HTTP request không có context → không huỷ được khi client ngắt
+    - revive
+    - rowserrcheck   # quên kiểm tra rows.Err() sau vòng lặp đọc DB
+    - sqlclosecheck  # quên đóng rows
+    - unconvert
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: true # không bắt buộc comment cho mọi hàm exported
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/PhamVanPhuc2k2/airlife/backend
