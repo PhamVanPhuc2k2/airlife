@@ -98,7 +98,7 @@ export const TOPNAV: TopNavItem[] = [
       { label: "Quốc tế", href: "/tour-bay?f=quoc-te", desc: "Nhật Bản, Hàn Quốc…" },
       {
         label: "Combo bay + khách sạn",
-        href: "/tour-bay?f=combo",
+        href: "/tour-bay?f=combo-bay-khach-san",
         desc: "Trọn gói, tự do lịch trình",
       },
     ],

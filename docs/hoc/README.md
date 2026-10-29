@@ -208,11 +208,31 @@ và trang chi tiết playlist.
 | [6.05](06-ban-va-suu-tap/05-trang-ban.md) | Trang Bạn: số liệu, tiếp tục xem, kênh đang theo dõi |
 | [6.06](06-ban-va-suu-tap/06-trang-suu-tap.md) | Trang Sưu tập và trang playlist; nghiệm thu Phần 06 |
 
+### Phần 07: Bán hàng
+
+Hàng hoá (miễn thuế, đặc sản, mua sắm, dịch vụ sân bay) có biến thể một thuộc tính, giá và tồn kho riêng.
+Giỏ hàng cho cả khách chưa đăng nhập (lưu trong trình duyệt, gộp khi đăng nhập), đặt hàng COD với trừ kho
+có điều kiện và khoá chống đặt trùng, email xác nhận, huỷ đơn trả hàng về kho. Vé bay, tour hiện trong danh
+mục; đặt chỗ ở Phần 08.
+
+| Bài | Nội dung |
+|---|---|
+| [7.01](07-ban-hang/01-schema-ban-hang.md) | Schema bán hàng: sản phẩm, biến thể, giỏ, đơn hàng |
+| [7.02](07-ban-hang/02-truy-van-va-du-lieu-mau.md) | Truy vấn sản phẩm, giỏ, đơn hàng và dữ liệu mẫu |
+| [7.03](07-ban-hang/03-module-san-pham.md) | Module sản phẩm: danh mục, trang sản phẩm, yêu thích |
+| [7.04](07-ban-hang/04-module-gio-hang.md) | Module giỏ hàng: giỏ của khách, giỏ trên server, gộp giỏ |
+| [7.05](07-ban-hang/05-module-dat-hang.md) | Module đặt hàng: trừ kho, chống đặt trùng, huỷ đơn |
+| [7.06](07-ban-hang/06-noi-route-va-thu-api.md) | Nối route, trang chủ, thử toàn bộ API bán hàng |
+| [7.07](07-ban-hang/07-frontend-danh-muc.md) | Frontend: thẻ sản phẩm, trang Kinh doanh và Tour bay |
+| [7.08](07-ban-hang/08-trang-san-pham.md) | Trang sản phẩm: ảnh, chọn biến thể, yêu thích, dữ liệu cho Google |
+| [7.09](07-ban-hang/09-gio-hang.md) | Giỏ hàng: giỏ trong trình duyệt, gộp khi đăng nhập |
+| [7.10](07-ban-hang/10-thanh-toan-va-don-hang.md) | Thanh toán và đơn hàng |
+| [7.11](07-ban-hang/11-gan-vao-trang-va-nghiem-thu.md) | Gắn bán hàng vào các trang có sẵn; nghiệm thu Phần 07 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 07 ban-hang | Sản phẩm, biến thể, giỏ hàng, đơn hàng |
 | 08 ve-va-tour | Lịch khởi hành, hạng dịch vụ, giữ chỗ bằng lock Redis |
 | 09 thanh-toan | Cổng thanh toán, webhook |
 | 10 tien-ich | Chuyến bay, thời tiết, Flightradar |

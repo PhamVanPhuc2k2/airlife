@@ -40,7 +40,8 @@ export async function ArticlePage({ slug }: { slug: string }) {
             src={article.cover_url}
             alt=""
             fill
-            priority
+            loading="eager"
+            fetchPriority="high"
             sizes="(min-width: 1024px) 900px, 100vw"
             className="object-cover"
           />

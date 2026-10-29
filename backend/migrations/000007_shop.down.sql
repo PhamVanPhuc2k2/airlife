@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cart_items;
+DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS media_products;
+DROP TABLE IF EXISTS product_variants;
+DROP TABLE IF EXISTS products;

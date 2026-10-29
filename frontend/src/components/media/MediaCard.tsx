@@ -14,12 +14,12 @@ import { mediaHref, viewWord } from "./links";
 // phải (vd. "Bỏ khỏi lịch sử"), do nơi dùng truyền vào.
 export function MediaCard({
   media,
-  priority = false,
+  eager = false,
   progress,
   action,
 }: {
   media: Media;
-  priority?: boolean;
+  eager?: boolean; // thẻ ở màn hình đầu: tải ảnh ngay, không chờ cuộn tới
   progress?: Progress;
   action?: React.ReactNode;
 }) {
@@ -33,7 +33,7 @@ export function MediaCard({
             src={media.thumbnail_url}
             alt=""
             fill
-            priority={priority}
+            loading={eager ? "eager" : "lazy"}
             // Trình duyệt chọn cỡ ảnh vừa đủ theo bề rộng thẻ trên từng màn hình
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-500 ease-brand group-hover:scale-105"

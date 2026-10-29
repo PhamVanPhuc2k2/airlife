@@ -24,20 +24,24 @@ const Queue = "email.send"
 const (
 	TemplateVerifyEmail   = "verify_email"
 	TemplateResetPassword = "reset_password"
+	TemplateOrderCreated  = "order_created"
 )
 
 // gosec G101 báo nhầm map này là "mật khẩu ghi cứng" vì có chữ "mật khẩu" trong tiêu đề email.
 var subjects = map[string]string{ //nolint:gosec // xem comment trên
 	TemplateVerifyEmail:   "Xác minh email tài khoản Airlife",
 	TemplateResetPassword: "Đặt lại mật khẩu Airlife",
+	TemplateOrderCreated:  "Airlife đã nhận đơn hàng của bạn",
 }
 
 // Job: nội dung đẩy vào hàng đợi. Chỉ chứa tên mẫu và dữ liệu, không chứa HTML: đổi giao diện
 // email chỉ cần sửa mẫu và khởi động lại worker, job đang chờ trong hàng đợi cũng dùng mẫu mới.
+// Data là map[string]any (không phải map[string]string) để truyền được danh sách, như các dòng của
+// đơn hàng: mẫu duyệt bằng {{range .items}}.
 type Job struct {
-	Template string            `json:"template"`
-	To       string            `json:"to"`
-	Data     map[string]string `json:"data"`
+	Template string         `json:"template"`
+	To       string         `json:"to"`
+	Data     map[string]any `json:"data"`
 }
 
 //go:embed templates/*

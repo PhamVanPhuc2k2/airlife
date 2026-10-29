@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { Icon } from "@/components/icons/Icon";
+import { useCart } from "@/lib/cart";
 import { useUIStore } from "@/stores/ui-store";
 
 import { AccountMenu } from "./AccountMenu";
@@ -61,9 +62,7 @@ export function Header() {
         <button type="button" className="icon-btn" aria-label="Thông báo">
           <Icon name="bell" className="size-[22px]" />
         </button>
-        <Link href="/gio-hang" className="icon-btn" aria-label="Giỏ hàng">
-          <Icon name="cart" className="size-[22px]" />
-        </Link>
+        <CartButton />
         <AccountMenu />
       </div>
     </header>
@@ -86,5 +85,28 @@ function LangSwitch() {
         EN
       </span>
     </div>
+  );
+}
+
+// Icon giỏ hàng kèm huy hiệu số món
+function CartButton() {
+  const { cart } = useCart();
+  const count = cart?.count ?? 0;
+  return (
+    <Link
+      href="/gio-hang"
+      className="icon-btn relative"
+      aria-label={count ? `Giỏ hàng, ${count} sản phẩm` : "Giỏ hàng"}
+    >
+      <Icon name="cart" className="size-[22px]" />
+      {count > 0 && (
+        <span
+          aria-hidden
+          className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent-600 px-1 text-[11px] font-bold leading-none text-white"
+        >
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
   );
 }

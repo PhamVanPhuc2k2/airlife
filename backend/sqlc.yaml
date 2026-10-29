@@ -38,3 +38,7 @@ sql:
             go_type:
               type: time.Time
               pointer: true
+          # numeric chỉ dùng cho điểm đánh giá (4,8 sao), đổi sang float64 cho dễ dùng.
+          # TIỀN KHÔNG dùng numeric/float: tiền là bigint (đồng), xem migrations/000007_shop.up.sql
+          - db_type: pg_catalog.numeric
+            go_type: float64

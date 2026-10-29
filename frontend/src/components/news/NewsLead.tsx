@@ -14,7 +14,8 @@ export function NewsLead({ news }: { news: NewsCard }) {
         src={news.cover_url}
         alt=""
         fill
-        priority
+        loading="eager"
+        fetchPriority="high"
         sizes="(min-width: 1280px) 80vw, 100vw"
         className="object-cover transition-transform duration-700 ease-brand group-hover:scale-[1.03]"
       />

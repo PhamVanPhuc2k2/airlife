@@ -161,6 +161,23 @@ func (q *Queries) UpsertMedia(ctx context.Context, arg UpsertMediaParams) error 
 	return err
 }
 
+const upsertMediaProduct = `-- name: UpsertMediaProduct :exec
+INSERT INTO media_products (media_id, product_id, sort_order)
+VALUES ($1, $2, $3)
+ON CONFLICT (media_id, product_id) DO UPDATE SET sort_order = EXCLUDED.sort_order
+`
+
+type UpsertMediaProductParams struct {
+	MediaID   uuid.UUID
+	ProductID uuid.UUID
+	SortOrder int16
+}
+
+func (q *Queries) UpsertMediaProduct(ctx context.Context, arg UpsertMediaProductParams) error {
+	_, err := q.db.Exec(ctx, upsertMediaProduct, arg.MediaID, arg.ProductID, arg.SortOrder)
+	return err
+}
+
 const upsertNews = `-- name: UpsertNews :exec
 INSERT INTO news (slug, category_slug, title, excerpt, body_html, cover_url, author, published_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -214,6 +231,98 @@ func (q *Queries) UpsertNewsCategory(ctx context.Context, arg UpsertNewsCategory
 		arg.Slug,
 		arg.Name,
 		arg.Description,
+		arg.SortOrder,
+	)
+	return err
+}
+
+const upsertProduct = `-- name: UpsertProduct :one
+INSERT INTO products (slug, kind, category_slug, tag, channel_id, name, description, body_html,
+                      image_url, gallery, price, old_price, delivery_methods, rating, rating_count,
+                      sold_count, published_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+ON CONFLICT (slug) DO UPDATE
+SET kind = EXCLUDED.kind, category_slug = EXCLUDED.category_slug, tag = EXCLUDED.tag,
+    channel_id = EXCLUDED.channel_id, name = EXCLUDED.name, description = EXCLUDED.description,
+    body_html = EXCLUDED.body_html, image_url = EXCLUDED.image_url, gallery = EXCLUDED.gallery,
+    price = EXCLUDED.price, old_price = EXCLUDED.old_price,
+    delivery_methods = EXCLUDED.delivery_methods, rating = EXCLUDED.rating,
+    rating_count = EXCLUDED.rating_count, updated_at = now()
+RETURNING id
+`
+
+type UpsertProductParams struct {
+	Slug            string
+	Kind            string
+	CategorySlug    string
+	Tag             string
+	ChannelID       uuid.UUID
+	Name            string
+	Description     string
+	BodyHtml        string
+	ImageUrl        string
+	Gallery         []string
+	Price           int64
+	OldPrice        *int64
+	DeliveryMethods []string
+	Rating          float64
+	RatingCount     int32
+	SoldCount       int32
+	PublishedAt     time.Time
+}
+
+func (q *Queries) UpsertProduct(ctx context.Context, arg UpsertProductParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, upsertProduct,
+		arg.Slug,
+		arg.Kind,
+		arg.CategorySlug,
+		arg.Tag,
+		arg.ChannelID,
+		arg.Name,
+		arg.Description,
+		arg.BodyHtml,
+		arg.ImageUrl,
+		arg.Gallery,
+		arg.Price,
+		arg.OldPrice,
+		arg.DeliveryMethods,
+		arg.Rating,
+		arg.RatingCount,
+		arg.SoldCount,
+		arg.PublishedAt,
+	)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const upsertProductVariant = `-- name: UpsertProductVariant :exec
+INSERT INTO product_variants (product_id, sku, label, price, old_price, stock, sort_order)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (sku) DO UPDATE
+SET label = EXCLUDED.label, price = EXCLUDED.price, old_price = EXCLUDED.old_price,
+    sort_order = EXCLUDED.sort_order
+`
+
+type UpsertProductVariantParams struct {
+	ProductID uuid.UUID
+	Sku       string
+	Label     string
+	Price     int64
+	OldPrice  *int64
+	Stock     int32
+	SortOrder int16
+}
+
+// Tồn kho chỉ đặt lần đầu: chạy seed lại không "nạp lại hàng" cho biến thể đã bán bớt khi thử.
+func (q *Queries) UpsertProductVariant(ctx context.Context, arg UpsertProductVariantParams) error {
+	_, err := q.db.Exec(ctx, upsertProductVariant,
+		arg.ProductID,
+		arg.Sku,
+		arg.Label,
+		arg.Price,
+		arg.OldPrice,
+		arg.Stock,
 		arg.SortOrder,
 	)
 	return err

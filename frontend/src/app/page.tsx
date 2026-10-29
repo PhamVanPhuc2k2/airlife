@@ -3,6 +3,7 @@ import { FeaturedHero } from "@/components/media/FeaturedHero";
 import { MediaCard } from "@/components/media/MediaCard";
 import { MediaTile } from "@/components/media/MediaTile";
 import { RankList } from "@/components/media/RankList";
+import { ProductMiniList } from "@/components/product/ProductMiniList";
 import { Panel } from "@/components/ui/Panel";
 import { api } from "@/lib/api";
 import type { Home } from "@/lib/types";
@@ -45,10 +46,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Hàng dưới của mockup: Nghe nhiều | Kinh doanh (Phần 07) | Tiện ích (Phần 10) */}
+      {/* Hàng dưới của mockup: Nghe nhiều | Kinh doanh | Tiện ích (Phần 10) */}
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel title="Nghe nhiều" icon="sound" moreHref="/nghe?sort=popular">
           <RankList items={home.top_listen} />
+        </Panel>
+        <Panel title="Kinh doanh" icon="briefcase" moreHref="/kinh-doanh?sort=bestseller">
+          <ProductMiniList items={home.shop} />
         </Panel>
       </section>
     </div>

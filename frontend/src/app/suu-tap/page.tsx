@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { FavoriteGrid } from "@/components/library/FavoriteGrid";
 import { LibraryGrid } from "@/components/library/LibraryGrid";
 import { PlaylistGrid } from "@/components/library/PlaylistGrid";
 import { PageHead } from "@/components/ui/PageHead";
@@ -7,10 +8,10 @@ import { TabLinks } from "@/components/ui/TabLinks";
 
 export const metadata: Metadata = { title: "Sưu tập", robots: { index: false } };
 
-// Tab "Yêu thích" (sản phẩm, tour) của mockup thêm ở Phần 07 khi có sản phẩm.
 const TABS = [
   { key: "playlist", label: "Playlist" },
   { key: "da-luu", label: "Đã lưu" },
+  { key: "yeu-thich", label: "Yêu thích" },
   { key: "da-xem", label: "Đã xem" },
 ] as const;
 
@@ -27,7 +28,7 @@ export default async function Page({ searchParams }: Props) {
       <PageHead
         icon="library"
         title="Sưu tập"
-        desc="Playlist của bạn, nội dung đã lưu để xem sau và lịch sử xem."
+        desc="Playlist của bạn, nội dung đã lưu để xem sau, sản phẩm và tour yêu thích, lịch sử xem."
       />
       <TabLinks
         label="Sưu tập"
@@ -39,6 +40,7 @@ export default async function Page({ searchParams }: Props) {
       />
       {tab === "playlist" && <PlaylistGrid />}
       {tab === "da-luu" && <LibraryGrid list="saved" />}
+      {tab === "yeu-thich" && <FavoriteGrid />}
       {tab === "da-xem" && <LibraryGrid list="history" />}
     </div>
   );

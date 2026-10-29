@@ -1,0 +1,12 @@
+Chào {{.name}},
+
+Airlife đã nhận đơn hàng {{.code}}. Bạn thanh toán khi nhận hàng ({{.delivery}}).
+{{range .items}}
+- {{.name}} ({{.label}}) × {{.quantity}}: {{.line_total}}{{end}}
+
+Phí giao hàng: {{.shipping}}
+Tổng cộng: {{.total}}
+
+Xem đơn hàng: {{.link}}
+
+Airlife – Đời sống hàng không

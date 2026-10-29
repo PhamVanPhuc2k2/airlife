@@ -48,7 +48,7 @@ func (s *Service) sendVerifyEmail(ctx context.Context, u User) error {
 	return s.mail.Publish(ctx, mail.Queue, mail.Job{
 		Template: mail.TemplateVerifyEmail,
 		To:       u.Email,
-		Data:     map[string]string{"name": u.DisplayName, "link": s.publicURL + "/xac-minh-email?token=" + token},
+		Data:     map[string]any{"name": u.DisplayName, "link": s.publicURL + "/xac-minh-email?token=" + token},
 	})
 }
 
@@ -110,7 +110,7 @@ func (s *Service) ForgotPassword(ctx context.Context, email, ip string) error {
 	return s.mail.Publish(ctx, mail.Queue, mail.Job{
 		Template: mail.TemplateResetPassword,
 		To:       row.Email,
-		Data:     map[string]string{"name": row.DisplayName, "link": s.publicURL + "/dat-lai-mat-khau?token=" + token},
+		Data:     map[string]any{"name": row.DisplayName, "link": s.publicURL + "/dat-lai-mat-khau?token=" + token},
 	})
 }
 

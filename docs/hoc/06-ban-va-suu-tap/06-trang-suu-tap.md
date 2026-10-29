@@ -1,6 +1,6 @@
 # Bài 6.06: Trang Sưu tập và trang playlist; nghiệm thu Phần 06
 
-> [← Bài trước](05-trang-ban.md) · [Mục lục](../README.md)
+> [← Bài trước](05-trang-ban.md) · [Mục lục](../README.md) · [Phần 07 →](../07-ban-hang/01-schema-ban-hang.md)
 
 ## Mục tiêu
 
@@ -616,7 +616,7 @@ Dọn tài khoản thử trong `make psql` như bài 6.02, rồi:
 git add . && git commit -m "Bạn và Sưu tập: lịch sử xem, đã lưu, playlist"
 ```
 
-Đến đây xong Phần 06.
+Đến đây xong Phần 06. Tiếp theo: [Phần 07 →](../07-ban-hang/01-schema-ban-hang.md)
 
 ## Hay gặp lỗi
 

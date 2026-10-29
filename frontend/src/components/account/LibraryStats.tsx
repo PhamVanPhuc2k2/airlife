@@ -16,7 +16,7 @@ export function LibraryStats() {
     { label: "Đang theo dõi", value: data?.following, href: "#kenh-theo-doi" },
     { label: "Đã lưu", value: data?.saved, href: "/suu-tap?tab=da-luu" },
     { label: "Playlist", value: data?.playlists, href: "/suu-tap" },
-    { label: "Đã xem", value: data?.watched, href: "/suu-tap?tab=da-xem" },
+    { label: "Đơn hàng", value: data?.orders, href: "/don-hang" },
   ];
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -18,6 +18,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/auth"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/cart"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/category"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/channel"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
@@ -28,6 +29,8 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/order"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
@@ -66,9 +69,11 @@ func (s *Server) Handler() (http.Handler, error) {
 	r.Use(requestLogger(s.deps.Log))
 	r.Use(recoverer(s.deps.Log))
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   s.deps.Config.HTTP.CORSOrigins,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Accept-Language"},
+		AllowedOrigins: s.deps.Config.HTTP.CORSOrigins,
+		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		// Idempotency-Key: chống đặt hàng trùng (Phần 07). Header lạ phải khai báo ở đây, không thì
+		// trình duyệt chặn request ngay ở bước preflight (OPTIONS).
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Accept-Language", "Idempotency-Key"},
 		AllowCredentials: true, // cần để trình duyệt gửi cookie refresh token
 		MaxAge:           300,
 	}))
@@ -101,7 +106,10 @@ func (s *Server) Handler() (http.Handler, error) {
 	commentSvc := comment.NewService(s.deps.DB, s.deps.Redis)
 	commentH := comment.NewHandler(commentSvc, s.deps.Log)
 	libraryH := library.NewHandler(library.NewService(s.deps.DB), s.deps.Log)
-	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, s.deps.Redis), s.deps.Log)
+	productSvc := product.NewService(q)
+	productH := product.NewHandler(productSvc, s.deps.Log)
+	cartH := cart.NewHandler(cart.NewService(q), s.deps.Log)
+	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, productSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
 	tokens := auth.NewTokenIssuer(authCfg.JWTSecret, authCfg.AccessTTL)
@@ -125,6 +133,8 @@ func (s *Server) Handler() (http.Handler, error) {
 		RefreshTTL: authCfg.RefreshTTL,
 	}, clientIP)
 	requireAuth := auth.RequireAuth(s.deps.Log)
+	orderH := order.NewHandler(order.NewService(s.deps.DB, s.deps.Redis, publisher,
+		s.deps.Config.App.PublicURL, s.deps.Log), s.deps.Log)
 	newsH := news.NewHandler(news.NewService(q, s.deps.Redis), s.deps.Log)
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -163,6 +173,12 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.With(requireAuth).Post("/channels/{slug}/follow", channelH.Follow)
 		r.With(requireAuth).Delete("/channels/{slug}/follow", channelH.Unfollow)
 
+		// Bán hàng (Phần 07)
+		r.Get("/products", productH.List)
+		r.Get("/products/{slug}", productH.Get)
+		r.Get("/media/{slug}/products", productH.ByMedia)
+		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
+
 		// Thư viện cá nhân (trang Bạn, Sưu tập): mọi route đều cần đăng nhập
 		r.Route("/me", func(r chi.Router) {
 			r.Use(requireAuth)
@@ -187,6 +203,21 @@ func (s *Server) Handler() (http.Handler, error) {
 			r.Delete("/playlists/{id}", libraryH.DeletePlaylist)
 			r.Put("/playlists/{id}/items/{slug}", libraryH.AddItem)
 			r.Delete("/playlists/{id}/items/{slug}", libraryH.RemoveItem)
+
+			r.Get("/products/{slug}", productH.State)
+			r.Get("/favorites", productH.Favorites)
+			r.Put("/favorites/{slug}", productH.AddFavorite)
+			r.Delete("/favorites/{slug}", productH.RemoveFavorite)
+
+			r.Get("/cart", cartH.Get)
+			r.Put("/cart/items/{variantID}", cartH.Set)
+			r.Delete("/cart/items/{variantID}", cartH.Remove)
+			r.Post("/cart/merge", cartH.Merge)
+
+			r.Get("/orders", orderH.List)
+			r.Post("/orders", orderH.Checkout)
+			r.Get("/orders/{code}", orderH.Get)
+			r.Post("/orders/{code}/cancel", orderH.Cancel)
 		})
 
 		r.Get("/media/{slug}/comments", commentH.List("media"))

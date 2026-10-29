@@ -58,3 +58,14 @@ export function formatDate(iso: string): string {
     year: "numeric",
   });
 }
+
+// 389000 → "389.000₫"
+export function formatPrice(n: number): string {
+  return `${n.toLocaleString("vi-VN")}₫`;
+}
+
+// Phần trăm giảm: giá 389.000, giá cũ 450.000 → 14
+export function discountPercent(price: number, oldPrice: number | null): number {
+  if (!oldPrice || oldPrice <= price) return 0;
+  return Math.round((1 - price / oldPrice) * 100);
+}

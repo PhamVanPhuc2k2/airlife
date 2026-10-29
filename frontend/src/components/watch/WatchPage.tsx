@@ -9,10 +9,11 @@ import { MediaActions } from "@/components/library/MediaActions";
 import { ResumeNote } from "@/components/library/ResumeNote";
 import { mediaHref, viewWord } from "@/components/media/links";
 import { PlayerSlot } from "@/components/player/PlayerSlot";
+import { ProductMiniList } from "@/components/product/ProductMiniList";
 import { Avatar } from "@/components/ui/Avatar";
 import { api } from "@/lib/api";
 import { compactNumber, durationLabel, timeAgo } from "@/lib/format";
-import type { MediaCard } from "@/lib/types";
+import type { MediaCard, ProductCard } from "@/lib/types";
 
 import { getMedia } from "./get-media";
 
@@ -22,7 +23,10 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
   // /nghe/<slug-của-phim> → chuyển về đúng /xem/<slug> (308), để mỗi nội dung chỉ có một URL
   if (media.category !== category) permanentRedirect(mediaHref(media));
 
-  const related = await api<MediaCard[]>(`/media/${encodeURIComponent(slug)}/related`);
+  const [related, products] = await Promise.all([
+    api<MediaCard[]>(`/media/${encodeURIComponent(slug)}/related`),
+    api<ProductCard[]>(`/media/${encodeURIComponent(slug)}/products`),
+  ]);
 
   return (
     <div className="mx-auto grid max-w-[1680px] gap-6 px-3 py-4 md:px-6 md:py-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -81,15 +85,24 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
         <CommentSection target={{ kind: "media", slug: media.slug }} />
       </div>
 
-      <aside aria-label="Có thể bạn thích">
-        <h2 className="mb-3 font-bold">Có thể bạn thích</h2>
-        <ul className="grid gap-3">
-          {related.map((m) => (
-            <li key={m.id}>
-              <RelatedItem media={m} />
-            </li>
-          ))}
-        </ul>
+      <aside aria-label="Có thể bạn thích" className="space-y-6">
+        {/* Sản phẩm gắn trong video (mockup: "Sản phẩm trong video") */}
+        {products.length > 0 && (
+          <section className="rounded-card bg-surface p-4 shadow-sm ring-1 ring-ink/[0.07]">
+            <h2 className="mb-3 font-bold">Sản phẩm trong video</h2>
+            <ProductMiniList items={products} />
+          </section>
+        )}
+        <div>
+          <h2 className="mb-3 font-bold">Có thể bạn thích</h2>
+          <ul className="grid gap-3">
+            {related.map((m) => (
+              <li key={m.id}>
+                <RelatedItem media={m} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </aside>
     </div>
   );

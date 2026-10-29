@@ -150,14 +150,14 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] `users` (email `citext` UNIQUE, mật khẩu argon2id, vai trò, trạng thái, `email_verified_at`). Phiên/refresh token lưu Redis (không cần bảng `user_sessions`)
 - [x] `channels` (loại kênh, `verified`, `followers_count`) + `channel_followers` (khoá chính ghép, Phần 05)
 - [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
-- [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); còn `media_products` (Phần 07)
-- [ ] `products` (`section`: vé bay / miễn thuế / mua sắm / đặc sản / dịch vụ sân bay / tour; giá, giá cũ, rating, đã bán) + `product_variants` (ngày bay, số khách cho vé & tour)
-- [ ] `carts`, `cart_items`, `orders`, `order_items`, `payments`
+- [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); ✓ `media_products` (Phần 07)
+- [ ] ✓ `products` (`kind` goods/booking, chuyên mục + chip lọc, giá "từ", giá cũ, rating, đã bán, cách nhận hàng) + `product_variants` (MỘT thuộc tính: nhãn, giá, tồn kho; chốt với khách 29/10/2026) (Phần 07); còn lịch khởi hành, hạng dịch vụ cho vé & tour (Phần 08)
+- [ ] ✓ `cart_items` (không cần bảng `carts`: mỗi người một giỏ), `orders` (mã AL-…, idempotency key, CHECK theo cách nhận hàng), `order_items` (snapshot tên/giá) (Phần 07); còn `payments` (Phần 09)
 - [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
 - [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
-- [ ] ✓ `watch_history` (tiến độ xem, "Tiếp tục xem"), `saved_media`, `playlists` + `playlist_items` (riêng tư, tối đa 50 playlist × 200 mục) (Phần 06); còn `favorites` cho sản phẩm/tour (Phần 07)
+- [ ] ✓ `watch_history` (tiến độ xem, "Tiếp tục xem"), `saved_media`, `playlists` + `playlist_items` (riêng tư, tối đa 50 playlist × 200 mục) (Phần 06); ✓ `favorites` (Phần 07)
 - [ ] `notifications`
 - [ ] Bảng dịch cho nội dung song ngữ (cột `title_vi/title_en` hoặc bảng `*_translations`), chốt một cách
 - [x] Index cho tìm kiếm: bật `pg_trgm` + `unaccent`, hàm `immutable_unaccent` (migration 000001). Index cụ thể tạo cùng bảng ở từng phần
@@ -171,12 +171,12 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Vai trò: ✓ cột `role` (`user`, `creator`, `business`, `editor`, `admin`) trong access token và `/auth/me`; còn middleware kiểm tra vai trò cho từng API (khi có API cần, vd. CMS)
 
 ### 2.4 API module
-- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); còn khối kinh doanh (Phần 07), tiện ích (Phần 10)
+- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); ✓ khối kinh doanh (Phần 07); còn tiện ích (Phần 10)
 - [x] **Categories**: danh sách, chi tiết kèm chip lọc (cache Redis 10 phút)
 - [ ] **Media**: ✓ danh sách (lọc chuyên mục/chip/line-up, sắp mới/xem nhiều, phân trang con trỏ), chi tiết, gợi ý liên quan, lượt xem (Redis + worker, mỗi IP 1 lượt/30 phút); còn lưu tiến độ xem (cần đăng nhập)
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
-- [ ] **Products**: danh sách theo section, chi tiết, tồn kho/lịch khởi hành cho vé & tour
-- [ ] **Cart & Orders**: giỏ hàng, đặt hàng, trạng thái đơn, lịch sử đơn
+- [ ] **Products**: ✓ danh sách (chuyên mục, chip, kênh; mới nhất / bán chạy; phân trang con trỏ), chi tiết (biến thể, video có sản phẩm, gợi ý), sản phẩm trong video, yêu thích (Phần 07); còn lịch khởi hành cho vé & tour (Phần 08), đánh giá sản phẩm thật (hiện rating là số mẫu)
+- [x] **Cart & Orders**: giỏ (khách: preview, gộp khi đăng nhập bằng GREATEST), đặt hàng COD (trừ kho có điều kiện, idempotency key, bắt xác minh email, 10 đơn/giờ), lịch sử, huỷ đơn chờ xác nhận (trả kho) (Phần 07). Chuyển trạng thái confirmed/delivering/completed ở trang quản trị (Phần 12)
 - [ ] **Payment**: tích hợp cổng VNPay/MoMo/ZaloPay, webhook IPN, đối soát
 - [x] **Channels**: chi tiết kênh, nội dung của kênh (`/media?channel=`), theo dõi/bỏ theo dõi (transaction, bấm 2 lần chỉ tính 1), `/me/following`
 - [x] **Comments**: viết, trả lời 1 cấp, thích, xoá (chủ bình luận hoặc editor/admin), sắp xếp Hay/Mới, bình luận nổi bật. Chống spam: bắt buộc xác minh email + rate limit 10 bình luận/5 phút/người (Redis). Chưa dùng Turnstile cho bình luận: chỉ thêm nếu vẫn bị spam
@@ -204,7 +204,7 @@ Bảng dựa trên `data/content.json` của mockup:
 
 ### 2.6 RabbitMQ & worker
 - [x] Hàng đợi job (`pkg/queue`): mỗi loại job có queue chính, `.retry` (chờ 30s rồi tự quay lại), `.dead` (lỗi quá 5 lần); publisher confirms; consumer ack thủ công, prefetch
-- [ ] Job gửi email (`internal/mail`, queue `email.send`): ✓ mẫu xác minh email, đặt lại mật khẩu (HTML + chữ thường); ✓ dev gửi qua SMTP vào **Mailpit** (thay MailHog đã ngừng phát triển từ 2020); còn gửi qua Resend ở production, mẫu đơn hàng (Phần 07), logo ảnh trong thư
+- [ ] Job gửi email (`internal/mail`, queue `email.send`): ✓ mẫu xác minh email, đặt lại mật khẩu (HTML + chữ thường); ✓ dev gửi qua SMTP vào **Mailpit** (thay MailHog đã ngừng phát triển từ 2020); ✓ mẫu xác nhận đơn hàng (Phần 07); còn gửi qua Resend ở production, logo ảnh trong thư
 - [ ] Job: kiểm tra định kỳ video YouTube còn hoạt động (bị xóa, chuyển riêng tư, chặn nhúng) → ẩn và báo admin
 - [ ] Job: xử lý webhook thanh toán → cập nhật đơn → gửi thông báo
 - [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
@@ -239,7 +239,7 @@ Bảng dựa trên `data/content.json` của mockup:
 ### 3.2 Store Zustand
 - [x] Người đang đăng nhập: dùng TanStack Query (`useMe`, key `["auth","me"]`) thay cho `useAuthStore`, vì đây là dữ liệu server; trạng thái "chưa biết" lúc hydrate
 - [ ] `usePlayerStore`: ✓ phát/dừng, tắt tiếng, tua ±10s, tiến độ thật từ YouTube, slot trang xem, controller; còn âm lượng, hàng đợi
-- [ ] `useCartStore`: giỏ hàng (đồng bộ với server khi đăng nhập, `persist` khi là khách)
+- [x] `useGuestCart` (`stores/cart-store.ts`): giỏ của khách, `persist` + `skipHydration`; đăng nhập thì `CartSync` gộp lên server (Phần 07)
 - [ ] `useUIStore`: ✓ menu dọc thu gọn / ngăn kéo; còn drawer giỏ hàng, modal
 
 ### 3.3 Layout dùng chung (từ `skyline/js/layout.js`)
@@ -264,23 +264,23 @@ Bảng dựa trên `data/content.json` của mockup:
 
 | Mockup | Route Next.js | Ghi chú |
 |---|---|---|
-| `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay, cột bình luận nổi bật (còn khối kinh doanh, tiện ích) |
+| `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay, cột bình luận nổi bật, khối Kinh doanh (còn tiện ích) |
 | `chuyen-muc.html?c=xem\|nghe` | `/xem`, `/nghe` | ✓ Chip lọc, sắp xếp, cuộn tải thêm |
-| `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | Lọc tiểu mục `?f=` |
+| `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | ✓ Chip lọc `?f=`, Mới nhất / Bán chạy (Phần 07) |
 | `tien-ich.html?tab=` | `/tien-ich/[tab]` | Ra tàu bay, Flightradar, thời tiết, Wi-Fi, phòng chờ |
 | `y-kien.html?tab=` | `/y-kien/[tab]` | Trải nghiệm, khảo sát, góp ý |
 | `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
 | `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; ✓ bình luận; còn chia sẻ/lưu |
 | `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
 | `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ, số liệu, tiếp tục xem, kênh theo dõi; còn chuyến bay (Phần 10), đơn hàng (Phần 07) |
-| `suu-tap.html` | `/suu-tap`, `/suu-tap/playlist/[id]` | ✓ Tab Playlist, Đã lưu, Đã xem; trang playlist; còn tab Yêu thích (Phần 07) |
+| `suu-tap.html` | `/suu-tap`, `/suu-tap/playlist/[id]` | ✓ Tab Playlist, Đã lưu, Yêu thích, Đã xem; trang playlist |
 | `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận, Lưu, thêm vào playlist, xem tiếp từ chỗ dừng; còn sản phẩm gắn video |
-| `san-pham.html?id=` | `/san-pham/[slug]` | Vé/tour có chọn ngày, số khách |
+| `san-pham.html?id=` | `/san-pham/[slug]` | ✓ Hàng hoá: bộ ảnh, biến thể, số lượng, giỏ, yêu thích, JSON-LD (Phần 07); còn vé/tour chọn ngày, số khách (Phần 08) |
 | `kenh.html?id=` | `/kenh/[slug]` | ✓ Ảnh bìa, thông tin, theo dõi, lưới nội dung của kênh; còn tab sản phẩm của kênh doanh nghiệp (Phần 07) |
 | `lien-he.html` | `/lien-he` | Form liên hệ |
 | `tim-kiem.html?q=` | `/tim-kiem` | Kết quả gộp nhiều loại |
 | (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | ✓ `/dang-nhap`, `/dang-ky`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh-email` (react-hook-form + zod, lỗi theo từng ô, chống open redirect) |
-| (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang/[id]` | Checkout |
+| (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang`, `/don-hang/[code]` | ✓ Giỏ, thanh toán COD, đơn hàng (Phần 07); thanh toán online Phần 09 |
 
 - [ ] Làm lần lượt từng trang trên, mỗi trang: UI pixel-perfect theo mockup → nối API bằng TanStack Query → loading/error/empty state → responsive
 - [ ] Player: ✓ YouTube IFrame Player API, mini player điều khiển bằng icon Player Airlife (phát/dừng, tua 10s, tắt tiếng, thanh đường băng theo thời gian thật), ✓ gửi lượt xem khi bắt đầu phát; còn nhớ tiến độ xem (cần đăng nhập)

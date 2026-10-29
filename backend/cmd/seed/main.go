@@ -85,6 +85,30 @@ type seedData struct {
 		BodyHTML    string    `json:"body_html"`
 		PublishedAt time.Time `json:"published_at"`
 	} `json:"news"`
+	Products []struct {
+		Slug            string   `json:"slug"`
+		Kind            string   `json:"kind"`
+		Category        string   `json:"category"`
+		Tag             string   `json:"tag"`
+		Channel         string   `json:"channel"`
+		Name            string   `json:"name"`
+		Description     string   `json:"description"`
+		BodyHTML        string   `json:"body_html"`
+		Price           int64    `json:"price"`
+		OldPrice        *int64   `json:"old_price"`
+		Rating          float64  `json:"rating"`
+		RatingCount     int32    `json:"rating_count"`
+		Sold            int32    `json:"sold"`
+		PublishedDays   float64  `json:"published_days_ago"`
+		DeliveryMethods []string `json:"delivery_methods"`
+		Media           []string `json:"media"` // slug các video có sản phẩm này
+		Variants        []struct {
+			Label    string `json:"label"`
+			Price    int64  `json:"price"`
+			OldPrice *int64 `json:"old_price"`
+			Stock    int32  `json:"stock"`
+		} `json:"variants"`
+	} `json:"products"`
 	Users []struct {
 		Key         string `json:"key"`
 		DisplayName string `json:"display_name"`
@@ -217,6 +241,9 @@ func run() error {
 		}
 	}
 
+	if err := seedProducts(ctx, q, data, channelIDs, now); err != nil {
+		return err
+	}
 	if err := seedComments(ctx, q, data, now); err != nil {
 		return err
 	}
@@ -226,7 +253,52 @@ func run() error {
 	}
 	log.Info("đã nạp dữ liệu mẫu",
 		"categories", len(data.Categories), "channels", len(data.Channels), "media", len(data.Media),
-		"news", len(data.News), "users", len(data.Users), "comments", len(data.Comments))
+		"news", len(data.News), "products", len(data.Products), "users", len(data.Users), "comments", len(data.Comments))
+	return nil
+}
+
+// seedProducts nạp sản phẩm, biến thể và liên kết sản phẩm trong video (Phần 07).
+func seedProducts(ctx context.Context, q *db.Queries, data seedData, channelIDs map[string]uuid.UUID, now time.Time) error {
+	for _, p := range data.Products {
+		channelID, ok := channelIDs[p.Channel]
+		if !ok {
+			return fmt.Errorf("sản phẩm %s: không có kênh %q", p.Slug, p.Channel)
+		}
+		img := func(n int) string {
+			return fmt.Sprintf("https://picsum.photos/seed/airlife-%s-%d/800/800", p.Slug, n)
+		}
+		id, err := q.UpsertProduct(ctx, db.UpsertProductParams{
+			Slug: p.Slug, Kind: p.Kind, CategorySlug: p.Category, Tag: p.Tag, ChannelID: channelID,
+			Name: p.Name, Description: p.Description, BodyHtml: sanitize.ArticleHTML(p.BodyHTML),
+			ImageUrl: img(1), Gallery: []string{img(2), img(3), img(4)},
+			Price: p.Price, OldPrice: p.OldPrice, DeliveryMethods: p.DeliveryMethods,
+			Rating: p.Rating, RatingCount: p.RatingCount, SoldCount: p.Sold,
+			PublishedAt: now.Add(-time.Duration(p.PublishedDays * float64(24*time.Hour))),
+		})
+		if err != nil {
+			return fmt.Errorf("sản phẩm %s: %w", p.Slug, err)
+		}
+		for i, v := range p.Variants {
+			if err := q.UpsertProductVariant(ctx, db.UpsertProductVariantParams{
+				ProductID: id, Sku: fmt.Sprintf("%s-%d", p.Slug, i+1), Label: v.Label,
+				Price: v.Price, OldPrice: v.OldPrice, Stock: v.Stock,
+				SortOrder: int16(i), //nolint:gosec // vài biến thể, không tràn
+			}); err != nil {
+				return fmt.Errorf("biến thể %s/%s: %w", p.Slug, v.Label, err)
+			}
+		}
+		for i, slug := range p.Media {
+			mediaID, err := q.GetMediaIDBySlug(ctx, slug)
+			if err != nil {
+				return fmt.Errorf("sản phẩm %s: video %q: %w", p.Slug, slug, err)
+			}
+			if err := q.UpsertMediaProduct(ctx, db.UpsertMediaProductParams{
+				MediaID: mediaID, ProductID: id, SortOrder: int16(i), //nolint:gosec // như trên
+			}); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 

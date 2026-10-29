@@ -8,7 +8,7 @@ import { type MediaListParams, mediaListOptions } from "@/lib/queries";
 
 // Lưới media cuộn tải thêm (LoadMore). Trang đầu đã được server lấy sẵn (CategoryPage → prefetch),
 // nên lần render đầu có dữ liệu ngay, không có màn "đang tải".
-export function MediaGrid(params: MediaListParams) {
+export function MediaGrid(params: MediaListParams & { empty?: string }) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, refetch } =
     useInfiniteQuery(mediaListOptions(params));
   const items = data?.pages.flatMap((p) => p.items) ?? [];
@@ -28,14 +28,18 @@ export function MediaGrid(params: MediaListParams) {
     );
   }
   if (items.length === 0) {
-    return <p className="py-16 text-center text-ink-muted">Chưa có nội dung nào trong mục này.</p>;
+    return (
+      <p className="py-16 text-center text-ink-muted">
+        {params.empty ?? "Chưa có nội dung nào trong mục này."}
+      </p>
+    );
   }
 
   return (
     <>
       <div className="grid gap-x-4 gap-y-7 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {items.map((m, i) => (
-          <MediaCard key={m.id} media={m} priority={i < 4} />
+          <MediaCard key={m.id} media={m} eager={i < 4} />
         ))}
       </div>
       <LoadMore

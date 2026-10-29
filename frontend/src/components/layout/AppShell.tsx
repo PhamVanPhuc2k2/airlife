@@ -1,6 +1,7 @@
 "use client";
 
 import { YouTubeHost } from "@/components/player/YouTubeHost";
+import { CartSync } from "@/lib/cart";
 import { usePlayerStore } from "@/stores/player-store";
 import { useUIStore } from "@/stores/ui-store";
 
@@ -38,6 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         Bỏ qua menu
       </a>
 
+      <CartSync />
       <Header />
       <TopNav />
       <SidebarRail />

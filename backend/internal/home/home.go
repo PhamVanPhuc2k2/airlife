@@ -5,7 +5,7 @@
 //	┌ 3 ô bên trái ┐┌──── khối nổi bật ────┐┌ bình luận nổi bật ┐
 //	└──────────────┘└──────────────────────┘└─────────────────────┘
 //	[ hàng 4 thẻ xem nhiều ]
-//	[ Nghe nhiều ] [ Kinh doanh (Phần 07) ] [ Tiện ích (Phần 10) ]
+//	[ Nghe nhiều ] [ Kinh doanh ] [ Tiện ích (Phần 10) ]
 package home
 
 import (
@@ -18,6 +18,7 @@ import (
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
 )
@@ -27,10 +28,11 @@ import (
 const cacheTTL = 60 * time.Second
 
 type Home struct {
-	Featured  *media.Card  `json:"featured"`
-	Latest    []media.Card `json:"latest"`     // 3 ô bên trái: phim mới
-	Trending  []media.Card `json:"trending"`   // hàng 4 thẻ: xem nhiều
-	TopListen []media.Card `json:"top_listen"` // khối "Nghe nhiều"
+	Featured  *media.Card    `json:"featured"`
+	Latest    []media.Card   `json:"latest"`     // 3 ô bên trái: phim mới
+	Trending  []media.Card   `json:"trending"`   // hàng 4 thẻ: xem nhiều
+	TopListen []media.Card   `json:"top_listen"` // khối "Nghe nhiều"
+	Shop      []product.Card `json:"shop"`       // khối "Kinh doanh": hàng bán chạy
 	// Cột "Bình luận nổi bật", hai tab: Hay (nhiều thích), Nhiều (nhiều trả lời)
 	HotComments struct {
 		Top     []comment.HotComment `json:"top"`
@@ -41,11 +43,12 @@ type Home struct {
 type Service struct {
 	media    *media.Service // dùng service của module khác, không gọi thẳng repository của nó
 	comments *comment.Service
+	products *product.Service
 	rdb      *redis.Client
 }
 
-func NewService(m *media.Service, c *comment.Service, rdb *redis.Client) *Service {
-	return &Service{media: m, comments: c, rdb: rdb}
+func NewService(m *media.Service, c *comment.Service, p *product.Service, rdb *redis.Client) *Service {
+	return &Service{media: m, comments: c, products: p, rdb: rdb}
 }
 
 func (s *Service) Get(ctx context.Context) (Home, error) {
@@ -98,6 +101,9 @@ func (s *Service) load(ctx context.Context) (Home, error) {
 		return h, err
 	}
 	if h.HotComments.Replied, err = s.comments.Hot(ctx, true, 5); err != nil {
+		return h, err
+	}
+	if h.Shop, err = s.products.TopSelling(ctx, "kinh-doanh", 4); err != nil {
 		return h, err
 	}
 	return h, nil

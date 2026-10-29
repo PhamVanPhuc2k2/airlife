@@ -133,7 +133,8 @@ const getLibraryStats = `-- name: GetLibraryStats :one
 SELECT (SELECT count(*) FROM channel_followers cf WHERE cf.user_id = $1) AS following,
        (SELECT count(*) FROM saved_media s WHERE s.user_id = $1) AS saved,
        (SELECT count(*) FROM playlists p WHERE p.user_id = $1) AS playlists,
-       (SELECT count(*) FROM watch_history h WHERE h.user_id = $1) AS watched
+       (SELECT count(*) FROM watch_history h WHERE h.user_id = $1) AS watched,
+       (SELECT count(*) FROM orders o WHERE o.user_id = $1) AS orders
 `
 
 type GetLibraryStatsRow struct {
@@ -141,6 +142,7 @@ type GetLibraryStatsRow struct {
 	Saved     int64
 	Playlists int64
 	Watched   int64
+	Orders    int64
 }
 
 // Số liệu ở thẻ hồ sơ trang Bạn
@@ -152,6 +154,7 @@ func (q *Queries) GetLibraryStats(ctx context.Context, userID uuid.UUID) (GetLib
 		&i.Saved,
 		&i.Playlists,
 		&i.Watched,
+		&i.Orders,
 	)
 	return i, err
 }

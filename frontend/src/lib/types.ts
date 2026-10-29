@@ -53,6 +53,7 @@ export type Home = {
   trending: MediaCard[];
   top_listen: MediaCard[];
   hot_comments: { top: HotComment[]; replied: HotComment[] };
+  shop: ProductCard[];
 };
 
 export type NewsCategory = {
@@ -146,7 +147,13 @@ export type LibraryPage = { items: LibraryItem[]; next_cursor?: string };
 // GET /me/media/{slug}: trạng thái của một media với người đang xem
 export type MediaState = { saved: boolean; progress: Progress | null; playlist_ids: string[] };
 
-export type LibraryStats = { following: number; saved: number; playlists: number; watched: number };
+export type LibraryStats = {
+  following: number;
+  saved: number;
+  playlists: number;
+  watched: number;
+  orders: number;
+};
 
 export type Playlist = {
   id: string;
@@ -157,3 +164,115 @@ export type Playlist = {
 };
 
 export type PlaylistDetail = Playlist & { items: LibraryItem[] };
+
+// Bán hàng (Phần 07) ---------------------------------------------------------------------------
+// Tiền là số nguyên, đơn vị đồng (389000 = 389.000₫)
+
+export type DeliveryMethod = "gate" | "arrival" | "home" | "evoucher";
+
+export type ProductCard = {
+  id: string;
+  slug: string;
+  kind: "goods" | "booking"; // booking: vé bay, tour (đặt chỗ ở Phần 08)
+  category: string;
+  tag: string;
+  tag_name: string;
+  name: string;
+  description: string;
+  image_url: string;
+  price: number; // giá thấp nhất ("từ")
+  old_price: number | null;
+  rating: number;
+  rating_count: number;
+  sold_count: number;
+  published_at: string;
+  channel: {
+    slug: string;
+    name: string;
+    verified: boolean;
+    type?: string;
+    followers_count?: number;
+  };
+};
+
+export type ProductVariant = {
+  id: string;
+  label: string;
+  price: number;
+  old_price: number | null;
+  stock: number;
+};
+
+export type ProductDetail = ProductCard & {
+  category_name: string;
+  body_html: string;
+  gallery: string[];
+  delivery_methods: DeliveryMethod[];
+  variants: ProductVariant[];
+  media: MediaCard[];
+  related: ProductCard[];
+};
+
+export type ProductPage = { items: ProductCard[]; next_cursor?: string };
+
+export type CartLine = {
+  variant_id: string;
+  quantity: number;
+  label: string;
+  price: number;
+  old_price: number | null;
+  stock: number;
+  product: { slug: string; name: string; image_url: string; channel_name: string };
+  delivery_methods: DeliveryMethod[];
+  problem?: "unavailable" | "out_of_stock" | "low_stock";
+};
+
+export type Cart = {
+  lines: CartLine[];
+  count: number;
+  subtotal: number;
+  delivery_methods: DeliveryMethod[]; // cách nhận dùng được cho cả giỏ
+  ready: boolean;
+};
+
+export type OrderStatus = "pending" | "confirmed" | "delivering" | "completed" | "cancelled";
+
+export type Order = {
+  code: string;
+  status: OrderStatus;
+  payment_method: "cod";
+  delivery_method: DeliveryMethod;
+  recipient_name: string;
+  phone: string;
+  flight_code: string | null;
+  flight_date: string | null;
+  address: string | null;
+  note: string;
+  subtotal: number;
+  shipping_fee: number;
+  total: number;
+  created_at: string;
+  cancelled_at: string | null;
+  items: {
+    product_slug: string;
+    product_name: string;
+    variant_label: string;
+    image_url: string;
+    unit_price: number;
+    quantity: number;
+    line_total: number;
+  }[];
+};
+
+export type OrderSummary = {
+  code: string;
+  status: OrderStatus;
+  delivery_method: DeliveryMethod;
+  total: number;
+  created_at: string;
+  first_name: string;
+  first_image: string;
+  item_count: number;
+};
+
+export type OrderPage = { items: OrderSummary[]; next_cursor?: string };

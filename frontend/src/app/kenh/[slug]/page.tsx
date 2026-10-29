@@ -5,12 +5,13 @@ import { cache } from "react";
 
 import { MediaGrid } from "@/components/category/MediaGrid";
 import { FollowButton } from "@/components/channel/FollowButton";
+import { ProductGrid } from "@/components/product/ProductGrid";
 import { CHANNEL_TYPE_LABEL } from "@/components/channel/labels";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar } from "@/components/ui/Avatar";
 import { ApiError, api } from "@/lib/api";
 import { getQueryClient } from "@/lib/query-client";
-import { mediaListOptions } from "@/lib/queries";
+import { mediaListOptions, productListOptions } from "@/lib/queries";
 import type { ChannelDetail } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,10 @@ export default async function ChannelPage({ params }: Props) {
     getChannel(slug),
     queryClient.prefetchInfiniteQuery(mediaListOptions({ channel: slug, sort: "new" })),
   ]);
+  // Gian hàng: chỉ kênh doanh nghiệp có sản phẩm. fetchInfiniteQuery (khác prefetch) trả dữ liệu
+  // để biết có hiện khối này không; dữ liệu cũng nằm trong cache, ProductGrid dùng lại.
+  const shop = await queryClient.fetchInfiniteQuery(productListOptions({ channel: slug }));
+  const hasShop = (shop.pages[0]?.items.length ?? 0) > 0;
 
   return (
     <div>
@@ -71,12 +76,18 @@ export default async function ChannelPage({ params }: Props) {
           />
         </header>
 
-        <section className="mt-8 pb-6">
-          <h2 className="mb-4 text-xl font-bold">Nội dung</h2>
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <MediaGrid channel={slug} sort="new" />
-          </HydrationBoundary>
-        </section>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          {hasShop && (
+            <section id="gian-hang" className="mt-8 scroll-mt-36">
+              <h2 className="mb-4 text-xl font-bold">Gian hàng</h2>
+              <ProductGrid channel={slug} />
+            </section>
+          )}
+          <section className="mt-8 pb-6">
+            <h2 className="mb-4 text-xl font-bold">Nội dung</h2>
+            <MediaGrid channel={slug} sort="new" empty="Kênh chưa đăng nội dung nào." />
+          </section>
+        </HydrationBoundary>
       </div>
     </div>
   );

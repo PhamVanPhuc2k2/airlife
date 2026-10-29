@@ -14,7 +14,10 @@ export function FeaturedHero({ media }: { media: MediaCard }) {
         src={media.thumbnail_url}
         alt=""
         fill
-        priority // ảnh lớn nhất màn hình đầu: tải sớm (tốt cho chỉ số LCP)
+        // Ảnh lớn nhất màn hình đầu (chỉ số LCP): tải ngay, ưu tiên cao. Next.js 16 bỏ thuộc tính
+        // `priority` cũ, thay bằng hai thuộc tính chuẩn của thẻ <img> này.
+        loading="eager"
+        fetchPriority="high"
         sizes="(min-width: 1024px) 55vw, 100vw"
         className="object-cover"
       />

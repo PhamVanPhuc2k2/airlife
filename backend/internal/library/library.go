@@ -71,6 +71,7 @@ type Stats struct {
 	Saved     int64 `json:"saved"`
 	Playlists int64 `json:"playlists"`
 	Watched   int64 `json:"watched"`
+	Orders    int64 `json:"orders"`
 }
 
 type Playlist struct {

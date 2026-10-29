@@ -66,3 +66,30 @@ INSERT INTO comments (id, media_id, news_id, parent_id, user_id, body, like_coun
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 ON CONFLICT (id) DO UPDATE
 SET body = EXCLUDED.body, like_count = EXCLUDED.like_count, reply_count = EXCLUDED.reply_count;
+
+-- name: UpsertProduct :one
+INSERT INTO products (slug, kind, category_slug, tag, channel_id, name, description, body_html,
+                      image_url, gallery, price, old_price, delivery_methods, rating, rating_count,
+                      sold_count, published_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+ON CONFLICT (slug) DO UPDATE
+SET kind = EXCLUDED.kind, category_slug = EXCLUDED.category_slug, tag = EXCLUDED.tag,
+    channel_id = EXCLUDED.channel_id, name = EXCLUDED.name, description = EXCLUDED.description,
+    body_html = EXCLUDED.body_html, image_url = EXCLUDED.image_url, gallery = EXCLUDED.gallery,
+    price = EXCLUDED.price, old_price = EXCLUDED.old_price,
+    delivery_methods = EXCLUDED.delivery_methods, rating = EXCLUDED.rating,
+    rating_count = EXCLUDED.rating_count, updated_at = now()
+RETURNING id;
+
+-- Tồn kho chỉ đặt lần đầu: chạy seed lại không "nạp lại hàng" cho biến thể đã bán bớt khi thử.
+-- name: UpsertProductVariant :exec
+INSERT INTO product_variants (product_id, sku, label, price, old_price, stock, sort_order)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (sku) DO UPDATE
+SET label = EXCLUDED.label, price = EXCLUDED.price, old_price = EXCLUDED.old_price,
+    sort_order = EXCLUDED.sort_order;
+
+-- name: UpsertMediaProduct :exec
+INSERT INTO media_products (media_id, product_id, sort_order)
+VALUES ($1, $2, $3)
+ON CONFLICT (media_id, product_id) DO UPDATE SET sort_order = EXCLUDED.sort_order;

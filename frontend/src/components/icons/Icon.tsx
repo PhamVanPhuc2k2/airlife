@@ -123,6 +123,9 @@ const LINE_ICONS = {
     </>
   ),
   pencil: <path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4" />,
+  star: <path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />,
+  heart: <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />,
+  minus: <path d="M5 12h14" />,
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,

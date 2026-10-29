@@ -10,6 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type CartItem struct {
+	UserID    uuid.UUID
+	VariantID uuid.UUID
+	Quantity  int32
+	UpdatedAt time.Time
+}
+
 type Category struct {
 	Slug        string
 	Name        string
@@ -66,6 +73,18 @@ type CommentLike struct {
 	CreatedAt time.Time
 }
 
+type Favorite struct {
+	UserID    uuid.UUID
+	ProductID uuid.UUID
+	CreatedAt time.Time
+}
+
+type MediaProduct struct {
+	MediaID   uuid.UUID
+	ProductID uuid.UUID
+	SortOrder int16
+}
+
 type Medium struct {
 	ID              uuid.UUID
 	Slug            string
@@ -112,6 +131,41 @@ type NewsCategory struct {
 	SortOrder   int16
 }
 
+type Order struct {
+	ID             uuid.UUID
+	Code           string
+	UserID         uuid.UUID
+	Status         string
+	PaymentMethod  string
+	DeliveryMethod string
+	RecipientName  string
+	Phone          string
+	FlightCode     *string
+	FlightDate     *time.Time
+	Address        *string
+	Note           string
+	Subtotal       int64
+	ShippingFee    int64
+	Total          int64
+	IdempotencyKey string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	CancelledAt    *time.Time
+}
+
+type OrderItem struct {
+	OrderID      uuid.UUID
+	VariantID    *uuid.UUID
+	ProductSlug  string
+	ProductName  string
+	VariantLabel string
+	ImageUrl     string
+	UnitPrice    int64
+	Quantity     int32
+	LineTotal    int64
+	Position     int16
+}
+
 type Playlist struct {
 	ID        uuid.UUID
 	UserID    uuid.UUID
@@ -125,6 +179,42 @@ type PlaylistItem struct {
 	PlaylistID uuid.UUID
 	MediaID    uuid.UUID
 	AddedAt    time.Time
+}
+
+type Product struct {
+	ID              uuid.UUID
+	Slug            string
+	Kind            string
+	CategorySlug    string
+	Tag             string
+	ChannelID       uuid.UUID
+	Name            string
+	Description     string
+	BodyHtml        string
+	ImageUrl        string
+	Gallery         []string
+	Price           int64
+	OldPrice        *int64
+	DeliveryMethods []string
+	Rating          float64
+	RatingCount     int32
+	SoldCount       int32
+	Status          string
+	PublishedAt     time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+type ProductVariant struct {
+	ID        uuid.UUID
+	ProductID uuid.UUID
+	Sku       string
+	Label     string
+	Price     int64
+	OldPrice  *int64
+	Stock     int32
+	SortOrder int16
+	Active    bool
 }
 
 type SavedMedium struct {

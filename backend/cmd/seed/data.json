@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài). Người dùng mẫu (seed-*@airlife.local) không đăng nhập được (mật khẩu ngẫu nhiên). Trả lời bình luận là câu mẫu.",
+  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài). Người dùng mẫu (seed-*@airlife.local) không đăng nhập được (mật khẩu ngẫu nhiên). Trả lời bình luận là câu mẫu. Sản phẩm: biến thể, tồn kho, cách nhận hàng là dữ liệu mẫu tự đặt (mockup chỉ có một giá).",
   "categories": [
     {
       "slug": "xem",
@@ -805,6 +805,441 @@
       "body": "Cảm ơn bạn, để chuyến sau thử.",
       "likes": 3,
       "hours_ago": 2
+    }
+  ],
+  "products": [
+    {
+      "slug": "hop-qua-dac-san-hue",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "dac-san",
+      "channel": "dac-san-3-mien",
+      "name": "Hộp quà Đặc sản Huế",
+      "description": "Mè xửng, tôm chua, mắm ruốc, trà cung đình… đóng hộp quà, giao tại sân bay đến.",
+      "body_html": "<p>Mè xửng, tôm chua, mắm ruốc, trà cung đình… đóng hộp quà, giao tại sân bay đến.</p>",
+      "price": 279000,
+      "old_price": 320000,
+      "rating": 4.8,
+      "rating_count": 238,
+      "sold": 2140,
+      "published_days_ago": 0.0,
+      "media": [
+        "chuyen-bay-ve-nha",
+        "an-gi-o-san-bay"
+      ],
+      "delivery_methods": [
+        "arrival",
+        "home"
+      ],
+      "variants": [
+        {
+          "label": "Hộp 6 món",
+          "price": 389000,
+          "old_price": 450000,
+          "stock": 40
+        },
+        {
+          "label": "Hộp 4 món",
+          "price": 279000,
+          "old_price": 320000,
+          "stock": 25
+        }
+      ]
+    },
+    {
+      "slug": "nuoc-hoa-aviator-edp",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "mien-thue",
+      "channel": "duty-free-sg",
+      "name": "Nước hoa Aviator Eau de Parfum",
+      "description": "Giá miễn thuế, đặt trước khi bay, nhận tại cửa ra máy bay.",
+      "body_html": "<p>Giá miễn thuế, đặt trước khi bay, nhận tại cửa ra máy bay.</p>",
+      "price": 1390000,
+      "old_price": 1890000,
+      "rating": 4.7,
+      "rating_count": 96,
+      "sold": 860,
+      "published_days_ago": 1.5,
+      "media": [
+        "vung-troi-cuoi-cung"
+      ],
+      "delivery_methods": [
+        "gate"
+      ],
+      "variants": [
+        {
+          "label": "100ml",
+          "price": 2150000,
+          "old_price": 2890000,
+          "stock": 5
+        },
+        {
+          "label": "50ml",
+          "price": 1390000,
+          "old_price": 1890000,
+          "stock": 12
+        }
+      ]
+    },
+    {
+      "slug": "ca-phe-buon-ma-thuot-rang-moc",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "dac-san",
+      "channel": "dac-san-3-mien",
+      "name": "Cà phê Buôn Ma Thuột rang mộc",
+      "description": "Robusta Buôn Ma Thuột rang mộc, xay theo yêu cầu.",
+      "body_html": "<p>Robusta Buôn Ma Thuột rang mộc, xay theo yêu cầu.</p>",
+      "price": 119000,
+      "old_price": null,
+      "rating": 4.9,
+      "rating_count": 591,
+      "sold": 5320,
+      "published_days_ago": 3.0,
+      "media": [
+        "chuyen-bay-ve-nha"
+      ],
+      "delivery_methods": [
+        "arrival",
+        "home"
+      ],
+      "variants": [
+        {
+          "label": "500g",
+          "price": 215000,
+          "old_price": null,
+          "stock": 80
+        },
+        {
+          "label": "250g",
+          "price": 119000,
+          "old_price": null,
+          "stock": 60
+        }
+      ]
+    },
+    {
+      "slug": "goi-co-memory-foam-du-lich",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "mua-sam",
+      "channel": "bay-vui",
+      "name": "Gối cổ memory foam du lịch",
+      "description": "Gối chữ U cao su non, kèm bịt mắt và nút tai.",
+      "body_html": "<p>Gối chữ U cao su non, kèm bịt mắt và nút tai.</p>",
+      "price": 189000,
+      "old_price": 259000,
+      "rating": 4.6,
+      "rating_count": 430,
+      "sold": 3870,
+      "published_days_ago": 4.5,
+      "media": [
+        "ghe-12a",
+        "tiep-vien-tap-su"
+      ],
+      "delivery_methods": [
+        "gate",
+        "arrival",
+        "home"
+      ],
+      "variants": [
+        {
+          "label": "Xám",
+          "price": 189000,
+          "old_price": 259000,
+          "stock": 30
+        },
+        {
+          "label": "Xanh navy",
+          "price": 189000,
+          "old_price": 259000,
+          "stock": 0
+        }
+      ]
+    },
+    {
+      "slug": "dong-ho-pilot-chronograph",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "mien-thue",
+      "channel": "duty-free-sg",
+      "name": "Đồng hồ Pilot Chronograph",
+      "description": "Mặt kính sapphire, chống nước 10ATM, bảo hành quốc tế 2 năm.",
+      "body_html": "<p>Mặt kính sapphire, chống nước 10ATM, bảo hành quốc tế 2 năm.</p>",
+      "price": 6490000,
+      "old_price": 7900000,
+      "rating": 4.8,
+      "rating_count": 24,
+      "sold": 214,
+      "published_days_ago": 6.0,
+      "media": [
+        "vung-troi-cuoi-cung"
+      ],
+      "delivery_methods": [
+        "gate"
+      ],
+      "variants": [
+        {
+          "label": "Mặt 42mm",
+          "price": 6490000,
+          "old_price": 7900000,
+          "stock": 3
+        }
+      ]
+    },
+    {
+      "slug": "phong-cho-thuong-gia-tan-son-nhat",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "dich-vu-san-bay",
+      "channel": "lounge-plus",
+      "name": "Vé phòng chờ thương gia Tân Sơn Nhất",
+      "description": "Sử dụng phòng chờ 3 giờ, buffet, tắm, wifi tốc độ cao.",
+      "body_html": "<p>Sử dụng phòng chờ 3 giờ, buffet, tắm, wifi tốc độ cao.</p>",
+      "price": 590000,
+      "old_price": 750000,
+      "rating": 4.5,
+      "rating_count": 143,
+      "sold": 1290,
+      "published_days_ago": 7.5,
+      "media": [
+        "review-hang-thuong-gia-5-hang-bay",
+        "ngu-ngon-tren-chuyen-bay-dem"
+      ],
+      "delivery_methods": [
+        "evoucher"
+      ],
+      "variants": [
+        {
+          "label": "1 lượt (3 giờ)",
+          "price": 590000,
+          "old_price": 750000,
+          "stock": 500
+        },
+        {
+          "label": "2 lượt",
+          "price": 1090000,
+          "old_price": 1500000,
+          "stock": 500
+        }
+      ]
+    },
+    {
+      "slug": "tour-phong-nha-2n1d",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "trong-nuoc",
+      "channel": "airlife-tour",
+      "name": "Tour Phong Nha 2 ngày 1 đêm",
+      "description": "Đón tại sân bay Đồng Hới, động Phong Nha, Thiên Đường, lưu trú homestay.",
+      "body_html": "<p>Đón tại sân bay Đồng Hới, động Phong Nha, Thiên Đường, lưu trú homestay.</p>",
+      "price": 1890000,
+      "old_price": 2290000,
+      "rating": 4.7,
+      "rating_count": 71,
+      "sold": 640,
+      "published_days_ago": 9.0,
+      "media": [
+        "hang-dong-cuoi-troi"
+      ],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "fast-track-an-ninh-dua-don",
+      "kind": "goods",
+      "category": "kinh-doanh",
+      "tag": "dich-vu-san-bay",
+      "channel": "lounge-plus",
+      "name": "Fast-track an ninh + đưa đón sân bay",
+      "description": "Làm thủ tục ưu tiên, qua an ninh nhanh, xe đón tận cửa.",
+      "body_html": "<p>Làm thủ tục ưu tiên, qua an ninh nhanh, xe đón tận cửa.</p>",
+      "price": 450000,
+      "old_price": null,
+      "rating": 4.6,
+      "rating_count": 109,
+      "sold": 980,
+      "published_days_ago": 10.5,
+      "media": [
+        "an-gi-o-san-bay"
+      ],
+      "delivery_methods": [
+        "evoucher"
+      ],
+      "variants": [
+        {
+          "label": "Fast-track",
+          "price": 450000,
+          "old_price": null,
+          "stock": 500
+        },
+        {
+          "label": "Fast-track + đưa đón",
+          "price": 790000,
+          "old_price": null,
+          "stock": 200
+        }
+      ]
+    },
+    {
+      "slug": "ve-tphcm-ha-noi-khu-hoi",
+      "kind": "booking",
+      "category": "kinh-doanh",
+      "tag": "ve-bay",
+      "channel": "airlife-tour",
+      "name": "Vé TP.HCM – Hà Nội khứ hồi",
+      "description": "Giá đã gồm thuế phí, 7kg xách tay + 20kg ký gửi. Bay tháng 11–12/2026.",
+      "body_html": "<p>Giá đã gồm thuế phí, 7kg xách tay + 20kg ký gửi. Bay tháng 11–12/2026.</p>",
+      "price": 1590000,
+      "old_price": 2100000,
+      "rating": 4.6,
+      "rating_count": 902,
+      "sold": 8120,
+      "published_days_ago": 12.0,
+      "media": [
+        "review-hang-thuong-gia-5-hang-bay"
+      ],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "ve-tphcm-phu-quoc-mot-chieu",
+      "kind": "booking",
+      "category": "kinh-doanh",
+      "tag": "ve-bay",
+      "channel": "airlife-tour",
+      "name": "Vé TP.HCM – Phú Quốc một chiều",
+      "description": "Giá đã gồm thuế phí, 7kg xách tay. Đổi ngày miễn phí 1 lần.",
+      "body_html": "<p>Giá đã gồm thuế phí, 7kg xách tay. Đổi ngày miễn phí 1 lần.</p>",
+      "price": 890000,
+      "old_price": 1190000,
+      "rating": 4.5,
+      "rating_count": 514,
+      "sold": 4630,
+      "published_days_ago": 13.5,
+      "media": [],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "ve-ha-noi-osaka-khu-hoi",
+      "kind": "booking",
+      "category": "kinh-doanh",
+      "tag": "ve-bay",
+      "channel": "airlife-tour",
+      "name": "Vé Hà Nội – Osaka khứ hồi",
+      "description": "Bay thẳng, 23kg ký gửi, suất ăn trên chuyến bay. Mùa lá đỏ tháng 11.",
+      "body_html": "<p>Bay thẳng, 23kg ký gửi, suất ăn trên chuyến bay. Mùa lá đỏ tháng 11.</p>",
+      "price": 6900000,
+      "old_price": 8400000,
+      "rating": 4.7,
+      "rating_count": 141,
+      "sold": 1270,
+      "published_days_ago": 15.0,
+      "media": [
+        "mua-thu-kyoto-trong-5-ngay"
+      ],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "tour-nhat-ban-mua-la-do-5n4d",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "quoc-te",
+      "channel": "airlife-tour",
+      "name": "Tour Nhật Bản mùa lá đỏ 5N4Đ",
+      "description": "Osaka – Kyoto – Nara – núi Phú Sĩ. Gồm vé bay, khách sạn 4 sao, visa và hướng dẫn viên.",
+      "body_html": "<p>Osaka – Kyoto – Nara – núi Phú Sĩ. Gồm vé bay, khách sạn 4 sao, visa và hướng dẫn viên.</p>",
+      "price": 18900000,
+      "old_price": 21500000,
+      "rating": 4.9,
+      "rating_count": 42,
+      "sold": 380,
+      "published_days_ago": 16.5,
+      "media": [
+        "mua-thu-kyoto-trong-5-ngay",
+        "mot-minh-di-nhat-tap-14"
+      ],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "combo-phu-quoc-3n2d-resort-5-sao",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "combo-bay-khach-san",
+      "channel": "airlife-tour",
+      "name": "Combo Phú Quốc 3N2Đ: vé bay + resort 5 sao",
+      "description": "Vé khứ hồi, 2 đêm resort 5 sao có bữa sáng, đưa đón sân bay.",
+      "body_html": "<p>Vé khứ hồi, 2 đêm resort 5 sao có bữa sáng, đưa đón sân bay.</p>",
+      "price": 4290000,
+      "old_price": 5600000,
+      "rating": 4.8,
+      "rating_count": 169,
+      "sold": 1520,
+      "published_days_ago": 18.0,
+      "media": [],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "tour-da-lat-san-may-3n2d",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "trong-nuoc",
+      "channel": "airlife-tour",
+      "name": "Tour Đà Lạt săn mây 3N2Đ",
+      "description": "Đón sân bay Liên Khương, đồi chè Cầu Đất, săn mây, khách sạn trung tâm.",
+      "body_html": "<p>Đón sân bay Liên Khương, đồi chè Cầu Đất, săn mây, khách sạn trung tâm.</p>",
+      "price": 2490000,
+      "old_price": 2990000,
+      "rating": 4.6,
+      "rating_count": 108,
+      "sold": 970,
+      "published_days_ago": 19.5,
+      "media": [],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "tour-han-quoc-seoul-nami-5n4d",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "quoc-te",
+      "channel": "airlife-tour",
+      "name": "Tour Hàn Quốc Seoul – Nami 5N4Đ",
+      "description": "Seoul – đảo Nami – Everland. Gồm vé bay, khách sạn, visa, bảo hiểm du lịch.",
+      "body_html": "<p>Seoul – đảo Nami – Everland. Gồm vé bay, khách sạn, visa, bảo hiểm du lịch.</p>",
+      "price": 12900000,
+      "old_price": 14900000,
+      "rating": 4.7,
+      "rating_count": 68,
+      "sold": 610,
+      "published_days_ago": 21.0,
+      "media": [],
+      "delivery_methods": [],
+      "variants": []
+    },
+    {
+      "slug": "combo-da-nang-4n3d-khach-san-bien",
+      "kind": "booking",
+      "category": "tour-bay",
+      "tag": "combo-bay-khach-san",
+      "channel": "airlife-tour",
+      "name": "Combo Đà Nẵng 4N3Đ: vé bay + khách sạn biển",
+      "description": "Vé khứ hồi, 3 đêm khách sạn 4 sao view biển Mỹ Khê.",
+      "body_html": "<p>Vé khứ hồi, 3 đêm khách sạn 4 sao view biển Mỹ Khê.</p>",
+      "price": 3690000,
+      "old_price": 4400000,
+      "rating": 4.6,
+      "rating_count": 246,
+      "sold": 2210,
+      "published_days_ago": 22.5,
+      "media": [],
+      "delivery_methods": [],
+      "variants": []
     }
   ]
 }

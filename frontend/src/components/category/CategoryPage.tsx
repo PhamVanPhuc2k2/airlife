@@ -8,6 +8,11 @@ import type { Category } from "@/lib/types";
 import { FilterChips } from "./FilterChips";
 import { MediaGrid } from "./MediaGrid";
 
+const SORTS = [
+  { value: "new", label: "Mới nhất" },
+  { value: "popular", label: "Xem nhiều" },
+] as const;
+
 type Props = {
   slug: "xem" | "nghe";
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -41,6 +46,7 @@ export async function CategoryPage({ slug, searchParams }: Props) {
         basePath={`/${slug}`}
         filters={category.filters ?? []}
         activeTag={tag}
+        sorts={SORTS}
         sort={sort}
       />
       <HydrationBoundary state={dehydrate(queryClient)}>

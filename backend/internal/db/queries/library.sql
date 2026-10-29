@@ -86,7 +86,8 @@ WHERE m.slug = sqlc.arg('slug') AND m.status = 'published';
 SELECT (SELECT count(*) FROM channel_followers cf WHERE cf.user_id = sqlc.arg('user_id')) AS following,
        (SELECT count(*) FROM saved_media s WHERE s.user_id = sqlc.arg('user_id')) AS saved,
        (SELECT count(*) FROM playlists p WHERE p.user_id = sqlc.arg('user_id')) AS playlists,
-       (SELECT count(*) FROM watch_history h WHERE h.user_id = sqlc.arg('user_id')) AS watched;
+       (SELECT count(*) FROM watch_history h WHERE h.user_id = sqlc.arg('user_id')) AS watched,
+       (SELECT count(*) FROM orders o WHERE o.user_id = sqlc.arg('user_id')) AS orders;
 
 -- Playlist ----------------------------------------------------------------------------------
 
