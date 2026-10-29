@@ -193,11 +193,25 @@ trang chủ, danh sách kênh đang theo dõi ở menu dọc.
 | [5.07](05-kenh-va-binh-luan/07-frontend-binh-luan.md) | Frontend: khung bình luận |
 | [5.08](05-kenh-va-binh-luan/08-binh-luan-noi-bat-va-menu.md) | Bình luận nổi bật, kênh đang theo dõi; nghiệm thu Phần 05 |
 
+### Phần 06: Bạn và Sưu tập
+
+Thư viện cá nhân: lịch sử xem và tiến độ (trình phát tự ghi, mở lại thì xem tiếp từ chỗ dừng), nội dung
+đã lưu, playlist riêng. Trang Bạn có số liệu, "Tiếp tục xem", kênh đang theo dõi; trang Sưu tập có ba tab
+và trang chi tiết playlist.
+
+| Bài | Nội dung |
+|---|---|
+| [6.01](06-ban-va-suu-tap/01-schema-thu-vien.md) | Schema thư viện cá nhân: lịch sử xem, đã lưu, playlist |
+| [6.02](06-ban-va-suu-tap/02-module-thu-vien.md) | Module thư viện: service, handler, thử API |
+| [6.03](06-ban-va-suu-tap/03-ghi-tien-do-xem.md) | Ghi tiến độ xem từ trình phát, xem tiếp từ chỗ dừng |
+| [6.04](06-ban-va-suu-tap/04-nut-luu-va-playlist.md) | Nút Lưu và hộp thoại playlist ở trang xem |
+| [6.05](06-ban-va-suu-tap/05-trang-ban.md) | Trang Bạn: số liệu, tiếp tục xem, kênh đang theo dõi |
+| [6.06](06-ban-va-suu-tap/06-trang-suu-tap.md) | Trang Sưu tập và trang playlist; nghiệm thu Phần 06 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 06 ban-va-suu-tap | Trang Bạn, Sưu tập, tiếp tục xem |
 | 07 ban-hang | Sản phẩm, biến thể, giỏ hàng, đơn hàng |
 | 08 ve-va-tour | Lịch khởi hành, hạng dịch vụ, giữ chỗ bằng lock Redis |
 | 09 thanh-toan | Cổng thanh toán, webhook |

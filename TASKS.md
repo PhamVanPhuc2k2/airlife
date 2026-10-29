@@ -157,7 +157,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
 - [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
-- [ ] `playlists`, `playlist_items`, `saved_items`, `favorites`, `watch_history` (tiến độ xem để "Tiếp tục xem")
+- [ ] ✓ `watch_history` (tiến độ xem, "Tiếp tục xem"), `saved_media`, `playlists` + `playlist_items` (riêng tư, tối đa 50 playlist × 200 mục) (Phần 06); còn `favorites` cho sản phẩm/tour (Phần 07)
 - [ ] `notifications`
 - [ ] Bảng dịch cho nội dung song ngữ (cột `title_vi/title_en` hoặc bảng `*_translations`), chốt một cách
 - [x] Index cho tìm kiếm: bật `pg_trgm` + `unaccent`, hàm `immutable_unaccent` (migration 000001). Index cụ thể tạo cùng bảng ở từng phần
@@ -183,8 +183,8 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
 - [ ] **Utilities**: chuyến bay (ra tàu bay, trạng thái, tiến độ), Flightradar (proxy API bên thứ ba), thời tiết điểm đến (proxy + cache), Wi-Fi, phòng chờ & fast-track
 - [ ] **Opinions**: trải nghiệm, khảo sát (bình chọn 1 lần/user), góp ý (có Turnstile)
-- [ ] **Me (Bạn)**: hồ sơ, chuyến bay sắp tới, đơn hàng, tiếp tục xem, kênh theo dõi
-- [ ] **Collection (Sưu tập)**: playlist, đã lưu, yêu thích, đã xem
+- [ ] **Me (Bạn)**: ✓ hồ sơ, số liệu (`/me/stats`), tiếp tục xem (`/me/continue`), kênh theo dõi, trạng thái một media (`/me/media/{slug}`) (Phần 06); còn chuyến bay sắp tới (Phần 10), đơn hàng (Phần 07)
+- [ ] **Collection (Sưu tập)**: ✓ playlist (tạo, đổi tên, xoá, thêm/bớt mục), đã lưu, đã xem + ghi tiến độ từ trình phát (Phần 06); còn yêu thích sản phẩm/tour (Phần 07), phát tự động hết playlist (hàng đợi phát trong player store)
 - [ ] **Search**: tìm chung media/sản phẩm/kênh/tin tức, gợi ý từ khóa
 - [ ] **Contact**: gửi liên hệ (có Turnstile)
 - [ ] Middleware Go xác minh token Turnstile (gọi `siteverify` của Cloudflare) cho các endpoint form công khai
@@ -272,9 +272,9 @@ Bảng dựa trên `data/content.json` của mockup:
 | `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
 | `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; ✓ bình luận; còn chia sẻ/lưu |
 | `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
-| `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ; còn chuyến bay, đơn hàng, tiếp tục xem, kênh theo dõi |
-| `suu-tap.html` | `/suu-tap` | Cần đăng nhập |
-| `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận; còn sản phẩm gắn video |
+| `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ, số liệu, tiếp tục xem, kênh theo dõi; còn chuyến bay (Phần 10), đơn hàng (Phần 07) |
+| `suu-tap.html` | `/suu-tap`, `/suu-tap/playlist/[id]` | ✓ Tab Playlist, Đã lưu, Đã xem; trang playlist; còn tab Yêu thích (Phần 07) |
+| `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận, Lưu, thêm vào playlist, xem tiếp từ chỗ dừng; còn sản phẩm gắn video |
 | `san-pham.html?id=` | `/san-pham/[slug]` | Vé/tour có chọn ngày, số khách |
 | `kenh.html?id=` | `/kenh/[slug]` | ✓ Ảnh bìa, thông tin, theo dõi, lưới nội dung của kênh; còn tab sản phẩm của kênh doanh nghiệp (Phần 07) |
 | `lien-he.html` | `/lien-he` | Form liên hệ |

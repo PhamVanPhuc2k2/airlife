@@ -112,6 +112,27 @@ type NewsCategory struct {
 	SortOrder   int16
 }
 
+type Playlist struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Name      string
+	ItemCount int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type PlaylistItem struct {
+	PlaylistID uuid.UUID
+	MediaID    uuid.UUID
+	AddedAt    time.Time
+}
+
+type SavedMedium struct {
+	UserID    uuid.UUID
+	MediaID   uuid.UUID
+	CreatedAt time.Time
+}
+
 type User struct {
 	ID              uuid.UUID
 	Email           string
@@ -123,5 +144,13 @@ type User struct {
 	EmailVerifiedAt *time.Time
 	LastLoginAt     *time.Time
 	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+type WatchHistory struct {
+	UserID          uuid.UUID
+	MediaID         uuid.UUID
+	PositionSeconds int32
+	DurationSeconds int32
 	UpdatedAt       time.Time
 }

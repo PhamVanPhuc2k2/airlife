@@ -114,6 +114,15 @@ const LINE_ICONS = {
   comment: <path d="M4 5h16v11H9l-5 4z" />,
   trash: <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />,
   fire: <path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z" />,
+  bookmark: <path d="M6 3h12v18l-6-4-6 4z" />,
+  plus: <path d="M12 5v14M5 12h14" />,
+  history: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v4l3 2" />
+    </>
+  ),
+  pencil: <path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4" />,
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,

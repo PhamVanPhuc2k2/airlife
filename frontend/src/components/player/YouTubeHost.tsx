@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef } from "react";
 
 import { api } from "@/lib/api";
+import { useMe } from "@/lib/auth";
 import { cn } from "@/lib/cn";
+import { useInvalidateLibrary } from "@/lib/library";
 import { usePlayerStore } from "@/stores/player-store";
 
 // Trình phát YouTube duy nhất của cả site (xem giải thích ở stores/player-store.ts).
@@ -26,13 +28,48 @@ function loadYouTubeAPI(): Promise<void> {
   return apiReady;
 }
 
+// Ghi tiến độ xem mỗi 15 giây khi đang phát (và ngay khi dừng, hết bài, đổi bài, đóng tab).
+// 15 giây: mất tối đa 15 giây tiến độ nếu trình duyệt tắt đột ngột, đổi lại mỗi người xem chỉ
+// tạo 4 request mỗi phút.
+const PROGRESS_EVERY_MS = 15_000;
+
 export function YouTubeHost() {
   const current = usePlayerStore((s) => s.current);
   const slot = usePlayerStore((s) => s.slot);
+  const playing = usePlayerStore((s) => s.playing);
   const hostRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YT.Player | null>(null);
   const countedRef = useRef<string | null>(null); // slug đã gửi lượt xem
+  const { me } = useMe();
+  const invalidateLibrary = useInvalidateLibrary();
+
+  // Gửi tiến độ của bài đang phát. useEffectEvent: hàm luôn đọc giá trị mới nhất (me) mà không
+  // phải đưa vào danh sách phụ thuộc của các effect gọi nó, nên timer và listener không bị tạo
+  // lại mỗi lần render. keepalive: request vẫn đi khi tab đang đóng.
+  // slug: mặc định là bài đang phát; lúc đổi bài thì truyền slug của bài CŨ (store đã sang bài mới).
+  const report = useEffectEvent(
+    ({
+      slug = usePlayerStore.getState().current?.slug,
+      refresh = false,
+      keepalive = false,
+    }: { slug?: string; refresh?: boolean; keepalive?: boolean } = {}) => {
+      const p = playerRef.current;
+      if (!me || !p?.getCurrentTime || !slug) return;
+      const position = Math.floor(p.getCurrentTime());
+      const duration = Math.floor(p.getDuration());
+      if (duration <= 0 || position <= 0) return; // chưa phát giây nào
+      api(`/me/history/${slug}`, {
+        method: "PUT",
+        body: JSON.stringify({ position, duration }),
+        keepalive,
+      })
+        .then(() => refresh && invalidateLibrary(slug))
+        .catch(() => {
+          // Ghi tiến độ hỏng không được làm phiền người đang xem
+        });
+    },
+  );
 
   // Tạo trình phát lần đầu, hoặc đổi video khi current đổi
   useEffect(() => {
@@ -58,12 +95,17 @@ export function YouTubeHost() {
               play: () => p.playVideo(),
               pause: () => p.pauseVideo(),
               seekBy: (sec) => p.seekTo(Math.max(0, p.getCurrentTime() + sec), true),
+              seekTo: (sec) => p.seekTo(sec, true),
               setMuted: (m) => (m ? p.mute() : p.unMute()),
             });
           },
           onStateChange: (e) => {
             const playing = e.data === YT.PlayerState.PLAYING;
             store().setPlaying(playing);
+            // Dừng hoặc hết bài: ghi tiến độ ngay và làm mới "Tiếp tục xem", "Đã xem"
+            if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+              report({ refresh: true });
+            }
             // Lượt xem: gửi một lần cho mỗi bài, khi bắt đầu phát thật (không phải lúc mở trang)
             const slug = store().current?.slug;
             if (playing && slug && countedRef.current !== slug) {
@@ -81,8 +123,30 @@ export function YouTubeHost() {
     };
   }, [current]);
 
+  // Đổi sang bài khác (hoặc đóng trình phát): ghi tiến độ của bài cũ. Cleanup chạy trước khi
+  // trình phát nạp bài mới, nên getCurrentTime() vẫn là của bài cũ; slug lấy từ biến current mà
+  // cleanup này "nhớ", vì store lúc đó đã là bài mới.
+  useEffect(() => {
+    if (!current) return;
+    const slug = current.slug;
+    return () => report({ slug, refresh: true });
+  }, [current]);
+
+  // Khi đang phát: ghi tiến độ định kỳ. Đóng tab / chuyển app trên điện thoại: ghi lần cuối.
+  useEffect(() => {
+    if (!playing) return;
+    const id = window.setInterval(() => report(), PROGRESS_EVERY_MS);
+    const onHide = () => {
+      if (document.visibilityState === "hidden") report({ keepalive: true });
+    };
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onHide);
+    };
+  }, [playing]);
+
   // Cập nhật tiến độ cho thanh đường băng, 2 lần mỗi giây khi đang phát
-  const playing = usePlayerStore((s) => s.playing);
   useEffect(() => {
     if (!playing) return;
     const id = window.setInterval(() => {

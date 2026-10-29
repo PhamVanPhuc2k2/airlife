@@ -150,6 +150,18 @@ func toCard(m db.ListMediaNewRow) Card {
 	}
 }
 
+// CardOf dựng Card từ dòng media và kênh đầy đủ. Dùng cho truy vấn có sqlc.embed ở module khác
+// (thư viện cá nhân: lịch sử xem, đã lưu, playlist).
+func CardOf(m db.Medium, c db.Channel) Card {
+	return Card{
+		ID: m.ID, Slug: m.Slug, Kind: m.Kind, Category: m.CategorySlug, Title: m.Title,
+		GroupLabel: m.GroupLabel, GenreLabel: m.GenreLabel, YoutubeID: m.YoutubeID,
+		ThumbnailURL: m.ThumbnailUrl, DurationSeconds: m.DurationSeconds, EpisodeCount: m.EpisodeCount,
+		ViewCount: m.ViewCount, Featured: m.Featured, PublishedAt: m.PublishedAt,
+		Channel: Channel{Slug: c.Slug, Name: c.Name, Verified: c.Verified},
+	}
+}
+
 // LineupMonths: các tháng có line-up phim, mới nhất trước.
 func (r *Repository) LineupMonths(ctx context.Context) ([]time.Time, error) {
 	return r.q.ListLineupMonths(ctx)

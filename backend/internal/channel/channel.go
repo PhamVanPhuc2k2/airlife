@@ -42,10 +42,14 @@ type FollowState struct {
 	Followers int64 `json:"followers_count"`
 }
 
+// Brief: một kênh trong danh sách "Kênh đang theo dõi" (menu dọc, trang Bạn).
 type Brief struct {
-	Slug     string `json:"slug"`
-	Name     string `json:"name"`
-	Verified bool   `json:"verified"`
+	Slug      string  `json:"slug"`
+	Name      string  `json:"name"`
+	Type      string  `json:"type"`
+	Verified  bool    `json:"verified"`
+	Followers int64   `json:"followers_count"`
+	AvatarURL *string `json:"avatar_url"`
 }
 
 type Service struct {
@@ -129,7 +133,10 @@ func (s *Service) Following(ctx context.Context, userID uuid.UUID) ([]Brief, err
 	}
 	out := make([]Brief, 0, len(rows))
 	for _, r := range rows {
-		out = append(out, Brief{Slug: r.Slug, Name: r.Name, Verified: r.Verified})
+		out = append(out, Brief{
+			Slug: r.Slug, Name: r.Name, Type: r.Type, Verified: r.Verified,
+			Followers: r.FollowersCount, AvatarURL: r.AvatarUrl,
+		})
 	}
 	return out, nil
 }

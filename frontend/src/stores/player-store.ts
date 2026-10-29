@@ -21,6 +21,7 @@ export type PlayerController = {
   play: () => void;
   pause: () => void;
   seekBy: (seconds: number) => void;
+  seekTo: (seconds: number) => void;
   setMuted: (muted: boolean) => void;
 };
 
@@ -32,12 +33,15 @@ type PlayerState = {
   duration: number; // tổng số giây
   slot: HTMLElement | null;
   controller: PlayerController | null;
+  resumedAt: number | null; // đã tự tua tới giây này (xem tiếp từ lần trước), để hiện "Xem từ đầu"
 
   play: (item: NowPlaying) => void;
   togglePlay: () => void;
   toggleMute: () => void;
   seekBy: (seconds: number) => void;
   close: () => void;
+  resume: (seconds: number) => void;
+  restart: () => void;
 
   // Chỉ YouTubeHost / PlayerSlot gọi
   setSlot: (el: HTMLElement | null) => void;
@@ -54,10 +58,11 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
   duration: 0,
   slot: null,
   controller: null,
+  resumedAt: null,
 
   play: (item) => {
     if (get().current?.slug === item.slug) return; // đang phát đúng bài này rồi
-    set({ current: item, playing: true, time: 0, duration: 0 });
+    set({ current: item, playing: true, time: 0, duration: 0, resumedAt: null });
   },
   togglePlay: () => {
     const { playing, controller } = get();
@@ -72,7 +77,15 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
   seekBy: (seconds) => get().controller?.seekBy(seconds),
   close: () => {
     get().controller?.pause();
-    set({ current: null, playing: false, time: 0, duration: 0 });
+    set({ current: null, playing: false, time: 0, duration: 0, resumedAt: null });
+  },
+  resume: (seconds) => {
+    get().controller?.seekTo(seconds);
+    set({ resumedAt: seconds });
+  },
+  restart: () => {
+    get().controller?.seekTo(0);
+    set({ resumedAt: null });
   },
 
   setSlot: (el) => set({ slot: el }),

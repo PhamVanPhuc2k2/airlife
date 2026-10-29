@@ -5,6 +5,8 @@ import { permanentRedirect } from "next/navigation";
 import { Icon } from "@/components/icons/Icon";
 import { FollowButton } from "@/components/channel/FollowButton";
 import { CommentSection } from "@/components/comment/CommentSection";
+import { MediaActions } from "@/components/library/MediaActions";
+import { ResumeNote } from "@/components/library/ResumeNote";
 import { mediaHref, viewWord } from "@/components/media/links";
 import { PlayerSlot } from "@/components/player/PlayerSlot";
 import { Avatar } from "@/components/ui/Avatar";
@@ -39,6 +41,7 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
         ) : (
           <NoVideo thumbnail={media.thumbnail_url} />
         )}
+        {media.youtube_id && <ResumeNote slug={media.slug} />}
 
         <h1 className="mt-4 text-xl font-bold md:text-2xl">{media.title}</h1>
         <p className="mt-1 text-sm text-ink-muted">
@@ -63,6 +66,7 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
             slug={media.channel.slug}
             initial={{ following: false, followers_count: media.channel.followers_count ?? 0 }}
           />
+          <MediaActions slug={media.slug} title={media.title} />
         </div>
 
         <div className="mt-4 whitespace-pre-line rounded-card bg-surface-2 p-4 text-[15px] leading-relaxed">

@@ -4,13 +4,25 @@ import Link from "next/link";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar } from "@/components/ui/Avatar";
 import { compactNumber, durationLabel, timeAgo } from "@/lib/format";
-import type { MediaCard as Media } from "@/lib/types";
+import type { MediaCard as Media, Progress } from "@/lib/types";
 
 import { mediaHref, viewWord } from "./links";
 
 // Thẻ media trong lưới (trang chủ, chuyên mục). Ảnh 16:9, nhãn thời lượng góc dưới phải,
 // avatar kênh + tiêu đề + "1,1 Tr lượt xem · 2 tuần trước" như mockup.
-export function MediaCard({ media, priority = false }: { media: Media; priority?: boolean }) {
+// progress (lịch sử xem): vạch đỏ ở đáy ảnh cho biết đã xem tới đâu. action: nút thêm ở góc
+// phải (vd. "Bỏ khỏi lịch sử"), do nơi dùng truyền vào.
+export function MediaCard({
+  media,
+  priority = false,
+  progress,
+  action,
+}: {
+  media: Media;
+  priority?: boolean;
+  progress?: Progress;
+  action?: React.ReactNode;
+}) {
   const href = mediaHref(media);
   const duration = durationLabel(media);
   return (
@@ -31,11 +43,21 @@ export function MediaCard({ media, priority = false }: { media: Media; priority?
               {duration}
             </span>
           )}
+          {progress && (
+            <span className="absolute inset-x-0 bottom-0 h-1 bg-white/40">
+              <span
+                className="block h-full bg-danger"
+                style={{
+                  width: `${Math.min(100, (progress.position / progress.duration) * 100)}%`,
+                }}
+              />
+            </span>
+          )}
         </div>
       </Link>
       <div className="mt-3 flex gap-3">
         <Avatar name={media.channel.name} size="sm" />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3 className="line-clamp-2 font-semibold leading-snug">
             <Link href={href} className="hover:text-brand-700">
               {media.title}
@@ -60,6 +82,7 @@ export function MediaCard({ media, priority = false }: { media: Media; priority?
             </time>
           </p>
         </div>
+        {action}
       </div>
     </article>
   );

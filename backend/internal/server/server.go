@@ -24,6 +24,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/library"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
@@ -99,6 +100,7 @@ func (s *Server) Handler() (http.Handler, error) {
 	channelH := channel.NewHandler(channel.NewService(s.deps.DB), s.deps.Log)
 	commentSvc := comment.NewService(s.deps.DB, s.deps.Redis)
 	commentH := comment.NewHandler(commentSvc, s.deps.Log)
+	libraryH := library.NewHandler(library.NewService(s.deps.DB), s.deps.Log)
 	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
@@ -160,7 +162,32 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/channels/{slug}", channelH.Get)
 		r.With(requireAuth).Post("/channels/{slug}/follow", channelH.Follow)
 		r.With(requireAuth).Delete("/channels/{slug}/follow", channelH.Unfollow)
-		r.With(requireAuth).Get("/me/following", channelH.Following)
+
+		// Thư viện cá nhân (trang Bạn, Sưu tập): mọi route đều cần đăng nhập
+		r.Route("/me", func(r chi.Router) {
+			r.Use(requireAuth)
+			r.Get("/following", channelH.Following)
+			r.Get("/stats", libraryH.Stats)
+			r.Get("/media/{slug}", libraryH.MediaState)
+
+			r.Get("/continue", libraryH.Continue)
+			r.Get("/history", libraryH.History)
+			r.Delete("/history", libraryH.ClearHistory)
+			r.Put("/history/{slug}", libraryH.SaveProgress)
+			r.Delete("/history/{slug}", libraryH.RemoveHistory)
+
+			r.Get("/saved", libraryH.Saved)
+			r.Put("/saved/{slug}", libraryH.Save)
+			r.Delete("/saved/{slug}", libraryH.Unsave)
+
+			r.Get("/playlists", libraryH.Playlists)
+			r.Post("/playlists", libraryH.CreatePlaylist)
+			r.Get("/playlists/{id}", libraryH.Playlist)
+			r.Patch("/playlists/{id}", libraryH.RenamePlaylist)
+			r.Delete("/playlists/{id}", libraryH.DeletePlaylist)
+			r.Put("/playlists/{id}/items/{slug}", libraryH.AddItem)
+			r.Delete("/playlists/{id}/items/{slug}", libraryH.RemoveItem)
+		})
 
 		r.Get("/media/{slug}/comments", commentH.List("media"))
 		r.With(requireAuth).Post("/media/{slug}/comments", commentH.Create("media"))

@@ -1,6 +1,6 @@
 # Bài 5.08: Bình luận nổi bật ở trang chủ, kênh đang theo dõi ở menu; nghiệm thu Phần 05
 
-> [← Bài trước](07-frontend-binh-luan.md) · [Mục lục](../README.md)
+> [← Bài trước](07-frontend-binh-luan.md) · [Mục lục](../README.md) · [Phần 06 →](../06-ban-va-suu-tap/01-schema-thu-vien.md)
 
 ## Mục tiêu
 
@@ -454,7 +454,7 @@ Nghiệm thu Phần 05 trên trình duyệt (http://localhost:3000):
 git add . && git commit -m "Frontend kênh, bình luận, bình luận nổi bật"
 ```
 
-Đến đây xong Phần 05.
+Đến đây xong Phần 05. Tiếp theo: [Phần 06 →](../06-ban-va-suu-tap/01-schema-thu-vien.md)
 
 ## Hay gặp lỗi
 

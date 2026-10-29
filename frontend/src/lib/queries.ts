@@ -1,7 +1,7 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { api, qs } from "./api";
-import type { CommentPage, MediaPage, NewsPage } from "./types";
+import type { CommentPage, LibraryPage, MediaPage, NewsPage } from "./types";
 
 // Mỗi truy vấn khai báo một lần (key + hàm lấy dữ liệu) bằng infiniteQueryOptions, dùng chung
 // cho server (prefetch) và client (useInfiniteQuery). Key giống nhau thì client nhận lại đúng
@@ -58,6 +58,18 @@ export function repliesOptions(commentId: string) {
     queryKey: ["comments", "replies", commentId],
     queryFn: ({ pageParam, signal }) =>
       api<CommentPage>(`/comments/${commentId}/replies?${qs({ cursor: pageParam })}`, { signal }),
+    initialPageParam: "",
+    getNextPageParam: (last) => last.next_cursor || undefined,
+  });
+}
+
+// Lịch sử xem / đã lưu của người đang đăng nhập. Key bắt đầu bằng "me": đăng xuất thì
+// useLogout xoá sạch cache, không để lộ cho người dùng sau trên cùng máy.
+export function libraryListOptions(list: "history" | "saved") {
+  return infiniteQueryOptions({
+    queryKey: ["me", list],
+    queryFn: ({ pageParam, signal }) =>
+      api<LibraryPage>(`/me/${list}?${qs({ cursor: pageParam })}`, { signal }),
     initialPageParam: "",
     getNextPageParam: (last) => last.next_cursor || undefined,
   });

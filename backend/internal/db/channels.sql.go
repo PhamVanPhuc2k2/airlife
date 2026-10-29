@@ -102,7 +102,7 @@ func (q *Queries) IsFollowing(ctx context.Context, arg IsFollowingParams) (bool,
 }
 
 const listFollowing = `-- name: ListFollowing :many
-SELECT c.slug, c.name, c.verified
+SELECT c.slug, c.name, c.type, c.verified, c.followers_count, c.avatar_url
 FROM channel_followers cf
 JOIN channels c ON c.id = cf.channel_id
 WHERE cf.user_id = $1
@@ -111,9 +111,12 @@ LIMIT 50
 `
 
 type ListFollowingRow struct {
-	Slug     string
-	Name     string
-	Verified bool
+	Slug           string
+	Name           string
+	Type           string
+	Verified       bool
+	FollowersCount int64
+	AvatarUrl      *string
 }
 
 // Kênh người dùng đang theo dõi (menu dọc), theo dõi gần nhất trước.
@@ -126,7 +129,14 @@ func (q *Queries) ListFollowing(ctx context.Context, userID uuid.UUID) ([]ListFo
 	items := []ListFollowingRow{}
 	for rows.Next() {
 		var i ListFollowingRow
-		if err := rows.Scan(&i.Slug, &i.Name, &i.Verified); err != nil {
+		if err := rows.Scan(
+			&i.Slug,
+			&i.Name,
+			&i.Type,
+			&i.Verified,
+			&i.FollowersCount,
+			&i.AvatarUrl,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

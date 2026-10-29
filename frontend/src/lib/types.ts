@@ -108,7 +108,15 @@ export type ChannelDetail = {
   following: boolean;
 };
 
-export type ChannelBrief = { slug: string; name: string; verified: boolean };
+// Kênh trong danh sách "Kênh đang theo dõi" (GET /me/following)
+export type ChannelBrief = {
+  slug: string;
+  name: string;
+  type: ChannelDetail["type"];
+  verified: boolean;
+  followers_count: number;
+  avatar_url: string | null;
+};
 
 export type Comment = {
   id: string;
@@ -124,3 +132,28 @@ export type Comment = {
 export type CommentPage = { items: Comment[]; next_cursor?: string };
 
 export type HotComment = Comment & { media: { slug: string; category: string; title: string } };
+
+// Thư viện cá nhân (Phần 06) ------------------------------------------------------------------
+
+// Đã xem tới giây thứ position trên tổng duration giây
+export type Progress = { position: number; duration: number };
+
+// Media trong thư viện. progress chỉ có ở lịch sử xem / tiếp tục xem
+export type LibraryItem = MediaCard & { progress?: Progress };
+
+export type LibraryPage = { items: LibraryItem[]; next_cursor?: string };
+
+// GET /me/media/{slug}: trạng thái của một media với người đang xem
+export type MediaState = { saved: boolean; progress: Progress | null; playlist_ids: string[] };
+
+export type LibraryStats = { following: number; saved: number; playlists: number; watched: number };
+
+export type Playlist = {
+  id: string;
+  name: string;
+  item_count: number;
+  updated_at: string;
+  first?: { slug: string; category: string; thumbnail_url: string };
+};
+
+export type PlaylistDetail = Playlist & { items: LibraryItem[] };

@@ -23,7 +23,7 @@ RETURNING followers_count;
 
 -- Kênh người dùng đang theo dõi (menu dọc), theo dõi gần nhất trước.
 -- name: ListFollowing :many
-SELECT c.slug, c.name, c.verified
+SELECT c.slug, c.name, c.type, c.verified, c.followers_count, c.avatar_url
 FROM channel_followers cf
 JOIN channels c ON c.id = cf.channel_id
 WHERE cf.user_id = $1

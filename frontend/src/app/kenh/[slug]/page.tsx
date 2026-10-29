@@ -5,6 +5,7 @@ import { cache } from "react";
 
 import { MediaGrid } from "@/components/category/MediaGrid";
 import { FollowButton } from "@/components/channel/FollowButton";
+import { CHANNEL_TYPE_LABEL } from "@/components/channel/labels";
 import { Icon } from "@/components/icons/Icon";
 import { Avatar } from "@/components/ui/Avatar";
 import { ApiError, api } from "@/lib/api";
@@ -13,13 +14,6 @@ import { mediaListOptions } from "@/lib/queries";
 import type { ChannelDetail } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-const TYPE_LABEL: Record<ChannelDetail["type"], string> = {
-  distributor: "Nhà phân phối nội dung",
-  creator: "Nhà sáng tạo",
-  business: "Doanh nghiệp",
-  travel: "Doanh nghiệp lữ hành",
-};
 
 const getChannel = cache(async (slug: string) => {
   try {
@@ -67,7 +61,7 @@ export default async function ChannelPage({ params }: Props) {
               )}
             </h1>
             <p className="text-ink-muted">
-              {TYPE_LABEL[channel.type]} · {channel.media_count} nội dung
+              {CHANNEL_TYPE_LABEL[channel.type]} · {channel.media_count} nội dung
             </p>
             <p className="mt-1 max-w-3xl text-ink-2">{channel.description}</p>
           </div>
