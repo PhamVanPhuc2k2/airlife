@@ -9,7 +9,7 @@ BACKEND_RUN  := $(COMPOSE) run --rm --no-deps api
 GOLANGCI     := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 GOVULNCHECK  := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 
-.PHONY: help up down restart logs ps psql migrate migrate-down migrate-new lint fmt vuln tidy \
+.PHONY: help up down restart logs ps psql migrate migrate-down migrate-new sqlc seed lint fmt vuln tidy \
         npm fe-lint fe-typecheck fe-format fe-audit
 
 help: ## Liệt kê các lệnh
@@ -42,6 +42,12 @@ migrate-down: ## Lùi 1 migration
 migrate-new: ## Tạo cặp file migration mới: make migrate-new name=create_users
 	@test -n "$(name)" || (echo "Thiếu tên: make migrate-new name=create_users" && exit 1)
 	$(COMPOSE) run --rm --no-deps migrate create -ext sql -dir /migrations -seq -digits 6 $(name)
+
+sqlc: ## Sinh code Go từ backend/internal/db/queries/*.sql
+	$(COMPOSE) run --rm sqlc generate
+
+seed: ## Nạp dữ liệu mẫu (chỉ môi trường dev)
+	$(COMPOSE) run --rm api go run ./cmd/seed
 
 lint: ## golangci-lint v2 cho backend
 	$(BACKEND_RUN) $(GOLANGCI) run ./...

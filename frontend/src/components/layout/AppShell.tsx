@@ -1,5 +1,6 @@
 "use client";
 
+import { YouTubeHost } from "@/components/player/YouTubeHost";
 import { usePlayerStore } from "@/stores/player-store";
 import { useUIStore } from "@/stores/ui-store";
 
@@ -24,7 +25,8 @@ import { TopNav } from "./TopNav";
 //   ≥ 1280   (xl):       menu đầy đủ 232px; ☰ thu gọn thành thanh icon 76px
 export function AppShell({ children }: { children: React.ReactNode }) {
   const navCollapsed = useUIStore((s) => s.navCollapsed);
-  const hasPlayer = usePlayerStore((s) => s.current !== null);
+  // Thanh mini player chỉ hiện khi đang phát và không ở trang xem (MiniPlayer.tsx)
+  const hasPlayer = usePlayerStore((s) => s.current !== null && s.slot === null);
 
   return (
     <div className="group/app" data-collapsed={navCollapsed} data-playing={hasPlayer}>
@@ -59,6 +61,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Footer />
       </div>
 
+      <YouTubeHost />
       <MiniPlayer />
       <TabBar />
     </div>

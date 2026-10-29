@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 import "./globals.css";
 
@@ -34,7 +35,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi" className={beVietnamPro.variable}>
       <body>
-        <AppShell>{children}</AppShell>
+        <QueryProvider>
+          <AppShell>{children}</AppShell>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,61 +1,50 @@
-import { DemoPlayButton } from "@/components/dev/DemoPlayButton";
+import { FeaturedHero } from "@/components/media/FeaturedHero";
+import { MediaCard } from "@/components/media/MediaCard";
+import { MediaTile } from "@/components/media/MediaTile";
+import { RankList } from "@/components/media/RankList";
+import { Panel } from "@/components/ui/Panel";
+import { api } from "@/lib/api";
+import type { Home } from "@/lib/types";
 
-// Trang tạm: kiểm tra logo, font, theme Tailwind và layout. Phần 02 thay bằng trang chủ thật.
-const swatches = [
-  { name: "brand-600", className: "bg-brand-600 text-white" },
-  { name: "brand-300", className: "bg-brand-300 text-ink" },
-  { name: "accent-700", className: "bg-accent-700 text-white" },
-  { name: "accent-light", className: "bg-accent-light text-ink" },
-  { name: "surface-2", className: "bg-surface-2 text-ink" },
-  { name: "overlay", className: "bg-overlay text-white" },
-];
+// Trang lấy dữ liệu từ API lúc có request, không dựng sẵn lúc build (lúc build không có API
+// để gọi). Dữ liệu đã được backend cache 60 giây bằng Redis.
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+// Server component: lấy dữ liệu ngay trên server, gửi về HTML có sẵn nội dung (tốt cho SEO,
+// hiện nhanh), không có JavaScript nào cho phần này chạy trên trình duyệt.
+export default async function HomePage() {
+  const home = await api<Home>("/home");
+
   return (
-    <main className="mx-auto max-w-4xl space-y-10 px-4 py-12">
-      {/* eslint-disable-next-line @next/next/no-img-element -- SVG tĩnh, không cần tối ưu ảnh */}
-      <img
-        src="/brand/airlife-logo.svg"
-        alt="Airlife – Đời sống hàng không"
-        className="h-24 w-auto"
-      />
+    <div className="mx-auto max-w-[1680px] space-y-8 px-3 py-4 md:px-6 md:py-6">
+      {/* Bố cục theo bản vẽ tay của mockup: 3 ô | khối nổi bật | cột phải.
+          Cột phải sẽ là "Bình luận nổi bật" (Phần 04); tạm đặt "Nghe nhiều". */}
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,2.1fr)] xl:grid-cols-[minmax(0,0.9fr)_minmax(0,2.1fr)_minmax(280px,1fr)]">
+        <div className="lg:order-2">{home.featured && <FeaturedHero media={home.featured} />}</div>
 
-      <section className="space-y-2">
-        <h1 className="text-3xl font-bold">Đời sống hàng không</h1>
-        <p className="text-ink-muted">
-          Font Be Vietnam Pro: ă â đ ê ô ơ ư — Ấ Ầ Ẩ Ẫ Ậ — Phở Hà Nội, Đà Lạt, Huế.
-        </p>
-        <p className="text-lg font-semibold text-accent-700">1.590.000₫</p>
-      </section>
+        <div className="-mx-3 flex snap-x gap-3 overflow-x-auto px-3 [scrollbar-width:none] lg:order-1 lg:mx-0 lg:grid lg:grid-rows-3 lg:overflow-visible lg:px-0">
+          {home.latest.map((m) => (
+            <div key={m.id} className="w-[72%] shrink-0 snap-start sm:w-[45%] lg:w-auto">
+              <MediaTile media={m} />
+            </div>
+          ))}
+        </div>
 
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {swatches.map((s) => (
-          <div
-            key={s.name}
-            className={`rounded-card p-4 text-sm font-medium shadow-sm ${s.className}`}
-          >
-            {s.name}
-          </div>
-        ))}
-        <div className="col-span-2 rounded-card bg-gradient-accent p-4 text-sm font-medium text-white sm:col-span-3">
-          gradient-accent
+        <div className="lg:order-3 lg:col-span-2 xl:col-span-1">
+          <Panel title="Nghe nhiều" icon="sound" moreHref="/nghe?sort=popular">
+            <RankList items={home.top_listen} />
+          </Panel>
         </div>
       </section>
 
-      <div className="flex flex-wrap gap-3">
-        <button className="rounded-card-sm bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-brand transition hover:bg-brand-700">
-          Xem ngay
-        </button>
-        <button className="rounded-card-sm bg-accent-700 px-5 py-2.5 font-semibold text-white transition hover:bg-accent-800">
-          Mua ngay
-        </button>
-        <DemoPlayButton />
-      </div>
-
-      <div className="rounded-card bg-overlay p-6">
-        {/* eslint-disable-next-line @next/next/no-img-element -- SVG tĩnh */}
-        <img src="/brand/airlife-logo-white.svg" alt="Airlife" className="h-16 w-auto" />
-      </div>
-    </main>
+      <section>
+        <h2 className="mb-4 text-xl font-bold">Đang được xem nhiều</h2>
+        <div className="grid gap-x-4 gap-y-7 sm:grid-cols-2 xl:grid-cols-4">
+          {home.trending.map((m) => (
+            <MediaCard key={m.id} media={m} />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

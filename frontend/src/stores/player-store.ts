@@ -1,35 +1,82 @@
 import { create } from "zustand";
 
-// Bài/video đang phát, hiện ở mini player dưới đáy trang.
-// Layout gốc không bị dựng lại khi chuyển trang trong Next.js, nên state này còn nguyên khi
-// khách bấm sang trang khác: nghe tiếp mà không bị ngắt (đúng ý mockup).
+// Trạng thái trình phát dùng chung cho cả trang.
 //
-// Bản khởi đầu: chưa nối với YouTube. Phần 02 (nội dung Xem/Nghe) thêm trình phát YouTube
-// thật, thời gian thực và tua 10 giây.
+// Chỉ có MỘT trình phát YouTube (YouTubeHost, gắn trong AppShell). Trang xem đăng ký một "ô"
+// (slot) để trình phát nằm đè đúng chỗ đó; rời trang xem thì ô bị gỡ và trình phát thu thành
+// ô nổi nhỏ ở góc dưới. Vì iframe không bao giờ bị gỡ khỏi DOM, video không tải lại khi
+// chuyển trang. (Di chuyển iframe sang chỗ khác trong DOM là trình duyệt tải lại nó từ đầu.)
 export type NowPlaying = {
-  id: string;
+  slug: string;
+  category: string;
   title: string;
   channel: string;
   thumbnail: string;
-  duration: string; // "1:12:00"
+  youtubeId: string;
+};
+
+// Các lệnh điều khiển trình phát thật. YouTubeHost đăng ký khi trình phát sẵn sàng; nút ở
+// mini player gọi qua đây, không cần biết gì về YouTube.
+export type PlayerController = {
+  play: () => void;
+  pause: () => void;
+  seekBy: (seconds: number) => void;
+  setMuted: (muted: boolean) => void;
 };
 
 type PlayerState = {
   current: NowPlaying | null;
   playing: boolean;
   muted: boolean;
+  time: number; // giây đã phát
+  duration: number; // tổng số giây
+  slot: HTMLElement | null;
+  controller: PlayerController | null;
+
   play: (item: NowPlaying) => void;
   togglePlay: () => void;
   toggleMute: () => void;
+  seekBy: (seconds: number) => void;
   close: () => void;
+
+  // Chỉ YouTubeHost / PlayerSlot gọi
+  setSlot: (el: HTMLElement | null) => void;
+  setController: (c: PlayerController | null) => void;
+  setPlaying: (playing: boolean) => void;
+  setProgress: (time: number, duration: number) => void;
 };
 
-export const usePlayerStore = create<PlayerState>()((set) => ({
+export const usePlayerStore = create<PlayerState>()((set, get) => ({
   current: null,
   playing: false,
   muted: false,
-  play: (item) => set({ current: item, playing: true }),
-  togglePlay: () => set((s) => ({ playing: !s.playing })),
-  toggleMute: () => set((s) => ({ muted: !s.muted })),
-  close: () => set({ current: null, playing: false }),
+  time: 0,
+  duration: 0,
+  slot: null,
+  controller: null,
+
+  play: (item) => {
+    if (get().current?.slug === item.slug) return; // đang phát đúng bài này rồi
+    set({ current: item, playing: true, time: 0, duration: 0 });
+  },
+  togglePlay: () => {
+    const { playing, controller } = get();
+    if (playing) controller?.pause();
+    else controller?.play();
+  },
+  toggleMute: () => {
+    const muted = !get().muted;
+    get().controller?.setMuted(muted);
+    set({ muted });
+  },
+  seekBy: (seconds) => get().controller?.seekBy(seconds),
+  close: () => {
+    get().controller?.pause();
+    set({ current: null, playing: false, time: 0, duration: 0 });
+  },
+
+  setSlot: (el) => set({ slot: el }),
+  setController: (c) => set({ controller: c }),
+  setPlaying: (playing) => set({ playing }),
+  setProgress: (time, duration) => set({ time, duration }),
 }));

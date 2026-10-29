@@ -17,7 +17,11 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/category"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
 )
@@ -75,10 +79,32 @@ func (s *Server) Handler() (http.Handler, error) {
 	r.Get("/healthz", s.healthz)
 	r.Get("/readyz", s.readyz)
 
+	// Nối dây các module: repository/service/handler tạo một lần ở đây.
+	q := db.New(s.deps.DB)
+	clientIP := func(r *http.Request) string { return ClientIP(r.Context()) }
+
+	categorySvc := category.NewService(q, s.deps.Redis)
+	categoryH := category.NewHandler(categorySvc, s.deps.Log)
+
+	mediaSvc := media.NewService(media.NewRepository(q), s.deps.Redis)
+	mediaH := media.NewHandler(mediaSvc, s.deps.Log, clientIP)
+
+	homeH := home.NewHandler(home.NewService(mediaSvc, s.deps.Redis), s.deps.Log)
+
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/ping", func(w http.ResponseWriter, _ *http.Request) {
 			response.OK(w, map[string]string{"message": "pong"})
 		})
+
+		r.Get("/home", homeH.Get)
+
+		r.Get("/categories", categoryH.List)
+		r.Get("/categories/{slug}", categoryH.Get)
+
+		r.Get("/media", mediaH.List)
+		r.Get("/media/{slug}", mediaH.Get)
+		r.Get("/media/{slug}/related", mediaH.Related)
+		r.Post("/media/{slug}/views", mediaH.RecordView)
 	})
 
 	return r, nil

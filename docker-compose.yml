@@ -68,6 +68,8 @@ services:
     environment:
       # Địa chỉ API mà TRÌNH DUYỆT gọi tới (nên là localhost của máy, không phải tên service)
       NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8080}
+      # Địa chỉ API mà SERVER Next.js (trong container này) gọi tới: tên service trong mạng Docker
+      API_INTERNAL_URL: http://api:8080
       NEXT_PUBLIC_SITE_URL: http://localhost:${FRONTEND_PORT:-3000}
       npm_config_cache: /tmp/.npm # user theo UID có thể không có thư mục home
       npm_config_update_notifier: "false" # tắt thông báo "npm có bản mới" làm rối log
@@ -96,6 +98,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # Sinh code Go từ SQL: make sqlc. Image chính thức của sqlc (cần CGO, không chạy được bằng
+  # `go run` trong image golang alpine).
+  sqlc:
+    image: sqlc/sqlc:1.31.1
+    profiles: ["tools"]
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /src
+    volumes:
+      - ./backend:/src
+    command: ["generate"]
 
   postgres:
     image: postgres:18.6-alpine

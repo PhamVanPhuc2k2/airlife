@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // Thumbnail video YouTube
       { protocol: "https", hostname: "i.ytimg.com" },
+      // Ảnh minh hoạ của dữ liệu mẫu (cmd/seed). Bỏ khi đã có ảnh thật.
+      { protocol: "https", hostname: "picsum.photos" },
     ],
   },
 };

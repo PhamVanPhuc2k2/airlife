@@ -1,6 +1,6 @@
 # Bài 1.08: Ghép khung `AppShell`, trang 404, nghiệm thu layout
 
-> [← Bài trước](07-mini-player.md) · [Mục lục](../README.md)
+> [← Bài trước](07-mini-player.md) · [Mục lục](../README.md) · [Phần 02 →](../02-noi-dung-xem-nghe/01-schema-noi-dung.md)
 
 ## Mục tiêu
 

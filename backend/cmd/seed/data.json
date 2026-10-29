@@ -1,0 +1,597 @@
+{
+  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL.",
+  "categories": [
+    {
+      "slug": "xem",
+      "name": "Xem",
+      "icon": "screen",
+      "title": "Phim & Series trên mọi chuyến bay",
+      "description": "Kho phim chiếu rạp, series và phim tài liệu được tuyển chọn cho màn hình ghế ngồi và thiết bị cá nhân.",
+      "filters": [
+        {
+          "slug": "phim-nuoc-ngoai",
+          "name": "Phim nước ngoài"
+        },
+        {
+          "slug": "series-nuoc-ngoai",
+          "name": "Series nước ngoài"
+        },
+        {
+          "slug": "phim-viet",
+          "name": "Phim Việt"
+        },
+        {
+          "slug": "series-viet",
+          "name": "Series Việt"
+        },
+        {
+          "slug": "hanh-dong",
+          "name": "Hành động"
+        },
+        {
+          "slug": "rom-com",
+          "name": "Rom-com"
+        },
+        {
+          "slug": "gia-dinh",
+          "name": "Gia đình"
+        },
+        {
+          "slug": "hoat-hinh",
+          "name": "Hoạt hình"
+        },
+        {
+          "slug": "tai-lieu",
+          "name": "Tài liệu"
+        }
+      ]
+    },
+    {
+      "slug": "nghe",
+      "name": "Nghe",
+      "icon": "sound",
+      "title": "Nghe trọn hành trình",
+      "description": "Âm nhạc, podcast, sách nói và nội dung thư giãn giúp bạn ngủ ngon ở độ cao 10.000 mét.",
+      "filters": [
+        {
+          "slug": "am-nhac",
+          "name": "Âm nhạc"
+        },
+        {
+          "slug": "podcast",
+          "name": "Podcast"
+        },
+        {
+          "slug": "sach-noi",
+          "name": "Sách nói"
+        },
+        {
+          "slug": "thien-ngu-ngon",
+          "name": "Thiền & Ngủ ngon"
+        }
+      ]
+    },
+    {
+      "slug": "kinh-doanh",
+      "name": "Kinh doanh",
+      "icon": "briefcase",
+      "title": "Vé bay, miễn thuế & mua sắm",
+      "description": "Đặt vé, mua hàng miễn thuế, đặc sản và dịch vụ sân bay ngay trên chuyến bay, nhận hàng khi hạ cánh.",
+      "filters": [
+        {
+          "slug": "ve-bay",
+          "name": "Vé bay"
+        },
+        {
+          "slug": "mien-thue",
+          "name": "Miễn thuế"
+        },
+        {
+          "slug": "mua-sam",
+          "name": "Mua sắm"
+        },
+        {
+          "slug": "dac-san",
+          "name": "Đặc sản"
+        },
+        {
+          "slug": "dich-vu-san-bay",
+          "name": "Dịch vụ sân bay"
+        }
+      ]
+    },
+    {
+      "slug": "tour-bay",
+      "name": "Tour bay",
+      "icon": "globe",
+      "title": "Tour bay trọn gói",
+      "description": "Tour trong nước, quốc tế và combo vé bay + khách sạn được tuyển chọn cho khách bay Airlife.",
+      "filters": [
+        {
+          "slug": "trong-nuoc",
+          "name": "Trong nước"
+        },
+        {
+          "slug": "quoc-te",
+          "name": "Quốc tế"
+        },
+        {
+          "slug": "combo-bay-khach-san",
+          "name": "Combo bay + khách sạn"
+        }
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "slug": "airlife",
+      "name": "Airlife",
+      "type": "distributor",
+      "verified": true,
+      "followers": 128000,
+      "description": "Đơn vị cung cấp nội dung giải trí trên chuyến bay cho các hãng hàng không tại Việt Nam và khu vực."
+    },
+    {
+      "slug": "bay-vui",
+      "name": "Bay Vui Travel",
+      "type": "creator",
+      "verified": true,
+      "followers": 54200,
+      "description": "Review sân bay, hạng ghế và kinh nghiệm bay tiết kiệm."
+    },
+    {
+      "slug": "dac-san-3-mien",
+      "name": "Đặc Sản 3 Miền",
+      "type": "business",
+      "verified": true,
+      "followers": 31800,
+      "description": "Đặc sản chính gốc từ các địa phương, đóng gói quà tặng cho khách bay."
+    },
+    {
+      "slug": "duty-free-sg",
+      "name": "Duty Free Sài Gòn",
+      "type": "business",
+      "verified": true,
+      "followers": 76500,
+      "description": "Cửa hàng miễn thuế: mỹ phẩm, nước hoa, đồng hồ, rượu vang. Đặt trước, nhận tại cửa ra máy bay."
+    },
+    {
+      "slug": "airlife-tour",
+      "name": "Airlife Tour",
+      "type": "travel",
+      "verified": true,
+      "followers": 42300,
+      "description": "Vé máy bay, tour trọn gói và combo bay + khách sạn trong nước và quốc tế."
+    },
+    {
+      "slug": "song-cham",
+      "name": "Sống Chậm Podcast",
+      "type": "creator",
+      "verified": false,
+      "followers": 22900,
+      "description": "Podcast về sống chậm, du lịch một mình và chăm sóc tinh thần."
+    },
+    {
+      "slug": "lounge-plus",
+      "name": "Lounge Plus",
+      "type": "business",
+      "verified": true,
+      "followers": 18400,
+      "description": "Phòng chờ hạng thương gia, fast-track và dịch vụ đưa đón sân bay."
+    }
+  ],
+  "media": [
+    {
+      "slug": "vung-troi-cuoi-cung",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Vùng Trời Cuối Cùng",
+      "description": "Một phi công thử nghiệm buộc phải hạ cánh khẩn cấp xuống vùng núi băng, nơi bí mật quân sự bị chôn vùi suốt ba thập kỷ.",
+      "group": "Phim nước ngoài",
+      "genre": "Hành động",
+      "tags": [
+        "hanh-dong",
+        "phim-nuoc-ngoai"
+      ],
+      "duration_seconds": 7694,
+      "episode_count": null,
+      "views": 1840000,
+      "featured": true,
+      "lineup": true,
+      "published_days_ago": 2
+    },
+    {
+      "slug": "chuyen-bay-ve-nha",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Chuyến Bay Về Nhà",
+      "description": "Ba anh em xa quê hẹn nhau trên cùng một chuyến bay đêm 30 Tết.",
+      "group": "Phim Việt",
+      "genre": "Gia đình",
+      "tags": [
+        "gia-dinh",
+        "phim-viet"
+      ],
+      "duration_seconds": 6760,
+      "episode_count": null,
+      "views": 932000,
+      "featured": false,
+      "lineup": true,
+      "published_days_ago": 5
+    },
+    {
+      "slug": "hanh-lang-so-7-mua-2",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Hành Lang Số 7 — Mùa 2",
+      "description": "Điều tra viên sân bay lần theo đường dây buôn lậu xuyên lục địa.",
+      "group": "Series nước ngoài",
+      "genre": "Tội ác",
+      "tags": [
+        "series-nuoc-ngoai",
+        "toi-ac"
+      ],
+      "duration_seconds": null,
+      "episode_count": 10,
+      "views": 2210000,
+      "featured": false,
+      "lineup": true,
+      "published_days_ago": 7
+    },
+    {
+      "slug": "ghe-12a",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Ghế 12A",
+      "description": "Hai người lạ liên tục bị xếp ngồi cạnh nhau trên mọi chuyến bay trong một năm.",
+      "group": "Phim nước ngoài",
+      "genre": "Rom-com",
+      "tags": [
+        "phim-nuoc-ngoai",
+        "rom-com"
+      ],
+      "duration_seconds": 6065,
+      "episode_count": null,
+      "views": 671000,
+      "featured": false,
+      "lineup": true,
+      "published_days_ago": 7
+    },
+    {
+      "slug": "may-nho-phieu-luu",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Mây Nhỏ Phiêu Lưu",
+      "description": "Đám mây nhỏ muốn trở thành cơn mưa đầu tiên của mùa hạ.",
+      "group": "Phim nước ngoài",
+      "genre": "Hoạt hình",
+      "tags": [
+        "hoat-hinh",
+        "phim-nuoc-ngoai"
+      ],
+      "duration_seconds": 5310,
+      "episode_count": null,
+      "views": 1120000,
+      "featured": false,
+      "lineup": true,
+      "published_days_ago": 14
+    },
+    {
+      "slug": "hang-dong-cuoi-troi",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Hang Động Cuối Trời",
+      "description": "Hành trình 21 ngày xuyên hệ thống hang động Quảng Bình.",
+      "group": "Phim Việt",
+      "genre": "Tài liệu",
+      "tags": [
+        "phim-viet",
+        "tai-lieu"
+      ],
+      "duration_seconds": 3492,
+      "episode_count": null,
+      "views": 384000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 21
+    },
+    {
+      "slug": "an-gi-o-san-bay",
+      "kind": "video",
+      "category": "xem",
+      "channel": "bay-vui",
+      "title": "Ăn Gì Ở Sân Bay",
+      "description": "Đánh giá món ăn tại 8 sân bay lớn của Việt Nam.",
+      "group": "Series Việt",
+      "genre": "Phong cách sống",
+      "tags": [
+        "phong-cach-song",
+        "series-viet"
+      ],
+      "duration_seconds": null,
+      "episode_count": 8,
+      "views": 512000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 4
+    },
+    {
+      "slug": "hoc-vien-phi-cong",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Học Viện Phi Công",
+      "description": "Năm học viên trẻ và giấc mơ chinh phục bầu trời.",
+      "group": "Series nước ngoài",
+      "genre": "Anime",
+      "tags": [
+        "anime",
+        "series-nuoc-ngoai"
+      ],
+      "duration_seconds": null,
+      "episode_count": 12,
+      "views": 1460000,
+      "featured": false,
+      "lineup": true,
+      "published_days_ago": 6
+    },
+    {
+      "slug": "chuyen-bay-0-gio",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Chuyến Bay 0 Giờ",
+      "description": "Chuyến bay cuối cùng trong đêm và hành khách không có tên trong danh sách.",
+      "group": "Phim Việt",
+      "genre": "Kinh dị",
+      "tags": [
+        "kinh-di",
+        "phim-viet"
+      ],
+      "duration_seconds": 6382,
+      "episode_count": null,
+      "views": 803000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 21
+    },
+    {
+      "slug": "tiep-vien-tap-su",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Tiếp Viên Tập Sự",
+      "description": "Những chuyện dở khóc dở cười của nhóm tiếp viên mới vào nghề.",
+      "group": "Series Việt",
+      "genre": "Rom-com",
+      "tags": [
+        "rom-com",
+        "series-viet"
+      ],
+      "duration_seconds": null,
+      "episode_count": 16,
+      "views": 1980000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 30
+    },
+    {
+      "slug": "review-hang-thuong-gia-5-hang-bay",
+      "kind": "video",
+      "category": "xem",
+      "channel": "bay-vui",
+      "title": "Review Hạng Thương Gia 5 Hãng Bay",
+      "description": "So sánh ghế, suất ăn và phòng chờ của 5 hãng bay nội địa.",
+      "group": "Series Việt",
+      "genre": "Phong cách sống",
+      "tags": [
+        "phong-cach-song",
+        "series-viet"
+      ],
+      "duration_seconds": 1450,
+      "episode_count": null,
+      "views": 296000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 2
+    },
+    {
+      "slug": "duong-bang-do",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife",
+      "title": "Đường Băng Đỏ",
+      "description": "Đặc nhiệm giải cứu con tin trên đường băng bị phong tỏa.",
+      "group": "Phim nước ngoài",
+      "genre": "Hành động",
+      "tags": [
+        "hanh-dong",
+        "phim-nuoc-ngoai"
+      ],
+      "duration_seconds": 7307,
+      "episode_count": null,
+      "views": 1270000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 30
+    },
+    {
+      "slug": "mua-thu-kyoto-trong-5-ngay",
+      "kind": "video",
+      "category": "xem",
+      "channel": "airlife-tour",
+      "title": "Mùa Thu Kyoto Trong 5 Ngày",
+      "description": "Lịch trình 5 ngày ngắm lá đỏ Kyoto – Osaka, chi phí và mẹo đặt vé sớm.",
+      "group": "Series Việt",
+      "genre": "Phong cách sống",
+      "tags": [
+        "phong-cach-song",
+        "series-viet"
+      ],
+      "duration_seconds": 1120,
+      "episode_count": null,
+      "views": 214000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 1
+    },
+    {
+      "slug": "lofi-tren-may-playlist-cat-canh",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "airlife",
+      "title": "Lofi Trên Mây — Playlist cất cánh",
+      "description": "Giai điệu lofi nhẹ nhàng cho lúc cất cánh và hạ cánh.",
+      "group": "Âm nhạc",
+      "genre": "Âm nhạc",
+      "tags": [
+        "am-nhac"
+      ],
+      "duration_seconds": 4320,
+      "episode_count": null,
+      "views": 640000,
+      "featured": true,
+      "lineup": false,
+      "published_days_ago": 3
+    },
+    {
+      "slug": "mot-minh-di-nhat-tap-14",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "song-cham",
+      "title": "Một Mình Đi Nhật — Tập 14",
+      "description": "Chuyện xin visa, đặt vé rẻ và lịch trình 10 ngày ở Kansai.",
+      "group": "Podcast",
+      "genre": "Podcast",
+      "tags": [
+        "podcast"
+      ],
+      "duration_seconds": 2538,
+      "episode_count": null,
+      "views": 128000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 7
+    },
+    {
+      "slug": "nha-gia-kim-sach-noi",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "airlife",
+      "title": "Nhà Giả Kim (Sách nói)",
+      "description": "Bản sách nói đầy đủ, giọng đọc truyền cảm.",
+      "group": "Sách nói",
+      "genre": "Sách nói",
+      "tags": [
+        "sach-noi"
+      ],
+      "duration_seconds": 20160,
+      "episode_count": null,
+      "views": 412000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 14
+    },
+    {
+      "slug": "ngu-ngon-tren-chuyen-bay-dem",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "song-cham",
+      "title": "Ngủ Ngon Trên Chuyến Bay Đêm",
+      "description": "Âm thanh trắng và hướng dẫn thở giúp ngủ sâu khi bay đường dài.",
+      "group": "Thiền & Ngủ ngon",
+      "genre": "Thiền & Ngủ ngon",
+      "tags": [
+        "thien-ngu-ngon"
+      ],
+      "duration_seconds": 3600,
+      "episode_count": null,
+      "views": 287000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 5
+    },
+    {
+      "slug": "nhac-trinh-nhung-ban-tinh-ca",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "airlife",
+      "title": "Nhạc Trịnh — Những Bản Tình Ca",
+      "description": "Tuyển tập nhạc Trịnh Công Sơn qua các giọng ca mới.",
+      "group": "Âm nhạc",
+      "genre": "Âm nhạc",
+      "tags": [
+        "am-nhac"
+      ],
+      "duration_seconds": 3524,
+      "episode_count": null,
+      "views": 905000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 30
+    },
+    {
+      "slug": "kinh-doanh-hang-khong-101",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "bay-vui",
+      "title": "Kinh Doanh Hàng Không 101",
+      "description": "Hãng bay kiếm tiền từ đâu? Phỏng vấn chuyên gia ngành.",
+      "group": "Podcast",
+      "genre": "Podcast",
+      "tags": [
+        "podcast"
+      ],
+      "duration_seconds": 2102,
+      "episode_count": null,
+      "views": 76000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 4
+    },
+    {
+      "slug": "thien-10-phut-chong-say-may-bay",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "song-cham",
+      "title": "Thiền 10 Phút Chống Say Máy Bay",
+      "description": "Bài tập hít thở giảm chóng mặt, buồn nôn khi gặp nhiễu động.",
+      "group": "Thiền & Ngủ ngon",
+      "genre": "Thiền & Ngủ ngon",
+      "tags": [
+        "thien-ngu-ngon"
+      ],
+      "duration_seconds": 600,
+      "episode_count": null,
+      "views": 154000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 14
+    },
+    {
+      "slug": "dac-nhan-tam-sach-noi",
+      "kind": "audio",
+      "category": "nghe",
+      "channel": "airlife",
+      "title": "Đắc Nhân Tâm (Sách nói)",
+      "description": "Phiên bản sách nói rút gọn cho chuyến bay dưới 2 giờ.",
+      "group": "Sách nói",
+      "genre": "Sách nói",
+      "tags": [
+        "sach-noi"
+      ],
+      "duration_seconds": 25920,
+      "episode_count": null,
+      "views": 520000,
+      "featured": false,
+      "lineup": false,
+      "published_days_ago": 30
+    }
+  ]
+}

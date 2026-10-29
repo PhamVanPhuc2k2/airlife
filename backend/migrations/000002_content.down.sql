@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS media;
+DROP TABLE IF EXISTS channels;
+DROP TABLE IF EXISTS category_filters;
+DROP TABLE IF EXISTS categories;

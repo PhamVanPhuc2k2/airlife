@@ -1,0 +1,38 @@
+# sqlc: viết SQL thuần trong internal/db/queries/*.sql → sinh code Go có kiểu vào internal/db.
+# Chạy: make sqlc. KHÔNG sửa tay các file *.sql.go do sqlc sinh ra.
+version: "2"
+sql:
+  - engine: postgresql
+    # sqlc đọc migrations/*.up.sql để biết cấu trúc bảng (bỏ qua *.down.sql)
+    schema: migrations
+    queries: internal/db/queries
+    gen:
+      go:
+        package: db
+        out: internal/db
+        sql_package: pgx/v5
+        # Cột NULL được thì thành con trỏ (*string, *int32) thay vì pgtype.Text…: dễ dùng hơn
+        emit_pointers_for_null_types: true
+        # Không có dòng nào thì trả slice rỗng [] chứ không phải nil (JSON ra [] thay vì null)
+        emit_empty_slices: true
+        overrides:
+          - db_type: uuid
+            go_type: github.com/google/uuid.UUID
+          - db_type: uuid
+            nullable: true
+            go_type:
+              import: github.com/google/uuid
+              type: UUID
+              pointer: true
+          - db_type: timestamptz
+            go_type: time.Time
+          - db_type: timestamptz
+            nullable: true
+            go_type:
+              type: time.Time
+              pointer: true
+          - db_type: date
+            nullable: true
+            go_type:
+              type: time.Time
+              pointer: true

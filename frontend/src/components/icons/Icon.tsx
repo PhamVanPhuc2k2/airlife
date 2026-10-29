@@ -107,6 +107,7 @@ const LINE_ICONS = {
     </>
   ),
   close: <path d="M6 6l12 12M18 6 6 18" />,
+  check: <path d="m5 12 5 5 9-10" />,
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,

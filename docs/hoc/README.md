@@ -118,11 +118,31 @@ Logo Airlife, khung Next.js chạy trong Docker, theme Tailwind, layout chung (h
 | [1.07](01-thuong-hieu-va-giao-dien/07-mini-player.md) | Mini player và thanh Player đường băng |
 | [1.08](01-thuong-hieu-va-giao-dien/08-ghep-khung-appshell.md) | Ghép khung `AppShell`, trang 404, nghiệm thu layout |
 
+### Phần 02: Nội dung Xem/Nghe
+
+Schema nội dung, sqlc, dữ liệu mẫu, API chuyên mục/media/trang chủ, cache Redis, phân trang con trỏ,
+đếm lượt xem bằng Redis + worker. Frontend: TanStack Query, trang chủ, trang chuyên mục cuộn tải thêm,
+trang xem với trình phát YouTube phát tiếp khi chuyển trang.
+
+| Bài | Nội dung |
+|---|---|
+| [2.01](02-noi-dung-xem-nghe/01-schema-noi-dung.md) | Schema nội dung: chuyên mục, kênh, media |
+| [2.02](02-noi-dung-xem-nghe/02-sqlc.md) | sqlc: viết SQL, sinh code Go |
+| [2.03](02-noi-dung-xem-nghe/03-du-lieu-mau-seed.md) | Dữ liệu mẫu và `cmd/seed` |
+| [2.04](02-noi-dung-xem-nghe/04-category-va-cache.md) | Module chuyên mục và cache Redis |
+| [2.05](02-noi-dung-xem-nghe/05-module-media.md) | Module media: repository, service, phân trang con trỏ |
+| [2.06](02-noi-dung-xem-nghe/06-dem-luot-xem.md) | Đếm lượt xem bằng Redis, gom ở worker |
+| [2.07](02-noi-dung-xem-nghe/07-trang-chu-va-noi-day.md) | API trang chủ, nối dây router, kiểm tra toàn bộ |
+| [2.08](02-noi-dung-xem-nghe/08-goi-api-tu-nextjs.md) | Gọi API từ Next.js: hai địa chỉ, `ApiError`, định dạng |
+| [2.09](02-noi-dung-xem-nghe/09-tanstack-query.md) | TanStack Query: cài đặt và khai báo truy vấn |
+| [2.10](02-noi-dung-xem-nghe/10-trang-chu.md) | Thẻ media và trang chủ |
+| [2.11](02-noi-dung-xem-nghe/11-trang-chuyen-muc.md) | Trang chuyên mục: chip lọc, cuộn tải thêm, prefetch + hydrate |
+| [2.12](02-noi-dung-xem-nghe/12-trinh-phat-youtube.md) | Trang xem và trình phát YouTube xuyên trang |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 02 noi-dung-xem-nghe | Danh mục, media từ YouTube, Player, lượt xem |
 | 03 tin-tuc-va-line-up | Tin tức, line-up phim theo tháng |
 | 04 kenh-va-binh-luan | Kênh, theo dõi, bình luận |
 | 05 dang-nhap-tai-khoan | Đăng ký, đăng nhập, JWT, phiên trên Redis, email qua Resend |

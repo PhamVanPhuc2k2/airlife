@@ -1,19 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { Icon } from "@/components/icons/Icon";
 import { Runway } from "@/components/player/Runway";
 import { cn } from "@/lib/cn";
+import { formatDuration } from "@/lib/format";
 import { usePlayerStore } from "@/stores/player-store";
 
-// Mini player dưới đáy trang: giữ bài đang nghe khi chuyển trang.
+// Thanh điều khiển dưới đáy trang khi đang phát mà KHÔNG ở trang xem (ở trang xem, trình phát
+// YouTube đã to và có nút riêng). Hình video nằm ở ô nổi phía trên thanh này (YouTubeHost).
+//
 // Màn ≥ 768px: đầy đủ nút, thanh đường băng ở giữa.
 // Điện thoại: nằm trên thanh tab, chỉ còn nút phát/dừng và đóng; thanh tiến độ thu thành
 // vạch mảnh ở mép trên.
 export function MiniPlayer() {
-  const { current, playing, muted, togglePlay, toggleMute, close } = usePlayerStore();
-  if (!current) return null;
+  const { current, playing, muted, time, duration, slot } = usePlayerStore();
+  const { togglePlay, toggleMute, seekBy, close } = usePlayerStore();
+  if (!current || slot) return null;
+
+  const progress = duration > 0 ? (time / duration) * 100 : 0;
 
   return (
     <div
@@ -21,7 +28,10 @@ export function MiniPlayer() {
       role="region"
       aria-label="Trình phát"
     >
-      <div className="flex min-w-0 flex-1 items-center gap-3 md:w-[280px] md:flex-none">
+      <Link
+        href={`/${current.category}/${current.slug}`}
+        className="flex min-w-0 flex-1 items-center gap-3 md:w-[280px] md:flex-none"
+      >
         <Image
           src={current.thumbnail}
           alt=""
@@ -33,10 +43,14 @@ export function MiniPlayer() {
           <strong className="truncate">{current.title}</strong>
           <small className="truncate text-white/55">{current.channel}</small>
         </div>
-      </div>
+      </Link>
 
       <div className="flex items-center gap-1">
-        <PlayerButton label="Tua lại 10 giây" className="hidden md:inline-flex">
+        <PlayerButton
+          label="Tua lại 10 giây"
+          onClick={() => seekBy(-10)}
+          className="hidden md:inline-flex"
+        >
           <Icon name="rewind" className="size-7" />
         </PlayerButton>
         <button
@@ -47,20 +61,25 @@ export function MiniPlayer() {
         >
           <Icon name={playing ? "pause" : "play"} className="size-5" />
         </button>
-        <PlayerButton label="Tua tới 10 giây" className="hidden md:inline-flex">
+        <PlayerButton
+          label="Tua tới 10 giây"
+          onClick={() => seekBy(10)}
+          className="hidden md:inline-flex"
+        >
           <Icon name="forward" className="size-7" />
         </PlayerButton>
       </div>
 
       {/* runway--compact: điện thoại thu thành vạch mảnh ở mép trên (globals.css) */}
       <Runway
-        progress={0}
+        progress={progress}
         running={playing}
-        animate
         className="runway--compact md:min-w-0 md:flex-1"
       />
 
-      <span className="hidden text-xs text-white/60 md:inline">{current.duration}</span>
+      <span className="hidden text-xs tabular-nums text-white/60 md:inline">
+        {formatDuration(time)} / {formatDuration(duration)}
+      </span>
 
       {/* Bật/tắt tiếng: trắng khi bật, xám khi tắt, như bản on/off của thiết kế */}
       <PlayerButton

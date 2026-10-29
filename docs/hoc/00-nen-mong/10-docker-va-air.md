@@ -83,13 +83,11 @@ ENTRYPOINT ["/worker"]
 
 ### Bước 2: Thêm api, worker, migrate vào `docker-compose.yml`
 
-Bản đầy đủ (phần hạ tầng giữ nguyên như bài 0.02). File in dưới đây là bản **hiện tại** của repo:
-khối `frontend:` và biến `npm_config_*` thuộc bài 1.02, **bỏ qua khi gõ** ở bài này.
+Bản đầy đủ (phần hạ tầng giữ nguyên như bài 0.02):
 
 ```yaml
 # Môi trường dev: mọi thứ chạy trong Docker.
-#   make up      → chạy hết (hạ tầng + api + worker + frontend)
-#                  web: http://localhost:3000   api: http://localhost:8080
+#   make up      → chạy hết (hạ tầng + api + worker), api ở http://localhost:8080
 #   make logs    → xem log
 #   make down    → tắt
 #
@@ -145,31 +143,6 @@ services:
   worker:
     <<: *backend
     command: ["air", "-c", ".air.worker.toml"]
-
-  frontend:
-    build:
-      context: ./frontend
-      target: dev
-    user: "${UID:-1000}:${GID:-1000}"
-    restart: unless-stopped
-    volumes:
-      - ./frontend:/app
-    environment:
-      # Địa chỉ API mà TRÌNH DUYỆT gọi tới (nên là localhost của máy, không phải tên service)
-      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8080}
-      NEXT_PUBLIC_SITE_URL: http://localhost:${FRONTEND_PORT:-3000}
-      npm_config_cache: /tmp/.npm # user theo UID có thể không có thư mục home
-      npm_config_update_notifier: "false" # tắt thông báo "npm có bản mới" làm rối log
-    ports:
-      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
-    healthcheck:
-      # 127.0.0.1, không dùng localhost: trong alpine localhost ra IPv6 (::1) trước,
-      # mà next dev chỉ nghe IPv4 (0.0.0.0) → healthcheck báo lỗi dù trang vẫn chạy.
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
-      interval: 5s
-      timeout: 5s
-      retries: 60 # lần đầu npm install + biên dịch trang đầu tiên khá lâu
-      start_period: 15s
 
   # Chạy migration: make migrate. profiles: ["tools"] để `docker compose up` không tự chạy nó.
   migrate:
@@ -365,7 +338,7 @@ docker compose up -d --build --wait
 docker compose ps
 ```
 
-Cả 5 container (chưa có frontend) `running`, api và hạ tầng `(healthy)`. Lần đầu mất 1–2 phút (tải image, build).
+Cả 5 container `running`, api và hạ tầng `(healthy)`. Lần đầu mất 1–2 phút (tải image, build).
 
 ```bash
 curl -s localhost:8080/healthz        # {"data":{"status":"ok"}}

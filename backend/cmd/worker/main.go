@@ -13,10 +13,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/database"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/logger"
@@ -41,11 +44,11 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	db, err := database.NewPostgres(ctx, cfg.Postgres.URL, cfg.Postgres.MaxConns)
+	pool, err := database.NewPostgres(ctx, cfg.Postgres.URL, cfg.Postgres.MaxConns)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer pool.Close()
 
 	rdb, err := cache.NewRedis(ctx, cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.DB)
 	if err != nil {
@@ -61,6 +64,22 @@ func run() error {
 
 	log.Info("worker đang chạy", "env", cfg.App.Env)
 
+	// Job nền chạy trong goroutine riêng. Khi run() kết thúc (tắt worker, hoặc mất RabbitMQ),
+	// defer dưới đây huỷ vòng lặp rồi CHỜ nó xong. defer chạy theo thứ tự ngược, nên defer này
+	// (khai báo sau cùng) chạy TRƯỚC các defer đóng PostgreSQL, Redis ở trên: lần gom cuối
+	// vẫn còn kết nối để dùng.
+	mediaSvc := media.NewService(media.NewRepository(db.New(pool)), rdb)
+	loopCtx, stopLoop := context.WithCancel(ctx)
+	loopDone := make(chan struct{})
+	go func() {
+		defer close(loopDone)
+		flushViewsLoop(loopCtx, log, mediaSvc)
+	}()
+	defer func() {
+		stopLoop()
+		<-loopDone
+	}()
+
 	// Mất kết nối RabbitMQ thì thoát với lỗi để Docker khởi động lại worker
 	// (restart: unless-stopped). Tự kết nối lại sẽ làm ở phần hàng đợi.
 	closed := mq.NotifyClose(make(chan *amqp.Error, 1))
@@ -75,5 +94,33 @@ func run() error {
 			return errors.New("kết nối rabbitmq bị đóng")
 		}
 		return fmt.Errorf("mất kết nối rabbitmq: %w", amqpErr)
+	}
+}
+
+// flushViewsLoop: 30 giây một lần, gom lượt xem từ Redis vào PostgreSQL (internal/media/views.go).
+// Lần gom cuối khi tắt worker dùng context mới, vì ctx đã bị huỷ.
+func flushViewsLoop(ctx context.Context, log *slog.Logger, svc *media.Service) {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	flush := func(ctx context.Context) {
+		n, err := svc.FlushViews(ctx)
+		if err != nil {
+			log.ErrorContext(ctx, "gom lượt xem lỗi", "err", err)
+			return
+		}
+		if n > 0 {
+			log.InfoContext(ctx, "đã gom lượt xem", "media", n)
+		}
+	}
+	for {
+		select {
+		case <-ctx.Done():
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			flush(shutdownCtx)
+			cancel()
+			return
+		case <-ticker.C:
+			flush(ctx)
+		}
 	}
 }

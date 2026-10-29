@@ -131,7 +131,7 @@ backend/
 - [x] Quy tắc phụ thuộc: `cmd` → `internal` → `pkg`; `pkg` không import `internal`; module trong `internal` không gọi thẳng repository của module khác (đi qua service)
 
 ### 2.1 Nền tảng
-- [ ] Stack: router `go-chi/chi/v5`, `pgx` + `sqlc` cho truy vấn, `golang-migrate` cho migration, `go-redis`, `amqp091-go`
+- [x] Stack: router `go-chi/chi/v5`, `pgx` + `sqlc` 1.31.1 (chạy bằng image Docker) cho truy vấn, `golang-migrate` cho migration, `go-redis`, `amqp091-go`
 - [ ] Thư viện thêm: `bluemonday` (lọc HTML), `resend-go` (gửi email)
 - [x] Config bằng **viper** (`internal/config`):
   - Đọc file `.env` khi dev (`SetConfigFile(".env")`, không bắt buộc có file), biến môi trường thật ghi đè (`AutomaticEnv`)
@@ -141,16 +141,16 @@ backend/
   - Không log giá trị secret (mật khẩu DB, API key, JWT secret)
 - [x] Logging có cấu trúc (`slog`), request ID
 - [ ] Middleware: ✓ CORS, ✓ recover, ✓ timeout, ✓ IP thật (CF-Connecting-IP, chỉ tin proxy trong danh sách); còn: rate limit (Redis), gzip, i18n (`Accept-Language` vi/en)
-- [ ] Chuẩn response lỗi (✓ `pkg/apperr` + `pkg/response`), phân trang (cursor cho feed, offset cho admin)
+- [ ] Chuẩn response lỗi (✓ `pkg/apperr` + `pkg/response`), phân trang (✓ con trỏ cho danh sách media; còn offset cho admin)
 - [x] Health check `/healthz`, `/readyz` (ping DB, Redis, RabbitMQ)
 - [x] Graceful shutdown
 
 ### 2.2 Database (PostgreSQL)
 Bảng dựa trên `data/content.json` của mockup:
 - [ ] `users`, `user_profiles`, `user_sessions` / refresh token
-- [ ] `channels` (nhà phân phối, nhà sáng tạo, doanh nghiệp; `verified`, `followers_count`) + `channel_followers`
-- [ ] `categories` (xem, nghe, kinh-doanh, tour-bay, tin-tuc…) + `category_filters` (tiểu mục)
-- [ ] `media` (video/audio: `kind`, `genre`, `youtube_id`, `duration`, `views`, `featured`, `lineup_month`; thumbnail lấy từ YouTube) + `media_products` (sản phẩm gắn trong video)
+- [ ] `channels` (✓ bảng: loại kênh, `verified`, `followers_count`); còn `channel_followers` (Phần 04)
+- [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
+- [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); còn `media_products` (Phần 07)
 - [ ] `products` (`section`: vé bay / miễn thuế / mua sắm / đặc sản / dịch vụ sân bay / tour; giá, giá cũ, rating, đã bán) + `product_variants` (ngày bay, số khách cho vé & tour)
 - [ ] `carts`, `cart_items`, `orders`, `order_items`, `payments`
 - [ ] `comments` (media, có reply lồng 1 cấp, likes) + `comment_likes`
@@ -161,7 +161,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] `notifications`
 - [ ] Bảng dịch cho nội dung song ngữ (cột `title_vi/title_en` hoặc bảng `*_translations`), chốt một cách
 - [x] Index cho tìm kiếm: bật `pg_trgm` + `unaccent`, hàm `immutable_unaccent` (migration 000001). Index cụ thể tạo cùng bảng ở từng phần
-- [ ] Script seed từ `skyline/data/content.json` (đã đổi brand)
+- [x] Seed (`cmd/seed`, `make seed`) từ `skyline/data/content.json` đã đổi brand: 4 chuyên mục, 7 kênh, 21 media. Chưa có `youtube_id` thật (chờ khách gửi link)
 
 ### 2.3 Xác thực & phân quyền
 - [ ] Đăng ký/đăng nhập email + mật khẩu (bcrypt/argon2), xác minh email; có Turnstile ở form đăng ký, quên mật khẩu
@@ -171,9 +171,9 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Vai trò: `guest`, `user`, `creator` (chủ kênh), `business` (doanh nghiệp bán hàng), `editor`, `admin`
 
 ### 2.4 API module
-- [ ] **Home**: khối nổi bật, 3 ô trái, cột bình luận Hay/Nhiều, hàng 4 thẻ, hàng 3 khối (1 endpoint tổng hợp, cache Redis)
-- [ ] **Categories**: danh sách, chi tiết, lọc tiểu mục `?f=`
-- [ ] **Media**: danh sách, chi tiết, gợi ý liên quan, tăng lượt xem (counter Redis, flush định kỳ về DB), lưu tiến độ xem
+- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); còn cột bình luận (Phần 04), khối kinh doanh (Phần 07), tiện ích (Phần 10)
+- [x] **Categories**: danh sách, chi tiết kèm chip lọc (cache Redis 10 phút)
+- [ ] **Media**: ✓ danh sách (lọc chuyên mục/chip/line-up, sắp mới/xem nhiều, phân trang con trỏ), chi tiết, gợi ý liên quan, lượt xem (Redis + worker, mỗi IP 1 lượt/30 phút); còn lưu tiến độ xem (cần đăng nhập)
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
 - [ ] **Products**: danh sách theo section, chi tiết, tồn kho/lịch khởi hành cho vé & tour
 - [ ] **Cart & Orders**: giỏ hàng, đặt hàng, trạng thái đơn, lịch sử đơn
@@ -196,8 +196,8 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] **Notifications**: danh sách, đánh dấu đã đọc
 
 ### 2.5 Redis
-- [ ] Cache các endpoint đọc nhiều (home, category, chi tiết media/news) + invalidation khi admin sửa
-- [ ] Counter lượt xem, lượt thích; flush về PostgreSQL theo lô
+- [ ] Cache các endpoint đọc nhiều (✓ home, categories); còn chi tiết media/news + invalidation khi admin sửa
+- [ ] Counter lượt xem (✓), lượt thích; flush về PostgreSQL theo lô (✓ lượt xem)
 - [ ] Session/refresh token, blacklist token khi logout
 - [ ] Rate limit theo IP/user
 - [ ] Lock phân tán khi giữ chỗ vé/tour
@@ -207,7 +207,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Job: gửi email qua Resend (xác minh, đơn hàng, quên mật khẩu); template email có logo Airlife
 - [ ] Job: kiểm tra định kỳ video YouTube còn hoạt động (bị xóa, chuyển riêng tư, chặn nhúng) → ẩn và báo admin
 - [ ] Job: xử lý webhook thanh toán → cập nhật đơn → gửi thông báo
-- [ ] Job: flush counter Redis → DB
+- [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
 - [ ] Job: gửi notification khi kênh theo dõi có nội dung mới
 - [ ] Job: đồng bộ dữ liệu chuyến bay / thời tiết định kỳ
 
@@ -227,18 +227,18 @@ Bảng dựa trên `data/content.json` của mockup:
 
 ### 3.1 Khởi tạo
 - [x] Dựng Next.js 16.4.3 bằng tay (không dùng `create-next-app` vì nó cài Tailwind v4): React 19.3.1, TypeScript 5.9.3, ESLint 9 + `eslint-config-next`, `tailwindcss@3.4.17`, `postcss`, `autoprefixer`. Chạy trong Docker (`frontend/Dockerfile` target `dev`/`runner`, service `frontend` ở cổng 3000)
-- [ ] Cài ✓ `zustand@5.0.16`; còn `@tanstack/react-query`, `@tanstack/react-query-devtools` (cài khi gọi API đầu tiên)
+- [x] Cài `zustand@5.0.16`, `@tanstack/react-query@5.105.0`, `@tanstack/react-query-devtools`, `@types/youtube@0.3.0`
 - [ ] Cài Radix UI primitives: ✓ dialog (ngăn kéo menu); còn dropdown-menu, tabs, popover, tooltip, slider, toast, `@marsidev/react-turnstile` (cài ở bài dùng tới). Menu chuyên mục xổ bằng CSS hover/focus-within như mockup, không cần Radix
 - [x] Prettier + `prettier-plugin-tailwindcss`
 - [x] `tailwind.config.ts`: theme Airlife từ `skyline/scss/_variables.scss` (thang màu brand tím / accent cam 50–950 đã kiểm tra tương phản WCAG, surface, ink, overlay, runway; radius card 16/10; shadow sm/md/lg/brand; gradient brand/accent/hero/glow; screens xs 400 + mặc định; spacing header/topnav/sidebar/tabbar/player)
 - [x] Font qua `next/font/google` (Be Vietnam Pro, subset vietnamese, tự host)
 - [ ] i18n VI/EN (`next-intl`), route `/[locale]/...`, nút chuyển ngôn ngữ như site cũ
-- [ ] API client (`fetch` wrapper có refresh token tự động), `QueryClientProvider`, hydrate dữ liệu SSR
-- [ ] Biến môi trường (✓ `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`), `next.config` cho domain ảnh (✓ `i.ytimg.com`; còn custom domain R2)
+- [ ] API client: ✓ `lib/api.ts` (hai địa chỉ server/trình duyệt, `ApiError`), ✓ `QueryProvider`, ✓ prefetch trên server + `HydrationBoundary`; còn refresh token tự động (Phần 05)
+- [ ] Biến môi trường (✓ `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `API_INTERNAL_URL`), `next.config` cho domain ảnh (✓ `i.ytimg.com`, `picsum.photos` cho dữ liệu mẫu; còn custom domain R2)
 
 ### 3.2 Store Zustand
 - [ ] `useAuthStore`: user hiện tại, trạng thái đăng nhập
-- [ ] `usePlayerStore`: ✓ bản khởi đầu (đang phát, phát/dừng, tắt tiếng, đóng); còn tua, âm lượng, hàng đợi, thời gian thật từ YouTube (Phần 02)
+- [ ] `usePlayerStore`: ✓ phát/dừng, tắt tiếng, tua ±10s, tiến độ thật từ YouTube, slot trang xem, controller; còn âm lượng, hàng đợi
 - [ ] `useCartStore`: giỏ hàng (đồng bộ với server khi đăng nhập, `persist` khi là khách)
 - [ ] `useUIStore`: ✓ menu dọc thu gọn / ngăn kéo; còn drawer giỏ hàng, modal
 
@@ -249,23 +249,23 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] Thanh tab mobile
 - [ ] Footer: ✓ nền tối, logo trắng, cột chuyên mục/giải trí/liên hệ; còn link MXH (chờ URL Facebook, YouTube, LinkedIn, Cinando) và thông tin pháp nhân Airlife (chờ khách)
 - [x] Mini player cố định đáy, thanh Player kiểu đường băng (máy bay ở đầu thanh), tạm dừng giữ nguyên vị trí; điện thoại thu thành vạch mảnh trên thanh tab
-- [ ] Iframe YouTube đặt trong layout gốc để video/âm thanh không tải lại khi chuyển trang
+- [x] Một trình phát YouTube duy nhất trong AppShell (YouTubeHost): trang xem đặt ô (PlayerSlot), trình phát đè khít lên; rời trang thì thu thành ô nổi 356×200 (YouTube bắt buộc khung ≥ 200×200), không tải lại khi chuyển trang
 - [ ] Drawer giỏ hàng
 - [x] Trang 404 trong khung chung; link "Bỏ qua menu" cho người dùng bàn phím
 
 ### 3.4 Component dùng chung
 - [ ] Bọc Radix UI bằng Tailwind theo theme Airlife: DropdownMenu (menu chuyên mục), Dialog/Drawer (modal, giỏ hàng), Tabs, Popover, Tooltip, Slider (âm lượng, tua), Toast
-- [ ] Icon (Player icons + icon nét), Avatar (màu theo tên), Button, Chip/Filter, Tabs, Rating sao, Badge verified
-- [ ] MediaCard, ProductCard, ChannelCard, NewsCard, CommentItem, ExperienceCard, SurveyCard
-- [ ] Skeleton loading, EmptyState, ErrorState, Pagination/Infinite scroll
-- [ ] Helper format: số rút gọn (`1,8 Tr`, `54,2 N`), giá `vi-VN` + ₫, thời lượng, thời gian tương đối
+- [ ] Icon (✓ Player icons + icon nét), ✓ Avatar (màu theo tên), ✓ Chip/Filter (link URL), ✓ Badge verified; còn Button, Tabs, Rating sao
+- [ ] ✓ MediaCard, MediaTile, FeaturedHero, RankList, Panel; còn ProductCard, ChannelCard, NewsCard, CommentItem, ExperienceCard, SurveyCard
+- [ ] ✓ EmptyState, ErrorState (có nút thử lại), ✓ Infinite scroll (IntersectionObserver + nút Xem thêm); còn Skeleton loading
+- [ ] Helper format: ✓ số rút gọn (`1,8 Tr`, `54,2 N`), ✓ thời lượng / số tập, ✓ thời gian tương đối; còn giá `vi-VN` + ₫ (Phần 07)
 
 ### 3.5 Trang (map từ mockup)
 
 | Mockup | Route Next.js | Ghi chú |
 |---|---|---|
-| `index.html` | `/` | Bố cục home theo bản vẽ tay |
-| `chuyen-muc.html?c=xem\|nghe` | `/xem`, `/nghe` | Lọc thể loại |
+| `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay (còn cột bình luận, khối kinh doanh, tiện ích) |
+| `chuyen-muc.html?c=xem\|nghe` | `/xem`, `/nghe` | ✓ Chip lọc, sắp xếp, cuộn tải thêm |
 | `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | Lọc tiểu mục `?f=` |
 | `tien-ich.html?tab=` | `/tien-ich/[tab]` | Ra tàu bay, Flightradar, thời tiết, Wi-Fi, phòng chờ |
 | `y-kien.html?tab=` | `/y-kien/[tab]` | Trải nghiệm, khảo sát, góp ý |
@@ -274,7 +274,7 @@ Bảng dựa trên `data/content.json` của mockup:
 | `moi-tai.html` | `/moi-tai` | Gồm tab Line-up phim tháng |
 | `ban.html` | `/ban` | Cần đăng nhập |
 | `suu-tap.html` | `/suu-tap` | Cần đăng nhập |
-| `xem.html?id=` | `/xem/[slug]` | Player YouTube (video & nghe), sản phẩm gắn video, bình luận |
+| `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý; còn sản phẩm gắn video, bình luận |
 | `san-pham.html?id=` | `/san-pham/[slug]` | Vé/tour có chọn ngày, số khách |
 | `kenh.html?id=` | `/kenh/[slug]` | Kênh creator/doanh nghiệp |
 | `lien-he.html` | `/lien-he` | Form liên hệ |
@@ -283,8 +283,8 @@ Bảng dựa trên `data/content.json` của mockup:
 | (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang/[id]` | Checkout |
 
 - [ ] Làm lần lượt từng trang trên, mỗi trang: UI pixel-perfect theo mockup → nối API bằng TanStack Query → loading/error/empty state → responsive
-- [ ] Player: YouTube IFrame Player API, điều khiển bằng icon Player Airlife (phát/dừng, tua 10s, âm lượng, toàn màn hình), nhớ tiến độ xem
-- [ ] Mục Nghe vẫn hiện khung video YouTube (điều khoản YouTube không cho ẩn video để phát riêng tiếng); thanh Player không được đè lên khung video
+- [ ] Player: ✓ YouTube IFrame Player API, mini player điều khiển bằng icon Player Airlife (phát/dừng, tua 10s, tắt tiếng, thanh đường băng theo thời gian thật), ✓ gửi lượt xem khi bắt đầu phát; còn nhớ tiến độ xem (cần đăng nhập)
+- [x] Mục Nghe vẫn hiện khung video YouTube (điều khoản YouTube không cho ẩn video để phát riêng tiếng); thanh Player không đè lên khung video
 - [ ] Optimistic update cho like, follow, lưu, thêm giỏ hàng
 - [ ] Form dùng `react-hook-form` + `zod`
 - [ ] Middleware Next.js bảo vệ route cần đăng nhập
