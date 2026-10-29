@@ -176,11 +176,27 @@ dev), xác minh email, quên/đặt lại mật khẩu.
 | [4.11](04-dang-nhap-tai-khoan/11-xac-minh-email-quen-mat-khau.md) | Xác minh email và quên mật khẩu (backend) |
 | [4.12](04-dang-nhap-tai-khoan/12-frontend-xac-minh-dat-lai.md) | Frontend: xác minh email, quên và đặt lại mật khẩu; nghiệm thu Phần 04 |
 
+### Phần 05: Kênh và bình luận
+
+Trang kênh và theo dõi kênh (transaction giữ số đếm đúng), bình luận cho video và bài viết: trả lời một
+cấp, thích, xoá, chỉ tài khoản đã xác minh email được viết, giới hạn tốc độ. Cột "Bình luận nổi bật" ở
+trang chủ, danh sách kênh đang theo dõi ở menu dọc.
+
+| Bài | Nội dung |
+|---|---|
+| [5.01](05-kenh-va-binh-luan/01-schema-theo-doi-binh-luan.md) | Schema theo dõi kênh và bình luận |
+| [5.02](05-kenh-va-binh-luan/02-module-kenh.md) | Module kênh: trang kênh, theo dõi trong transaction |
+| [5.03](05-kenh-va-binh-luan/03-module-binh-luan.md) | Module bình luận: viết, trả lời, thích, xoá |
+| [5.04](05-kenh-va-binh-luan/04-api-va-trang-chu.md) | Nối route, bình luận nổi bật ở trang chủ, request bị huỷ |
+| [5.05](05-kenh-va-binh-luan/05-du-lieu-mau-va-thu-api.md) | Dữ liệu mẫu và thử toàn bộ API |
+| [5.06](05-kenh-va-binh-luan/06-frontend-kenh-va-theo-doi.md) | Frontend: trang kênh và nút Theo dõi |
+| [5.07](05-kenh-va-binh-luan/07-frontend-binh-luan.md) | Frontend: khung bình luận |
+| [5.08](05-kenh-va-binh-luan/08-binh-luan-noi-bat-va-menu.md) | Bình luận nổi bật, kênh đang theo dõi; nghiệm thu Phần 05 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 05 kenh-va-binh-luan | Kênh, theo dõi, bình luận |
 | 06 ban-va-suu-tap | Trang Bạn, Sưu tập, tiếp tục xem |
 | 07 ban-hang | Sản phẩm, biến thể, giỏ hàng, đơn hàng |
 | 08 ve-va-tour | Lịch khởi hành, hạng dịch vụ, giữ chỗ bằng lock Redis |

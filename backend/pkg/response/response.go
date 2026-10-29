@@ -7,7 +7,9 @@
 package response
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
@@ -50,9 +52,21 @@ func List(w http.ResponseWriter, data, meta any) {
 	write(w, http.StatusOK, body{Data: data, Meta: meta})
 }
 
+// statusClientClosed: khách đã đóng kết nối trước khi có phản hồi (quy ước 499 của nginx).
+const statusClientClosed = 499
+
 // Error đổi lỗi thành phản hồi HTTP. Lỗi Internal được ghi log đầy đủ (kèm lỗi gốc),
 // còn client chỉ nhận câu thông báo chung.
 func Error(w http.ResponseWriter, r *http.Request, log *slog.Logger, err error) {
+	// Khách tự huỷ request (rời trang giữa chừng, TanStack Query huỷ request cũ): context bị huỷ
+	// nên truy vấn DB dừng theo. Đây không phải lỗi hệ thống; ghi ở mức debug để log lỗi thật
+	// không bị lẫn trong hàng trăm dòng "context canceled".
+	if errors.Is(err, context.Canceled) && r.Context().Err() != nil {
+		log.DebugContext(r.Context(), "khách huỷ request", "path", r.URL.Path)
+		w.WriteHeader(statusClientClosed)
+		return
+	}
+
 	e, ok := apperr.As(err)
 	if !ok {
 		e = apperr.Internal(err)

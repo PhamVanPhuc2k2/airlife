@@ -52,6 +52,7 @@ export type Home = {
   latest: MediaCard[];
   trending: MediaCard[];
   top_listen: MediaCard[];
+  hot_comments: { top: HotComment[]; replied: HotComment[] };
 };
 
 export type NewsCategory = {
@@ -93,3 +94,33 @@ export type User = {
   email_verified: boolean;
   created_at: string;
 };
+
+// Trang kênh (GET /channels/{slug}). following: người đang xem có theo dõi không
+export type ChannelDetail = {
+  slug: string;
+  name: string;
+  type: "distributor" | "creator" | "business" | "travel";
+  verified: boolean;
+  followers_count: number;
+  description: string;
+  avatar_url: string | null;
+  media_count: number;
+  following: boolean;
+};
+
+export type ChannelBrief = { slug: string; name: string; verified: boolean };
+
+export type Comment = {
+  id: string;
+  author: { id: string; display_name: string; avatar_url: string | null };
+  body: string;
+  like_count: number;
+  reply_count: number;
+  created_at: string;
+  liked_by_me: boolean;
+  mine: boolean;
+};
+
+export type CommentPage = { items: Comment[]; next_cursor?: string };
+
+export type HotComment = Comment & { media: { slug: string; category: string; title: string } };

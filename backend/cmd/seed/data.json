@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài).",
+  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài). Người dùng mẫu (seed-*@airlife.local) không đăng nhập được (mật khẩu ngẫu nhiên). Trả lời bình luận là câu mẫu.",
   "categories": [
     {
       "slug": "xem",
@@ -685,6 +685,126 @@
       "excerpt": "Cẩm nang 5 ngày cho mùa thu Kyoto, kèm lịch lá đỏ dự kiến tháng 11.",
       "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
       "published_at": "2026-09-18T09:00:00+07:00"
+    }
+  ],
+  "users": [
+    {
+      "key": "u1",
+      "display_name": "Minh Anh"
+    },
+    {
+      "key": "u2",
+      "display_name": "Hoàng Long"
+    },
+    {
+      "key": "u3",
+      "display_name": "Thu Trang"
+    },
+    {
+      "key": "u4",
+      "display_name": "Quốc Bảo"
+    },
+    {
+      "key": "u5",
+      "display_name": "Lan Phương"
+    },
+    {
+      "key": "u6",
+      "display_name": "Đức Huy"
+    },
+    {
+      "key": "u7",
+      "display_name": "Ngọc Hân"
+    },
+    {
+      "key": "u8",
+      "display_name": "Tuấn Kiệt"
+    }
+  ],
+  "comments": [
+    {
+      "key": "c1",
+      "user": "u1",
+      "media": "vung-troi-cuoi-cung",
+      "body": "Xem trọn bộ trên chuyến SGN – HAN mà quên luôn giờ hạ cánh. Cảnh hạ cánh trên núi băng quá đỉnh!",
+      "likes": 1240,
+      "hours_ago": 2
+    },
+    {
+      "key": "c2",
+      "user": "u2",
+      "media": "chuyen-bay-ve-nha",
+      "body": "Khóc thật sự ở đoạn ba anh em gặp nhau ở cửa ra. Ai bay Tết chắc đồng cảm.",
+      "likes": 980,
+      "hours_ago": 5
+    },
+    {
+      "key": "c3",
+      "user": "u3",
+      "media": "ngu-ngon-tren-chuyen-bay-dem",
+      "body": "Bay đêm 12 tiếng đi Frankfurt, nghe cái này ngủ được 6 tiếng liền. Cảm ơn kênh!",
+      "likes": 760,
+      "hours_ago": 24
+    },
+    {
+      "key": "c4",
+      "user": "u4",
+      "media": "review-hang-thuong-gia-5-hang-bay",
+      "body": "Phần chấm điểm suất ăn hơi khắt khe, nhưng review phòng chờ thì chuẩn.",
+      "likes": 642,
+      "hours_ago": 24
+    },
+    {
+      "key": "c5",
+      "user": "u6",
+      "media": "hanh-lang-so-7-mua-2",
+      "body": "Mùa 2 cài cắm tình tiết hay hơn mùa 1 nhiều. Hóng mùa 3.",
+      "likes": 498,
+      "hours_ago": 48
+    },
+    {
+      "key": "c6",
+      "user": "u8",
+      "media": "hoc-vien-phi-cong",
+      "body": "Anime về phi công hiếm lắm, nét vẽ đẹp, nhạc phim hay.",
+      "likes": 312,
+      "hours_ago": 96
+    },
+    {
+      "key": "r1",
+      "parent": "c1",
+      "user": "u3",
+      "media": "vung-troi-cuoi-cung",
+      "body": "Đồng ý! Mình xem chuyến HAN – SGN cũng bị cuốn y vậy.",
+      "likes": 40,
+      "hours_ago": 1
+    },
+    {
+      "key": "r2",
+      "parent": "c1",
+      "user": "u5",
+      "media": "vung-troi-cuoi-cung",
+      "body": "Đoạn hạ cánh quay thật hay kỹ xảo vậy mọi người?",
+      "likes": 12,
+      "hours_ago": 1
+    },
+    {
+      "key": "r3",
+      "parent": "c2",
+      "user": "u4",
+      "media": "chuyen-bay-ve-nha",
+      "body": "Bay Tết năm ngoái mình cũng khóc ở đoạn này.",
+      "likes": 25,
+      "hours_ago": 3
+    },
+    {
+      "key": "r4",
+      "parent": "c3",
+      "user": "u6",
+      "media": "ngu-ngon-tren-chuyen-bay-dem",
+      "body": "Cảm ơn bạn, để chuyến sau thử.",
+      "likes": 3,
+      "hours_ago": 2
     }
   ]
 }

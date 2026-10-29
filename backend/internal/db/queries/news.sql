@@ -32,3 +32,6 @@ JOIN news_categories nc ON nc.slug = n.category_slug
 WHERE n.status = 'published' AND n.id <> sqlc.arg('exclude_id')
 ORDER BY (n.category_slug = sqlc.arg('category')) DESC, n.published_at DESC
 LIMIT sqlc.arg('limit');
+
+-- name: GetNewsIDBySlug :one
+SELECT id FROM news WHERE slug = $1 AND status = 'published';

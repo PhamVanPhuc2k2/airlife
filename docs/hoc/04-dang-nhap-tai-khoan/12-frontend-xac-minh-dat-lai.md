@@ -470,7 +470,7 @@ make fe-typecheck && make fe-lint && make fe-audit && make lint && make vuln
 git add . && git commit -m "Frontend xác minh email, quên mật khẩu"
 ```
 
-Đến đây xong Phần 04.
+Đến đây xong Phần 04. Tiếp theo: [Phần 05 →](../05-kenh-va-binh-luan/01-schema-theo-doi-binh-luan.md)
 
 ## Hay gặp lỗi
 

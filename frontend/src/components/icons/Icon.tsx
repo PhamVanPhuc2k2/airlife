@@ -108,6 +108,12 @@ const LINE_ICONS = {
   ),
   close: <path d="M6 6l12 12M18 6 6 18" />,
   check: <path d="m5 12 5 5 9-10" />,
+  like: (
+    <path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.7 20H7" />
+  ),
+  comment: <path d="M4 5h16v11H9l-5 4z" />,
+  trash: <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />,
+  fire: <path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z" />,
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,

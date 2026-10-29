@@ -40,6 +40,32 @@ type Channel struct {
 	UpdatedAt      time.Time
 }
 
+type ChannelFollower struct {
+	ChannelID uuid.UUID
+	UserID    uuid.UUID
+	CreatedAt time.Time
+}
+
+type Comment struct {
+	ID         uuid.UUID
+	MediaID    *uuid.UUID
+	NewsID     *uuid.UUID
+	ParentID   *uuid.UUID
+	UserID     uuid.UUID
+	Body       string
+	LikeCount  int32
+	ReplyCount int32
+	Status     string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+type CommentLike struct {
+	CommentID uuid.UUID
+	UserID    uuid.UUID
+	CreatedAt time.Time
+}
+
 type Medium struct {
 	ID              uuid.UUID
 	Slug            string

@@ -19,6 +19,8 @@ import (
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/auth"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/category"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/channel"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
@@ -94,7 +96,10 @@ func (s *Server) Handler() (http.Handler, error) {
 	mediaSvc := media.NewService(media.NewRepository(q), s.deps.Redis)
 	mediaH := media.NewHandler(mediaSvc, s.deps.Log, clientIP)
 
-	homeH := home.NewHandler(home.NewService(mediaSvc, s.deps.Redis), s.deps.Log)
+	channelH := channel.NewHandler(channel.NewService(s.deps.DB), s.deps.Log)
+	commentSvc := comment.NewService(s.deps.DB, s.deps.Redis)
+	commentH := comment.NewHandler(commentSvc, s.deps.Log)
+	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
 	tokens := auth.NewTokenIssuer(authCfg.JWTSecret, authCfg.AccessTTL)
@@ -151,6 +156,20 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/media/{slug}/related", mediaH.Related)
 		r.Post("/media/{slug}/views", mediaH.RecordView)
 		r.Get("/lineup/months", mediaH.LineupMonths)
+
+		r.Get("/channels/{slug}", channelH.Get)
+		r.With(requireAuth).Post("/channels/{slug}/follow", channelH.Follow)
+		r.With(requireAuth).Delete("/channels/{slug}/follow", channelH.Unfollow)
+		r.With(requireAuth).Get("/me/following", channelH.Following)
+
+		r.Get("/media/{slug}/comments", commentH.List("media"))
+		r.With(requireAuth).Post("/media/{slug}/comments", commentH.Create("media"))
+		r.Get("/news/{slug}/comments", commentH.List("news"))
+		r.With(requireAuth).Post("/news/{slug}/comments", commentH.Create("news"))
+		r.Get("/comments/{id}/replies", commentH.Replies)
+		r.With(requireAuth).Post("/comments/{id}/like", commentH.Like)
+		r.With(requireAuth).Delete("/comments/{id}/like", commentH.Unlike)
+		r.With(requireAuth).Delete("/comments/{id}", commentH.Delete)
 
 		// /news/categories khai báo trước /news/{slug}; chi luôn ưu tiên đường dẫn tĩnh, nên
 		// "categories" không bao giờ bị hiểu nhầm là một slug bài viết.

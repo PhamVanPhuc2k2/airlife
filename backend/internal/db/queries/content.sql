@@ -34,6 +34,7 @@ WHERE m.status = 'published'
   AND (sqlc.narg('category')::text IS NULL OR m.category_slug = sqlc.narg('category'))
   AND (sqlc.narg('tag')::text IS NULL OR m.tags @> ARRAY[sqlc.narg('tag')::text])
   AND (sqlc.narg('lineup_month')::date IS NULL OR m.lineup_month = sqlc.narg('lineup_month'))
+  AND (sqlc.narg('channel')::text IS NULL OR c.slug = sqlc.narg('channel'))
   AND (sqlc.narg('cursor_time')::timestamptz IS NULL
        OR (m.published_at, m.id) < (sqlc.narg('cursor_time')::timestamptz, sqlc.narg('cursor_id')::uuid))
 ORDER BY m.published_at DESC, m.id DESC
@@ -50,6 +51,7 @@ JOIN channels c ON c.id = m.channel_id
 WHERE m.status = 'published'
   AND (sqlc.narg('category')::text IS NULL OR m.category_slug = sqlc.narg('category'))
   AND (sqlc.narg('tag')::text IS NULL OR m.tags @> ARRAY[sqlc.narg('tag')::text])
+  AND (sqlc.narg('channel')::text IS NULL OR c.slug = sqlc.narg('channel'))
   AND (sqlc.narg('cursor_views')::bigint IS NULL
        OR (m.view_count, m.id) < (sqlc.narg('cursor_views')::bigint, sqlc.narg('cursor_id')::uuid))
 ORDER BY m.view_count DESC, m.id DESC

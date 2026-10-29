@@ -1,3 +1,4 @@
+import { HotComments } from "@/components/comment/HotComments";
 import { FeaturedHero } from "@/components/media/FeaturedHero";
 import { MediaCard } from "@/components/media/MediaCard";
 import { MediaTile } from "@/components/media/MediaTile";
@@ -11,14 +12,13 @@ import type { Home } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 // Server component: lấy dữ liệu ngay trên server, gửi về HTML có sẵn nội dung (tốt cho SEO,
-// hiện nhanh), không có JavaScript nào cho phần này chạy trên trình duyệt.
+// hiện nhanh). Chỉ cột Bình luận nổi bật (đổi tab Hay/Nhiều) là client component.
 export default async function HomePage() {
   const home = await api<Home>("/home");
 
   return (
     <div className="mx-auto max-w-[1680px] space-y-8 px-3 py-4 md:px-6 md:py-6">
-      {/* Bố cục theo bản vẽ tay của mockup: 3 ô | khối nổi bật | cột phải.
-          Cột phải sẽ là "Bình luận nổi bật" (Phần 04); tạm đặt "Nghe nhiều". */}
+      {/* Bố cục theo bản vẽ tay của mockup: 3 ô | khối nổi bật | bình luận nổi bật */}
       <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,2.1fr)] xl:grid-cols-[minmax(0,0.9fr)_minmax(0,2.1fr)_minmax(280px,1fr)]">
         <div className="lg:order-2">{home.featured && <FeaturedHero media={home.featured} />}</div>
 
@@ -30,10 +30,9 @@ export default async function HomePage() {
           ))}
         </div>
 
-        <div className="lg:order-3 lg:col-span-2 xl:col-span-1">
-          <Panel title="Nghe nhiều" icon="sound" moreHref="/nghe?sort=popular">
-            <RankList items={home.top_listen} />
-          </Panel>
+        {/* Màn ≥ 1280px: cao bằng khối nổi bật, cuộn bên trong */}
+        <div className="lg:order-3 lg:col-span-2 xl:col-span-1 xl:max-h-[560px]">
+          <HotComments top={home.hot_comments.top} replied={home.hot_comments.replied} />
         </div>
       </section>
 
@@ -44,6 +43,13 @@ export default async function HomePage() {
             <MediaCard key={m.id} media={m} />
           ))}
         </div>
+      </section>
+
+      {/* Hàng dưới của mockup: Nghe nhiều | Kinh doanh (Phần 07) | Tiện ích (Phần 10) */}
+      <section className="grid gap-4 lg:grid-cols-3">
+        <Panel title="Nghe nhiều" icon="sound" moreHref="/nghe?sort=popular">
+          <RankList items={home.top_listen} />
+        </Panel>
       </section>
     </div>
   );

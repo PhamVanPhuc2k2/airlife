@@ -28,12 +28,13 @@ type listFilter struct {
 	Category *string
 	Tag      *string
 	Lineup   *time.Time
+	Channel  *string
 	Limit    int32
 }
 
 func (r *Repository) ListNew(ctx context.Context, f listFilter, afterTime *time.Time, afterID *uuid.UUID) ([]Card, error) {
 	rows, err := r.q.ListMediaNew(ctx, db.ListMediaNewParams{
-		Category: f.Category, Tag: f.Tag, LineupMonth: f.Lineup,
+		Category: f.Category, Tag: f.Tag, LineupMonth: f.Lineup, Channel: f.Channel,
 		CursorTime: afterTime, CursorID: afterID, Limit: f.Limit,
 	})
 	if err != nil {
@@ -44,7 +45,8 @@ func (r *Repository) ListNew(ctx context.Context, f listFilter, afterTime *time.
 
 func (r *Repository) ListPopular(ctx context.Context, f listFilter, afterViews *int64, afterID *uuid.UUID) ([]Card, error) {
 	rows, err := r.q.ListMediaPopular(ctx, db.ListMediaPopularParams{
-		Category: f.Category, Tag: f.Tag, CursorViews: afterViews, CursorID: afterID, Limit: f.Limit,
+		Category: f.Category, Tag: f.Tag, Channel: f.Channel,
+		CursorViews: afterViews, CursorID: afterID, Limit: f.Limit,
 	})
 	if err != nil {
 		return nil, err

@@ -2,7 +2,7 @@
 //
 // Bố cục theo bản vẽ tay của mockup:
 //
-//	┌ 3 ô bên trái ┐┌──── khối nổi bật ────┐┌ bình luận (Phần 04) ┐
+//	┌ 3 ô bên trái ┐┌──── khối nổi bật ────┐┌ bình luận nổi bật ┐
 //	└──────────────┘└──────────────────────┘└─────────────────────┘
 //	[ hàng 4 thẻ xem nhiều ]
 //	[ Nghe nhiều ] [ Kinh doanh (Phần 07) ] [ Tiện ích (Phần 10) ]
@@ -16,6 +16,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
@@ -30,15 +31,21 @@ type Home struct {
 	Latest    []media.Card `json:"latest"`     // 3 ô bên trái: phim mới
 	Trending  []media.Card `json:"trending"`   // hàng 4 thẻ: xem nhiều
 	TopListen []media.Card `json:"top_listen"` // khối "Nghe nhiều"
+	// Cột "Bình luận nổi bật", hai tab: Hay (nhiều thích), Nhiều (nhiều trả lời)
+	HotComments struct {
+		Top     []comment.HotComment `json:"top"`
+		Replied []comment.HotComment `json:"replied"`
+	} `json:"hot_comments"`
 }
 
 type Service struct {
-	media *media.Service // dùng service của module media, không gọi thẳng repository của nó
-	rdb   *redis.Client
+	media    *media.Service // dùng service của module khác, không gọi thẳng repository của nó
+	comments *comment.Service
+	rdb      *redis.Client
 }
 
-func NewService(m *media.Service, rdb *redis.Client) *Service {
-	return &Service{media: m, rdb: rdb}
+func NewService(m *media.Service, c *comment.Service, rdb *redis.Client) *Service {
+	return &Service{media: m, comments: c, rdb: rdb}
 }
 
 func (s *Service) Get(ctx context.Context) (Home, error) {
@@ -86,6 +93,13 @@ func (s *Service) load(ctx context.Context) (Home, error) {
 		return h, err
 	}
 	h.TopListen = listen.Items
+
+	if h.HotComments.Top, err = s.comments.Hot(ctx, false, 5); err != nil {
+		return h, err
+	}
+	if h.HotComments.Replied, err = s.comments.Hot(ctx, true, 5); err != nil {
+		return h, err
+	}
 	return h, nil
 }
 

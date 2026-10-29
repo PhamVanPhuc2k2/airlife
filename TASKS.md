@@ -148,12 +148,12 @@ backend/
 ### 2.2 Database (PostgreSQL)
 Bảng dựa trên `data/content.json` của mockup:
 - [x] `users` (email `citext` UNIQUE, mật khẩu argon2id, vai trò, trạng thái, `email_verified_at`). Phiên/refresh token lưu Redis (không cần bảng `user_sessions`)
-- [ ] `channels` (✓ bảng: loại kênh, `verified`, `followers_count`); còn `channel_followers` (Phần 04)
+- [x] `channels` (loại kênh, `verified`, `followers_count`) + `channel_followers` (khoá chính ghép, Phần 05)
 - [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
 - [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); còn `media_products` (Phần 07)
 - [ ] `products` (`section`: vé bay / miễn thuế / mua sắm / đặc sản / dịch vụ sân bay / tour; giá, giá cũ, rating, đã bán) + `product_variants` (ngày bay, số khách cho vé & tour)
 - [ ] `carts`, `cart_items`, `orders`, `order_items`, `payments`
-- [ ] `comments` (media, có reply lồng 1 cấp, likes) + `comment_likes`
+- [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
 - [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
@@ -171,15 +171,15 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Vai trò: ✓ cột `role` (`user`, `creator`, `business`, `editor`, `admin`) trong access token và `/auth/me`; còn middleware kiểm tra vai trò cho từng API (khi có API cần, vd. CMS)
 
 ### 2.4 API module
-- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); còn cột bình luận (Phần 04), khối kinh doanh (Phần 07), tiện ích (Phần 10)
+- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); còn khối kinh doanh (Phần 07), tiện ích (Phần 10)
 - [x] **Categories**: danh sách, chi tiết kèm chip lọc (cache Redis 10 phút)
 - [ ] **Media**: ✓ danh sách (lọc chuyên mục/chip/line-up, sắp mới/xem nhiều, phân trang con trỏ), chi tiết, gợi ý liên quan, lượt xem (Redis + worker, mỗi IP 1 lượt/30 phút); còn lưu tiến độ xem (cần đăng nhập)
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
 - [ ] **Products**: danh sách theo section, chi tiết, tồn kho/lịch khởi hành cho vé & tour
 - [ ] **Cart & Orders**: giỏ hàng, đặt hàng, trạng thái đơn, lịch sử đơn
 - [ ] **Payment**: tích hợp cổng VNPay/MoMo/ZaloPay, webhook IPN, đối soát
-- [ ] **Channels**: chi tiết kênh, nội dung của kênh, theo dõi/bỏ theo dõi
-- [ ] **Comments**: CRUD, reply, like, sắp xếp Hay/Mới, chống spam (Turnstile + rate limit)
+- [x] **Channels**: chi tiết kênh, nội dung của kênh (`/media?channel=`), theo dõi/bỏ theo dõi (transaction, bấm 2 lần chỉ tính 1), `/me/following`
+- [x] **Comments**: viết, trả lời 1 cấp, thích, xoá (chủ bình luận hoặc editor/admin), sắp xếp Hay/Mới, bình luận nổi bật. Chống spam: bắt buộc xác minh email + rate limit 10 bình luận/5 phút/người (Redis). Chưa dùng Turnstile cho bình luận: chỉ thêm nếu vẫn bị spam
 - [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
 - [ ] **Utilities**: chuyến bay (ra tàu bay, trạng thái, tiến độ), Flightradar (proxy API bên thứ ba), thời tiết điểm đến (proxy + cache), Wi-Fi, phòng chờ & fast-track
 - [ ] **Opinions**: trải nghiệm, khảo sát (bình chọn 1 lần/user), góp ý (có Turnstile)
@@ -244,7 +244,7 @@ Bảng dựa trên `data/content.json` của mockup:
 
 ### 3.3 Layout dùng chung (từ `skyline/js/layout.js`)
 - [x] Header: logo Airlife (wordmark), ô tìm kiếm (form GET, chạy không cần JS), nút Đăng bán, VN/EN (EN chờ i18n), chuông, giỏ hàng, nút tài khoản (avatar khi có đăng nhập)
-- [x] Menu dọc (kiểu YouTube): Home · Xem · Nghe · Mới tải · Bạn · Sưu tập; 3 dạng: thanh icon 76px, menu đầy đủ 232px, ngăn kéo (Radix Dialog) cho màn < 1280px. "Kênh đang theo dõi" chờ đăng nhập (Phần 04)
+- [x] Menu dọc (kiểu YouTube): Home · Xem · Nghe · Mới tải · Bạn · Sưu tập; 3 dạng: thanh icon 76px, menu đầy đủ 232px, ngăn kéo (Radix Dialog) cho màn < 1280px. "Kênh đang theo dõi" lấy từ `/me/following` (Phần 05)
 - [x] Menu ngang chuyên mục có dropdown tiểu mục (CSS hover + focus-within, dùng được bằng bàn phím): Tiện ích · Tin tức · Kinh doanh · Ý kiến · Tour bay
 - [x] Thanh tab mobile
 - [ ] Footer: ✓ nền tối, logo trắng, cột chuyên mục/giải trí/liên hệ; còn link MXH (chờ URL Facebook, YouTube, LinkedIn, Cinando) và thông tin pháp nhân Airlife (chờ khách)
@@ -264,19 +264,19 @@ Bảng dựa trên `data/content.json` của mockup:
 
 | Mockup | Route Next.js | Ghi chú |
 |---|---|---|
-| `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay (còn cột bình luận, khối kinh doanh, tiện ích) |
+| `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay, cột bình luận nổi bật (còn khối kinh doanh, tiện ích) |
 | `chuyen-muc.html?c=xem\|nghe` | `/xem`, `/nghe` | ✓ Chip lọc, sắp xếp, cuộn tải thêm |
 | `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | Lọc tiểu mục `?f=` |
 | `tien-ich.html?tab=` | `/tien-ich/[tab]` | Ra tàu bay, Flightradar, thời tiết, Wi-Fi, phòng chờ |
 | `y-kien.html?tab=` | `/y-kien/[tab]` | Trải nghiệm, khảo sát, góp ý |
 | `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
-| `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; còn bình luận (Phần 04), chia sẻ/lưu |
+| `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; ✓ bình luận; còn chia sẻ/lưu |
 | `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
 | `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ; còn chuyến bay, đơn hàng, tiếp tục xem, kênh theo dõi |
 | `suu-tap.html` | `/suu-tap` | Cần đăng nhập |
-| `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý; còn sản phẩm gắn video, bình luận |
+| `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận; còn sản phẩm gắn video |
 | `san-pham.html?id=` | `/san-pham/[slug]` | Vé/tour có chọn ngày, số khách |
-| `kenh.html?id=` | `/kenh/[slug]` | Kênh creator/doanh nghiệp |
+| `kenh.html?id=` | `/kenh/[slug]` | ✓ Ảnh bìa, thông tin, theo dõi, lưới nội dung của kênh; còn tab sản phẩm của kênh doanh nghiệp (Phần 07) |
 | `lien-he.html` | `/lien-he` | Form liên hệ |
 | `tim-kiem.html?q=` | `/tim-kiem` | Kết quả gộp nhiều loại |
 | (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | ✓ `/dang-nhap`, `/dang-ky`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh-email` (react-hook-form + zod, lỗi theo từng ô, chống open redirect) |

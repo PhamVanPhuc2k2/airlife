@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { CommentSection } from "@/components/comment/CommentSection";
 import { Icon } from "@/components/icons/Icon";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
@@ -52,6 +53,8 @@ export async function ArticlePage({ slug }: { slug: string }) {
           className="prose prose-lg mt-8 max-w-none prose-headings:font-bold prose-a:text-brand-700 prose-blockquote:border-brand-500 prose-blockquote:font-medium prose-blockquote:text-ink-2"
           dangerouslySetInnerHTML={{ __html: article.body_html }}
         />
+
+        <CommentSection target={{ kind: "news", slug: article.slug }} />
       </article>
 
       <aside

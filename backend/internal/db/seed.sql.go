@@ -218,3 +218,59 @@ func (q *Queries) UpsertNewsCategory(ctx context.Context, arg UpsertNewsCategory
 	)
 	return err
 }
+
+const upsertSeedComment = `-- name: UpsertSeedComment :exec
+INSERT INTO comments (id, media_id, news_id, parent_id, user_id, body, like_count, reply_count, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+ON CONFLICT (id) DO UPDATE
+SET body = EXCLUDED.body, like_count = EXCLUDED.like_count, reply_count = EXCLUDED.reply_count
+`
+
+type UpsertSeedCommentParams struct {
+	ID         uuid.UUID
+	MediaID    *uuid.UUID
+	NewsID     *uuid.UUID
+	ParentID   *uuid.UUID
+	UserID     uuid.UUID
+	Body       string
+	LikeCount  int32
+	ReplyCount int32
+	CreatedAt  time.Time
+}
+
+// Bình luận mẫu có id cố định (uuid sinh từ khoá trong data.json): chạy seed lại không bị nhân đôi.
+func (q *Queries) UpsertSeedComment(ctx context.Context, arg UpsertSeedCommentParams) error {
+	_, err := q.db.Exec(ctx, upsertSeedComment,
+		arg.ID,
+		arg.MediaID,
+		arg.NewsID,
+		arg.ParentID,
+		arg.UserID,
+		arg.Body,
+		arg.LikeCount,
+		arg.ReplyCount,
+		arg.CreatedAt,
+	)
+	return err
+}
+
+const upsertSeedUser = `-- name: UpsertSeedUser :one
+INSERT INTO users (email, password_hash, display_name, email_verified_at)
+VALUES ($1, $2, $3, now())
+ON CONFLICT (email) DO UPDATE SET display_name = EXCLUDED.display_name
+RETURNING id
+`
+
+type UpsertSeedUserParams struct {
+	Email        string
+	PasswordHash string
+	DisplayName  string
+}
+
+// Người dùng mẫu (bình luận mẫu cần người viết). Đánh dấu đã xác minh email.
+func (q *Queries) UpsertSeedUser(ctx context.Context, arg UpsertSeedUserParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, upsertSeedUser, arg.Email, arg.PasswordHash, arg.DisplayName)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}

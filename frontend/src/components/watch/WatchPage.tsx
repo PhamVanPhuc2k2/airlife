@@ -3,6 +3,8 @@ import Link from "next/link";
 import { permanentRedirect } from "next/navigation";
 
 import { Icon } from "@/components/icons/Icon";
+import { FollowButton } from "@/components/channel/FollowButton";
+import { CommentSection } from "@/components/comment/CommentSection";
 import { mediaHref, viewWord } from "@/components/media/links";
 import { PlayerSlot } from "@/components/player/PlayerSlot";
 import { Avatar } from "@/components/ui/Avatar";
@@ -46,26 +48,21 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
           {durationLabel(media) && ` · ${durationLabel(media)}`}
         </p>
 
-        <div className="mt-4 flex items-center gap-3">
-          <Avatar name={media.channel.name} />
-          <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1 font-semibold">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Link
+            href={`/kenh/${media.channel.slug}`}
+            className="flex min-w-0 flex-1 items-center gap-3"
+          >
+            <Avatar name={media.channel.name} />
+            <span className="flex items-center gap-1 font-semibold hover:text-brand-700">
               {media.channel.name}
               {media.channel.verified && <Icon name="check" className="size-4 text-brand-600" />}
-            </p>
-            {media.channel.followers_count !== undefined && (
-              <p className="text-sm text-ink-muted">
-                {compactNumber(media.channel.followers_count)} người theo dõi
-              </p>
-            )}
-          </div>
-          {/* Theo dõi kênh cần đăng nhập (Phần 04) */}
-          <Link
-            href="/dang-nhap"
-            className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink-2"
-          >
-            Theo dõi
+            </span>
           </Link>
+          <FollowButton
+            slug={media.channel.slug}
+            initial={{ following: false, followers_count: media.channel.followers_count ?? 0 }}
+          />
         </div>
 
         <div className="mt-4 whitespace-pre-line rounded-card bg-surface-2 p-4 text-[15px] leading-relaxed">
@@ -76,6 +73,8 @@ export async function WatchPage({ category, slug }: { category: "xem" | "nghe"; 
           )}
           {media.description || "Chưa có mô tả."}
         </div>
+
+        <CommentSection target={{ kind: "media", slug: media.slug }} />
       </div>
 
       <aside aria-label="Có thể bạn thích">

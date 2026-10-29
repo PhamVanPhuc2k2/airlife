@@ -22,7 +22,7 @@ func NewHandler(svc *Service, log *slog.Logger, clientIP func(*http.Request) str
 	return &Handler{svc: svc, log: log, clientIP: clientIP}
 }
 
-// GET /api/v1/media?category=xem&tag=hanh-dong&sort=new|popular&lineup=2026-10&cursor=…&limit=24
+// GET /api/v1/media?category=xem&tag=hanh-dong&channel=airlife&sort=new|popular&lineup=2026-10&cursor=…&limit=24
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	limit, _ := strconv.Atoi(q.Get("limit")) // sai hoặc thiếu → 0 → service dùng mặc định
@@ -31,6 +31,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		Tag:      q.Get("tag"),
 		Sort:     q.Get("sort"),
 		Lineup:   q.Get("lineup"),
+		Channel:  q.Get("channel"),
 		Cursor:   q.Get("cursor"),
 		Limit:    limit,
 	})

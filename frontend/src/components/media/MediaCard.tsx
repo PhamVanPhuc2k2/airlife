@@ -42,7 +42,9 @@ export function MediaCard({ media, priority = false }: { media: Media; priority?
             </Link>
           </h3>
           <p className="mt-1 flex items-center gap-1 text-sm text-ink-muted">
-            {media.channel.name}
+            <Link href={`/kenh/${media.channel.slug}`} className="hover:text-ink">
+              {media.channel.name}
+            </Link>
             {media.channel.verified && (
               <span title="Kênh đã xác minh">
                 <Icon name="check" className="size-3.5 text-brand-600" />

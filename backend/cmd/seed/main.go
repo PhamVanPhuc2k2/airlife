@@ -8,7 +8,9 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,6 +24,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/database"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/logger"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/password"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/sanitize"
 )
 
@@ -82,7 +85,24 @@ type seedData struct {
 		BodyHTML    string    `json:"body_html"`
 		PublishedAt time.Time `json:"published_at"`
 	} `json:"news"`
+	Users []struct {
+		Key         string `json:"key"`
+		DisplayName string `json:"display_name"`
+	} `json:"users"`
+	Comments []struct {
+		Key      string  `json:"key"`
+		Parent   string  `json:"parent"`
+		User     string  `json:"user"`
+		Media    string  `json:"media"`
+		Body     string  `json:"body"`
+		Likes    int32   `json:"likes"`
+		HoursAgo float64 `json:"hours_ago"`
+	} `json:"comments"`
 }
+
+// Id cố định cho bình luận mẫu: uuid v5 sinh từ khoá ("c1", "r2"…). Cùng khoá luôn ra cùng id,
+// nên chạy seed lại thì cập nhật đúng bình luận cũ thay vì thêm bản sao.
+var seedNamespace = uuid.MustParse("6f1c2b9e-5a0d-4c3e-9b7a-2d4e8f1a3c5b")
 
 func main() {
 	if err := run(); err != nil {
@@ -197,11 +217,74 @@ func run() error {
 		}
 	}
 
+	if err := seedComments(ctx, q, data, now); err != nil {
+		return err
+	}
+
 	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
 	log.Info("đã nạp dữ liệu mẫu",
 		"categories", len(data.Categories), "channels", len(data.Channels), "media", len(data.Media),
-		"news", len(data.News))
+		"news", len(data.News), "users", len(data.Users), "comments", len(data.Comments))
+	return nil
+}
+
+// seedComments nạp người dùng mẫu và bình luận mẫu (Phần 05).
+func seedComments(ctx context.Context, q *db.Queries, data seedData, now time.Time) error {
+	userIDs := make(map[string]uuid.UUID, len(data.Users))
+	for _, u := range data.Users {
+		// Mật khẩu là chuỗi ngẫu nhiên không ai biết: tài khoản mẫu chỉ để làm người viết bình
+		// luận, không đăng nhập được.
+		random := make([]byte, 32)
+		if _, err := rand.Read(random); err != nil {
+			return err
+		}
+		hash, err := password.Hash(hex.EncodeToString(random))
+		if err != nil {
+			return err
+		}
+		id, err := q.UpsertSeedUser(ctx, db.UpsertSeedUserParams{
+			Email: "seed-" + u.Key + "@airlife.local", PasswordHash: hash, DisplayName: u.DisplayName,
+		})
+		if err != nil {
+			return fmt.Errorf("người dùng mẫu %s: %w", u.Key, err)
+		}
+		userIDs[u.Key] = id
+	}
+
+	// Đếm số trả lời thật của mỗi bình luận gốc
+	replies := map[string]int32{}
+	for _, c := range data.Comments {
+		if c.Parent != "" {
+			replies[c.Parent]++
+		}
+	}
+	commentID := func(key string) uuid.UUID { return uuid.NewSHA1(seedNamespace, []byte("comment:"+key)) }
+
+	// Bình luận gốc trước, trả lời sau (trả lời tham chiếu tới bình luận gốc)
+	for _, pass := range []bool{false, true} {
+		for _, c := range data.Comments {
+			if (c.Parent != "") != pass {
+				continue
+			}
+			mediaID, err := q.GetMediaIDBySlug(ctx, c.Media)
+			if err != nil {
+				return fmt.Errorf("bình luận %s: media %q: %w", c.Key, c.Media, err)
+			}
+			var parent *uuid.UUID
+			if c.Parent != "" {
+				p := commentID(c.Parent)
+				parent = &p
+			}
+			if err := q.UpsertSeedComment(ctx, db.UpsertSeedCommentParams{
+				ID: commentID(c.Key), MediaID: &mediaID, ParentID: parent, UserID: userIDs[c.User],
+				Body: c.Body, LikeCount: c.Likes, ReplyCount: replies[c.Key],
+				CreatedAt: now.Add(-time.Duration(c.HoursAgo * float64(time.Hour))),
+			}); err != nil {
+				return fmt.Errorf("bình luận %s: %w", c.Key, err)
+			}
+		}
+	}
 	return nil
 }

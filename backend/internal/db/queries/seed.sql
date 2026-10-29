@@ -52,3 +52,17 @@ ON CONFLICT (slug) DO UPDATE
 SET category_slug = EXCLUDED.category_slug, title = EXCLUDED.title, excerpt = EXCLUDED.excerpt,
     body_html = EXCLUDED.body_html, cover_url = EXCLUDED.cover_url, author = EXCLUDED.author,
     published_at = EXCLUDED.published_at, updated_at = now();
+
+-- Người dùng mẫu (bình luận mẫu cần người viết). Đánh dấu đã xác minh email.
+-- name: UpsertSeedUser :one
+INSERT INTO users (email, password_hash, display_name, email_verified_at)
+VALUES ($1, $2, $3, now())
+ON CONFLICT (email) DO UPDATE SET display_name = EXCLUDED.display_name
+RETURNING id;
+
+-- Bình luận mẫu có id cố định (uuid sinh từ khoá trong data.json): chạy seed lại không bị nhân đôi.
+-- name: UpsertSeedComment :exec
+INSERT INTO comments (id, media_id, news_id, parent_id, user_id, body, like_count, reply_count, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+ON CONFLICT (id) DO UPDATE
+SET body = EXCLUDED.body, like_count = EXCLUDED.like_count, reply_count = EXCLUDED.reply_count;

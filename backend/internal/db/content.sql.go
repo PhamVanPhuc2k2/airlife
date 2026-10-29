@@ -322,16 +322,18 @@ WHERE m.status = 'published'
   AND ($1::text IS NULL OR m.category_slug = $1)
   AND ($2::text IS NULL OR m.tags @> ARRAY[$2::text])
   AND ($3::date IS NULL OR m.lineup_month = $3)
-  AND ($4::timestamptz IS NULL
-       OR (m.published_at, m.id) < ($4::timestamptz, $5::uuid))
+  AND ($4::text IS NULL OR c.slug = $4)
+  AND ($5::timestamptz IS NULL
+       OR (m.published_at, m.id) < ($5::timestamptz, $6::uuid))
 ORDER BY m.published_at DESC, m.id DESC
-LIMIT $6
+LIMIT $7
 `
 
 type ListMediaNewParams struct {
 	Category    *string
 	Tag         *string
 	LineupMonth *time.Time
+	Channel     *string
 	CursorTime  *time.Time
 	CursorID    *uuid.UUID
 	Limit       int32
@@ -365,6 +367,7 @@ func (q *Queries) ListMediaNew(ctx context.Context, arg ListMediaNewParams) ([]L
 		arg.Category,
 		arg.Tag,
 		arg.LineupMonth,
+		arg.Channel,
 		arg.CursorTime,
 		arg.CursorID,
 		arg.Limit,
@@ -415,15 +418,17 @@ JOIN channels c ON c.id = m.channel_id
 WHERE m.status = 'published'
   AND ($1::text IS NULL OR m.category_slug = $1)
   AND ($2::text IS NULL OR m.tags @> ARRAY[$2::text])
-  AND ($3::bigint IS NULL
-       OR (m.view_count, m.id) < ($3::bigint, $4::uuid))
+  AND ($3::text IS NULL OR c.slug = $3)
+  AND ($4::bigint IS NULL
+       OR (m.view_count, m.id) < ($4::bigint, $5::uuid))
 ORDER BY m.view_count DESC, m.id DESC
-LIMIT $5
+LIMIT $6
 `
 
 type ListMediaPopularParams struct {
 	Category    *string
 	Tag         *string
+	Channel     *string
 	CursorViews *int64
 	CursorID    *uuid.UUID
 	Limit       int32
@@ -454,6 +459,7 @@ func (q *Queries) ListMediaPopular(ctx context.Context, arg ListMediaPopularPara
 	rows, err := q.db.Query(ctx, listMediaPopular,
 		arg.Category,
 		arg.Tag,
+		arg.Channel,
 		arg.CursorViews,
 		arg.CursorID,
 		arg.Limit,

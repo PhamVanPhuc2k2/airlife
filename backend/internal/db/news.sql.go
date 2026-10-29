@@ -53,6 +53,17 @@ func (q *Queries) GetNewsBySlug(ctx context.Context, slug string) (GetNewsBySlug
 	return i, err
 }
 
+const getNewsIDBySlug = `-- name: GetNewsIDBySlug :one
+SELECT id FROM news WHERE slug = $1 AND status = 'published'
+`
+
+func (q *Queries) GetNewsIDBySlug(ctx context.Context, slug string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getNewsIDBySlug, slug)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const listNews = `-- name: ListNews :many
 SELECT n.id, n.slug, n.category_slug, nc.name AS category_name, n.title, n.excerpt,
        n.cover_url, n.author, n.published_at

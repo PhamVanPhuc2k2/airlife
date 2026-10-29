@@ -34,6 +34,7 @@ type ListParams struct {
 	Tag      string // slug chip lọc, "" = tất cả
 	Sort     string // "new" (mặc định) | "popular"
 	Lineup   string // "2026-10": line-up phim tháng 10/2026
+	Channel  string // slug kênh: nội dung của một kênh (trang kênh)
 	Cursor   string // next_cursor của trang trước
 	Limit    int
 }
@@ -149,6 +150,12 @@ func (p ListParams) filter() (listFilter, error) {
 			return f, apperr.Invalid("invalid_tag", "Bộ lọc không hợp lệ")
 		}
 		f.Tag = &p.Tag
+	}
+	if p.Channel != "" {
+		if !slugRe.MatchString(p.Channel) {
+			return f, apperr.Invalid("invalid_channel", "Kênh không hợp lệ")
+		}
+		f.Channel = &p.Channel
 	}
 	if p.Lineup != "" {
 		t, err := time.Parse("2006-01", p.Lineup)

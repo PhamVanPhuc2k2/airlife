@@ -1,14 +1,18 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Icon, type IconName } from "@/components/icons/Icon";
+import { Avatar } from "@/components/ui/Avatar";
 import { SIDENAV, TOPNAV, isActive } from "@/config/nav";
 import { SITE } from "@/config/site";
+import { api } from "@/lib/api";
 import { useMe } from "@/lib/auth";
 import { cn } from "@/lib/cn";
+import type { ChannelBrief } from "@/lib/types";
 import { useUIStore } from "@/stores/ui-store";
 
 // Menu dọc có ba dạng, giống YouTube. Tách thành ba component riêng thay vì một component
@@ -112,10 +116,9 @@ function FullNav({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </NavGroup>
 
-      {/* Danh sách kênh đang theo dõi làm ở Phần 05 (Kênh) */}
       <NavGroup title="Kênh đang theo dõi">
         {me ? (
-          <p className="px-3 py-2 text-sm text-ink-muted">Bạn chưa theo dõi kênh nào.</p>
+          <FollowingList onNavigate={onNavigate} />
         ) : (
           <Link
             href="/dang-nhap"
@@ -194,5 +197,43 @@ function FullNavItem({
       <Icon name={item.icon} className={cn("size-[22px]", active && "text-brand-600")} />
       <span className="truncate">{item.label}</span>
     </Link>
+  );
+}
+
+// Kênh đang theo dõi (GET /me/following). Nút Theo dõi làm mới danh sách này (FollowButton).
+function FollowingList({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const { data = [], isPending } = useQuery({
+    queryKey: ["me", "following"],
+    queryFn: () => api<ChannelBrief[]>("/me/following"),
+  });
+  if (isPending) return null;
+  if (data.length === 0) {
+    return <p className="px-3 py-2 text-sm text-ink-muted">Bạn chưa theo dõi kênh nào.</p>;
+  }
+  return (
+    <>
+      {data.map((c) => {
+        const href = `/kenh/${c.slug}`;
+        const active = isActive(pathname, href);
+        return (
+          <Link
+            key={c.slug}
+            href={href}
+            onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "flex h-11 items-center gap-3.5 rounded-card-sm px-3 text-sm transition-colors",
+              active
+                ? "bg-brand-600/10 font-bold text-brand-700"
+                : "font-medium text-ink-2 hover:bg-surface hover:text-ink",
+            )}
+          >
+            <Avatar name={c.name} size="xs" />
+            <span className="truncate">{c.name}</span>
+          </Link>
+        );
+      })}
+    </>
   );
 }
