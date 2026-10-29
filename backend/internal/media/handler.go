@@ -69,3 +69,13 @@ func (h *Handler) RecordView(w http.ResponseWriter, r *http.Request) {
 	}
 	response.NoContent(w)
 }
+
+// GET /api/v1/lineup/months — các tháng có line-up phim (trang Mới tải, tab Line-up)
+func (h *Handler) LineupMonths(w http.ResponseWriter, r *http.Request) {
+	months, err := h.svc.LineupMonths(r.Context())
+	if err != nil {
+		response.Error(w, r, h.log, err)
+		return
+	}
+	response.OK(w, months)
+}

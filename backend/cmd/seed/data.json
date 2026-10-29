@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL.",
+  "_ghi_chu": "Dữ liệu mẫu cho môi trường dev, chuyển từ skyline/data/content.json của mockup. Chưa có youtube_id: gắn video thật qua trang quản trị (Phần 12) hoặc SQL. Thân bài tin tức là đoạn mẫu của mockup (giống nhau cho mọi bài).",
   "categories": [
     {
       "slug": "xem",
@@ -592,6 +592,99 @@
       "featured": false,
       "lineup": false,
       "published_days_ago": 30
+    }
+  ],
+  "news_categories": [
+    {
+      "slug": "kham-pha",
+      "name": "Khám phá",
+      "description": "Điểm đến, sân bay, văn hóa"
+    },
+    {
+      "slug": "su-kien",
+      "name": "Sự kiện",
+      "description": "Tin hoạt động Airlife"
+    },
+    {
+      "slug": "meo-bay",
+      "name": "Mẹo bay",
+      "description": "Bay thông minh, thoải mái"
+    },
+    {
+      "slug": "line-up-phim",
+      "name": "Line-up phim",
+      "description": "Phim mới trên chuyến bay"
+    },
+    {
+      "slug": "kinh-doanh",
+      "name": "Kinh doanh",
+      "description": "Doanh nghiệp và mua sắm trên chuyến bay"
+    }
+  ],
+  "news": [
+    {
+      "slug": "airlife-dua-40-phim-moi-len-he-thong-giai-tri-thang-11",
+      "category": "line-up-phim",
+      "title": "Airlife đưa 40 phim mới lên hệ thống giải trí tháng 11",
+      "excerpt": "Danh sách phim chiếu trên các chuyến bay nội địa và quốc tế trong tháng 11 có nhiều tác phẩm Việt vừa ra rạp.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-10-20T09:00:00+07:00"
+    },
+    {
+      "slug": "ra-mat-airlife-xem-nghe-mua-sam-ngay-tren-chuyen-bay",
+      "category": "su-kien",
+      "title": "Ra mắt Airlife: xem, nghe, mua sắm ngay trên chuyến bay",
+      "excerpt": "Nền tảng mới cho phép hành khách bình luận, theo dõi nhà sáng tạo và đặt hàng giao tại sân bay đến.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-10-15T09:00:00+07:00"
+    },
+    {
+      "slug": "5-meo-de-ngu-ngon-tren-chuyen-bay-duong-dai",
+      "category": "meo-bay",
+      "title": "5 mẹo để ngủ ngon trên chuyến bay đường dài",
+      "excerpt": "Chọn ghế, giờ ăn, ánh sáng và âm thanh: những điều nhỏ giúp bạn hạ cánh tỉnh táo.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-10-10T09:00:00+07:00"
+    },
+    {
+      "slug": "kham-pha-con-dao-45-phut-bay-mot-the-gioi-khac",
+      "category": "kham-pha",
+      "title": "Khám phá Côn Đảo: 45 phút bay, một thế giới khác",
+      "excerpt": "Biển xanh, rùa đẻ trứng và những cung đường ven núi: lịch trình 3 ngày cho người lần đầu đến Côn Đảo.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-10-06T09:00:00+07:00"
+    },
+    {
+      "slug": "nhung-san-bay-dep-nhat-chau-a-ban-nen-ghe-mot-lan",
+      "category": "kham-pha",
+      "title": "Những sân bay đẹp nhất châu Á bạn nên ghé một lần",
+      "excerpt": "Từ thác nước trong nhà ở Singapore đến khu vườn Nhật ở Haneda: quá cảnh cũng thành trải nghiệm.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-10-02T09:00:00+07:00"
+    },
+    {
+      "slug": "phim-viet-chiem-35-luot-xem-tren-may-bay-quy-iii",
+      "category": "line-up-phim",
+      "title": "Phim Việt chiếm 35% lượt xem trên máy bay quý III",
+      "excerpt": "Phim gia đình và hài lãng mạn được khách nội địa chọn xem nhiều nhất.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-09-28T09:00:00+07:00"
+    },
+    {
+      "slug": "doanh-nghiep-dac-san-tang-3-lan-don-hang-nho-ban-tren-chuyen-bay",
+      "category": "kinh-doanh",
+      "title": "Doanh nghiệp đặc sản tăng 3 lần đơn hàng nhờ bán trên chuyến bay",
+      "excerpt": "Mô hình gian hàng trên Airlife giúp thương hiệu địa phương tiếp cận khách bay mỗi ngày.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-09-24T09:00:00+07:00"
+    },
+    {
+      "slug": "kham-pha-kyoto-mua-la-do-di-dau-an-gi-o-dau",
+      "category": "kham-pha",
+      "title": "Khám phá Kyoto mùa lá đỏ: đi đâu, ăn gì, ở đâu",
+      "excerpt": "Cẩm nang 5 ngày cho mùa thu Kyoto, kèm lịch lá đỏ dự kiến tháng 11.",
+      "body_html": "<p>Nội dung bài viết minh họa cho mockup. Phần thân bài sẽ do biên tập viên nhập trong CMS, gồm đoạn văn, ảnh, video và có thể gắn sản phẩm, tour hoặc nội dung liên quan ngay trong bài.</p><h2>Điểm nổi bật</h2><p>Airlife kết hợp nội dung giải trí trên chuyến bay với tính năng mạng xã hội: hành khách có thể xem, nghe, bình luận, theo dõi kênh yêu thích và mua sắm ngay khi đang bay.</p><blockquote>“Mỗi chuyến bay là vài giờ khách hàng sẵn sàng khám phá nội dung mới.”</blockquote><p>Doanh nghiệp có thể mở kênh, đăng video giới thiệu sản phẩm và gắn sản phẩm vào nội dung để khách đặt hàng chỉ với một chạm.</p><script>alert('XSS: dòng này phải bị lọc khi seed')</script>",
+      "published_at": "2026-09-18T09:00:00+07:00"
     }
   ]
 }

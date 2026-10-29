@@ -139,11 +139,25 @@ trang xem với trình phát YouTube phát tiếp khi chuyển trang.
 | [2.11](02-noi-dung-xem-nghe/11-trang-chuyen-muc.md) | Trang chuyên mục: chip lọc, cuộn tải thêm, prefetch + hydrate |
 | [2.12](02-noi-dung-xem-nghe/12-trinh-phat-youtube.md) | Trang xem và trình phát YouTube xuyên trang |
 
+### Phần 03: Tin tức và line-up phim
+
+Phần giữ lại từ site cũ skyline.vn. Gói phân trang dùng chung, lọc HTML chống XSS (bluemonday), tin
+tức theo chuyên mục, trang bài viết, trang Mới tải với line-up phim theo tháng.
+
+| Bài | Nội dung |
+|---|---|
+| [3.01](03-tin-tuc-va-line-up/01-phan-trang-chung-va-loc-html.md) | Gói phân trang dùng chung, lọc HTML bằng bluemonday |
+| [3.02](03-tin-tuc-va-line-up/02-schema-tin-tuc.md) | Schema và truy vấn tin tức, tháng line-up |
+| [3.03](03-tin-tuc-va-line-up/03-seed-tin-tuc.md) | Dữ liệu mẫu tin tức, lọc HTML ngay trong seed |
+| [3.04](03-tin-tuc-va-line-up/04-module-news.md) | Module tin tức, API tháng line-up |
+| [3.05](03-tin-tuc-va-line-up/05-component-dung-chung.md) | Tách component dùng chung ở frontend |
+| [3.06](03-tin-tuc-va-line-up/06-trang-tin-tuc.md) | Trang Tin tức và trang bài viết |
+| [3.07](03-tin-tuc-va-line-up/07-trang-moi-tai-line-up.md) | Trang Mới tải và line-up phim theo tháng |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 03 tin-tuc-va-line-up | Tin tức, line-up phim theo tháng |
 | 04 kenh-va-binh-luan | Kênh, theo dõi, bình luận |
 | 05 dang-nhap-tai-khoan | Đăng ký, đăng nhập, JWT, phiên trên Redis, email qua Resend |
 | 06 ban-va-suu-tap | Trang Bạn, Sưu tập, tiếp tục xem |

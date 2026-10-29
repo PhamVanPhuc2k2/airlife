@@ -1,21 +1,21 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { api, qs } from "./api";
-import type { MediaPage } from "./types";
+import type { MediaPage, NewsPage } from "./types";
 
 // Mỗi truy vấn khai báo một lần (key + hàm lấy dữ liệu) bằng infiniteQueryOptions, dùng chung
 // cho server (prefetch) và client (useInfiniteQuery). Key giống nhau thì client nhận lại đúng
 // dữ liệu server đã lấy.
 
 export type MediaListParams = {
-  category: string;
+  category?: string; // bỏ trống = mọi chuyên mục (trang Mới tải)
   tag?: string;
   sort?: "new" | "popular";
 };
 
 export function mediaListOptions(p: MediaListParams) {
   return infiniteQueryOptions({
-    queryKey: ["media", "list", p.category, p.tag ?? "", p.sort ?? "new"],
+    queryKey: ["media", "list", p.category ?? "", p.tag ?? "", p.sort ?? "new"],
     queryFn: ({ pageParam, signal }) =>
       api<MediaPage>(
         `/media?${qs({ category: p.category, tag: p.tag, sort: p.sort, cursor: pageParam, limit: 24 })}`,
@@ -23,6 +23,16 @@ export function mediaListOptions(p: MediaListParams) {
       ),
     initialPageParam: "",
     // next_cursor rỗng → undefined → TanStack hiểu là hết trang
+    getNextPageParam: (last) => last.next_cursor || undefined,
+  });
+}
+
+export function newsListOptions(category?: string) {
+  return infiniteQueryOptions({
+    queryKey: ["news", "list", category ?? ""],
+    queryFn: ({ pageParam, signal }) =>
+      api<NewsPage>(`/news?${qs({ category, cursor: pageParam, limit: 12 })}`, { signal }),
+    initialPageParam: "",
     getNextPageParam: (last) => last.next_cursor || undefined,
   });
 }

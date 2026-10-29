@@ -53,3 +53,32 @@ export type Home = {
   trending: MediaCard[];
   top_listen: MediaCard[];
 };
+
+export type NewsCategory = {
+  slug: string;
+  name: string;
+  description: string;
+};
+
+export type NewsCard = {
+  id: string;
+  slug: string;
+  category: string;
+  category_name: string;
+  title: string;
+  excerpt: string;
+  cover_url: string;
+  author: string;
+  published_at: string;
+};
+
+// body_html đã được backend lọc bằng bluemonday trước khi lưu (backend/pkg/sanitize)
+export type Article = NewsCard & {
+  body_html: string;
+  updated_at: string;
+};
+
+export type NewsPage = {
+  items: NewsCard[];
+  next_cursor?: string;
+};

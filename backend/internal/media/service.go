@@ -2,8 +2,6 @@ package media
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"regexp"
 	"time"
 
@@ -11,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/pagination"
 )
 
 const (
@@ -39,8 +38,7 @@ type ListParams struct {
 	Limit    int
 }
 
-// cursor là vị trí dòng cuối của trang trước. Mã hoá base64 để client coi nó là chuỗi
-// "đen" (opaque), chỉ việc gửi lại, không tự ghép hay sửa.
+// cursor là vị trí dòng cuối của trang trước (mã hoá bằng pkg/pagination).
 type cursor struct {
 	Time  *time.Time `json:"t,omitempty"` // sort=new
 	Views *int64     `json:"v,omitempty"` // sort=popular
@@ -52,9 +50,13 @@ func (s *Service) List(ctx context.Context, p ListParams) (Page, error) {
 	if err != nil {
 		return Page{}, err
 	}
-	cur, err := decodeCursor(p.Cursor)
+	var cur cursor
+	hasCur, err := pagination.Decode(p.Cursor, &cur)
 	if err != nil {
 		return Page{}, err
+	}
+	if hasCur && cur.ID == uuid.Nil {
+		return Page{}, apperr.Invalid("invalid_cursor", "Con trỏ phân trang không hợp lệ")
 	}
 
 	// Lấy dư 1 dòng: có dòng thứ limit+1 nghĩa là còn trang sau.
@@ -66,7 +68,7 @@ func (s *Service) List(ctx context.Context, p ListParams) (Page, error) {
 	case "", "new":
 		var t *time.Time
 		var id *uuid.UUID
-		if cur != nil {
+		if hasCur {
 			t, id = cur.Time, &cur.ID
 		}
 		items, err = s.repo.ListNew(ctx, f, t, id)
@@ -76,7 +78,7 @@ func (s *Service) List(ctx context.Context, p ListParams) (Page, error) {
 		}
 		var v *int64
 		var id *uuid.UUID
-		if cur != nil {
+		if hasCur {
 			v, id = cur.Views, &cur.ID
 		}
 		items, err = s.repo.ListPopular(ctx, f, v, id)
@@ -97,7 +99,7 @@ func (s *Service) List(ctx context.Context, p ListParams) (Page, error) {
 		} else {
 			next.Time = &last.PublishedAt
 		}
-		page.NextCursor = encodeCursor(next)
+		page.NextCursor = pagination.Encode(next)
 	}
 	return page, nil
 }
@@ -111,6 +113,19 @@ func (s *Service) Get(ctx context.Context, slug string) (Detail, error) {
 		return Detail{}, errNotFound
 	}
 	return s.repo.GetBySlug(ctx, slug)
+}
+
+// LineupMonths trả các tháng có line-up phim dạng "2026-10", mới nhất trước.
+func (s *Service) LineupMonths(ctx context.Context) ([]string, error) {
+	months, err := s.repo.LineupMonths(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]string, 0, len(months))
+	for _, m := range months {
+		out = append(out, m.Format("2006-01"))
+	}
+	return out, nil
 }
 
 func (s *Service) Related(ctx context.Context, slug string, limit int32) ([]Card, error) {
@@ -151,24 +166,4 @@ func (p ListParams) filter() (listFilter, error) {
 		f.Limit = int32(p.Limit) //nolint:gosec // đã chặn trong khoảng 1..maxLimit
 	}
 	return f, nil
-}
-
-func encodeCursor(c cursor) string {
-	b, _ := json.Marshal(c) // struct đơn giản, Marshal không thể lỗi
-	return base64.RawURLEncoding.EncodeToString(b)
-}
-
-func decodeCursor(s string) (*cursor, error) {
-	if s == "" {
-		return nil, nil //nolint:nilnil // không có con trỏ = trang đầu, không phải lỗi
-	}
-	b, err := base64.RawURLEncoding.DecodeString(s)
-	if err != nil {
-		return nil, apperr.Invalid("invalid_cursor", "Con trỏ phân trang không hợp lệ")
-	}
-	var c cursor
-	if err := json.Unmarshal(b, &c); err != nil || c.ID == uuid.Nil {
-		return nil, apperr.Invalid("invalid_cursor", "Con trỏ phân trang không hợp lệ")
-	}
-	return &c, nil
 }

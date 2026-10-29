@@ -132,7 +132,7 @@ backend/
 
 ### 2.1 Nền tảng
 - [x] Stack: router `go-chi/chi/v5`, `pgx` + `sqlc` 1.31.1 (chạy bằng image Docker) cho truy vấn, `golang-migrate` cho migration, `go-redis`, `amqp091-go`
-- [ ] Thư viện thêm: `bluemonday` (lọc HTML), `resend-go` (gửi email)
+- [ ] Thư viện thêm: ✓ `bluemonday` v1.0.27 (lọc HTML, kèm nâng `golang.org/x/net` v0.62.0 vá GO-2025-3595); còn `resend-go` (gửi email)
 - [x] Config bằng **viper** (`internal/config`):
   - Đọc file `.env` khi dev (`SetConfigFile(".env")`, không bắt buộc có file), biến môi trường thật ghi đè (`AutomaticEnv`)
   - Unmarshal vào struct `Config` lồng nhóm: `App`, `HTTP`, `Postgres`, `Redis`, `RabbitMQ`, `R2`, `Resend`, `Turnstile`, `YouTube`, `JWT`, `Payment`
@@ -154,7 +154,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] `products` (`section`: vé bay / miễn thuế / mua sắm / đặc sản / dịch vụ sân bay / tour; giá, giá cũ, rating, đã bán) + `product_variants` (ngày bay, số khách cho vé & tour)
 - [ ] `carts`, `cart_items`, `orders`, `order_items`, `payments`
 - [ ] `comments` (media, có reply lồng 1 cấp, likes) + `comment_likes`
-- [ ] `news` (bài viết, chuyên mục: Khám phá, Sự kiện, Mẹo bay, Line-up phim)
+- [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
 - [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
 - [ ] `playlists`, `playlist_items`, `saved_items`, `favorites`, `watch_history` (tiến độ xem để "Tiếp tục xem")
@@ -180,7 +180,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] **Payment**: tích hợp cổng VNPay/MoMo/ZaloPay, webhook IPN, đối soát
 - [ ] **Channels**: chi tiết kênh, nội dung của kênh, theo dõi/bỏ theo dõi
 - [ ] **Comments**: CRUD, reply, like, sắp xếp Hay/Mới, chống spam (Turnstile + rate limit)
-- [ ] **News**: danh sách theo chuyên mục, chi tiết, bài liên quan
+- [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
 - [ ] **Utilities**: chuyến bay (ra tàu bay, trạng thái, tiến độ), Flightradar (proxy API bên thứ ba), thời tiết điểm đến (proxy + cache), Wi-Fi, phòng chờ & fast-track
 - [ ] **Opinions**: trải nghiệm, khảo sát (bình chọn 1 lần/user), góp ý (có Turnstile)
 - [ ] **Me (Bạn)**: hồ sơ, chuyến bay sắp tới, đơn hàng, tiếp tục xem, kênh theo dõi
@@ -188,7 +188,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] **Search**: tìm chung media/sản phẩm/kênh/tin tức, gợi ý từ khóa
 - [ ] **Contact**: gửi liên hệ (có Turnstile)
 - [ ] Middleware Go xác minh token Turnstile (gọi `siteverify` của Cloudflare) cho các endpoint form công khai
-- [ ] Lọc HTML bằng `bluemonday` (policy riêng cho bài viết, mô tả sản phẩm/tour) trước khi lưu nội dung từ editor
+- [ ] Lọc HTML bằng `bluemonday` (✓ `pkg/sanitize.ArticleHTML` cho bài viết, dùng cả trong seed); còn policy cho mô tả sản phẩm/tour (Phần 07–08) và nối vào editor CMS (Phần 12)
 - [ ] **Upload file**: Go tạo presigned PUT URL lên Cloudflare R2 (`aws-sdk-go-v2`, endpoint R2), client upload thẳng lên R2; giới hạn loại file và dung lượng; video & âm thanh không upload (dùng YouTube)
 - [ ] Cấu hình R2: bucket dev/prod, CORS cho domain web, custom domain public (vd. `cdn.airlife.vn`), lưu key file trong DB thay vì URL đầy đủ
 - [ ] Job: dọn file R2 mồ côi (upload xong nhưng không gắn vào bản ghi nào)
@@ -258,7 +258,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Icon (✓ Player icons + icon nét), ✓ Avatar (màu theo tên), ✓ Chip/Filter (link URL), ✓ Badge verified; còn Button, Tabs, Rating sao
 - [ ] ✓ MediaCard, MediaTile, FeaturedHero, RankList, Panel; còn ProductCard, ChannelCard, NewsCard, CommentItem, ExperienceCard, SurveyCard
 - [ ] ✓ EmptyState, ErrorState (có nút thử lại), ✓ Infinite scroll (IntersectionObserver + nút Xem thêm); còn Skeleton loading
-- [ ] Helper format: ✓ số rút gọn (`1,8 Tr`, `54,2 N`), ✓ thời lượng / số tập, ✓ thời gian tương đối; còn giá `vi-VN` + ₫ (Phần 07)
+- [ ] Helper format: ✓ số rút gọn (`1,8 Tr`, `54,2 N`), ✓ thời lượng / số tập, ✓ thời gian tương đối, ✓ ngày `dd/mm/yyyy` theo giờ VN; còn giá `vi-VN` + ₫ (Phần 07)
 
 ### 3.5 Trang (map từ mockup)
 
@@ -269,9 +269,9 @@ Bảng dựa trên `data/content.json` của mockup:
 | `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | Lọc tiểu mục `?f=` |
 | `tien-ich.html?tab=` | `/tien-ich/[tab]` | Ra tàu bay, Flightradar, thời tiết, Wi-Fi, phòng chờ |
 | `y-kien.html?tab=` | `/y-kien/[tab]` | Trải nghiệm, khảo sát, góp ý |
-| `tin-tuc.html?f=` | `/tin-tuc` | Theo chuyên mục |
-| `bai-viet.html?id=` | `/tin-tuc/[slug]` | SSG/ISR cho SEO |
-| `moi-tai.html` | `/moi-tai` | Gồm tab Line-up phim tháng |
+| `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
+| `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; còn bình luận (Phần 04), chia sẻ/lưu |
+| `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
 | `ban.html` | `/ban` | Cần đăng nhập |
 | `suu-tap.html` | `/suu-tap` | Cần đăng nhập |
 | `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý; còn sản phẩm gắn video, bình luận |

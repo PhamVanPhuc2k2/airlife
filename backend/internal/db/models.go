@@ -63,3 +63,25 @@ type Medium struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }
+
+type News struct {
+	ID           uuid.UUID
+	Slug         string
+	CategorySlug string
+	Title        string
+	Excerpt      string
+	BodyHtml     string
+	CoverUrl     string
+	Author       string
+	Status       string
+	PublishedAt  time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+type NewsCategory struct {
+	Slug        string
+	Name        string
+	Description string
+	SortOrder   int16
+}

@@ -147,3 +147,8 @@ func toCard(m db.ListMediaNewRow) Card {
 		Channel: Channel{Slug: m.ChannelSlug, Name: m.ChannelName, Verified: m.ChannelVerified},
 	}
 }
+
+// LineupMonths: các tháng có line-up phim, mới nhất trước.
+func (r *Repository) LineupMonths(ctx context.Context) ([]time.Time, error) {
+	return r.q.ListLineupMonths(ctx)
+}

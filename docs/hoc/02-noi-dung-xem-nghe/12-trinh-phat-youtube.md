@@ -1,6 +1,6 @@
 # Bài 2.12: Trang xem và trình phát YouTube xuyên trang
 
-> [← Bài trước](11-trang-chuyen-muc.md) · [Mục lục](../README.md)
+> [← Bài trước](11-trang-chuyen-muc.md) · [Mục lục](../README.md) · [Phần 03 →](../03-tin-tuc-va-line-up/01-phan-trang-chung-va-loc-html.md)
 
 ## Mục tiêu
 

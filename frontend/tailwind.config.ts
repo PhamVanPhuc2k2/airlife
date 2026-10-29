@@ -1,3 +1,4 @@
+import typography from "@tailwindcss/typography";
 import type { Config } from "tailwindcss";
 
 // Theme Airlife, chuyển từ skyline/scss/_variables.scss của mockup, đổi bảng màu sang
@@ -126,7 +127,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  // typography: class `prose` định dạng sẵn HTML thân bài viết (đoạn văn, tiêu đề, trích dẫn…)
+  // mà không phải gắn class cho từng thẻ do biên tập viên nhập.
+  plugins: [typography],
 };
 
 export default config;

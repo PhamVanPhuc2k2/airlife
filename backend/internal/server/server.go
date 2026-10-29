@@ -22,6 +22,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
 )
@@ -90,6 +91,7 @@ func (s *Server) Handler() (http.Handler, error) {
 	mediaH := media.NewHandler(mediaSvc, s.deps.Log, clientIP)
 
 	homeH := home.NewHandler(home.NewService(mediaSvc, s.deps.Redis), s.deps.Log)
+	newsH := news.NewHandler(news.NewService(q, s.deps.Redis), s.deps.Log)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/ping", func(w http.ResponseWriter, _ *http.Request) {
@@ -105,6 +107,14 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/media/{slug}", mediaH.Get)
 		r.Get("/media/{slug}/related", mediaH.Related)
 		r.Post("/media/{slug}/views", mediaH.RecordView)
+		r.Get("/lineup/months", mediaH.LineupMonths)
+
+		// /news/categories khai báo trước /news/{slug}; chi luôn ưu tiên đường dẫn tĩnh, nên
+		// "categories" không bao giờ bị hiểu nhầm là một slug bài viết.
+		r.Get("/news/categories", newsH.Categories)
+		r.Get("/news", newsH.List)
+		r.Get("/news/{slug}", newsH.Get)
+		r.Get("/news/{slug}/related", newsH.Related)
 	})
 
 	return r, nil

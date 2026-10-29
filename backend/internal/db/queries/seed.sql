@@ -38,3 +38,17 @@ SET kind = EXCLUDED.kind, category_slug = EXCLUDED.category_slug,
     thumbnail_url = EXCLUDED.thumbnail_url, duration_seconds = EXCLUDED.duration_seconds,
     episode_count = EXCLUDED.episode_count, featured = EXCLUDED.featured,
     lineup_month = EXCLUDED.lineup_month, updated_at = now();
+
+-- name: UpsertNewsCategory :exec
+INSERT INTO news_categories (slug, name, description, sort_order)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (slug) DO UPDATE
+SET name = EXCLUDED.name, description = EXCLUDED.description, sort_order = EXCLUDED.sort_order;
+
+-- name: UpsertNews :exec
+INSERT INTO news (slug, category_slug, title, excerpt, body_html, cover_url, author, published_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+ON CONFLICT (slug) DO UPDATE
+SET category_slug = EXCLUDED.category_slug, title = EXCLUDED.title, excerpt = EXCLUDED.excerpt,
+    body_html = EXCLUDED.body_html, cover_url = EXCLUDED.cover_url, author = EXCLUDED.author,
+    published_at = EXCLUDED.published_at, updated_at = now();

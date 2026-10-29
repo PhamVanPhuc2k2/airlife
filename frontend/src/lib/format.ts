@@ -47,3 +47,14 @@ export function timeAgo(iso: string, now: number = Date.now()): string {
   }
   return `${Math.floor(value)} năm trước`;
 }
+
+// "20/10/2026". Ghi rõ múi giờ Việt Nam: server (container, giờ UTC) và trình duyệt cho ra cùng
+// một ngày, không bị lệch khi bài đăng lúc gần nửa đêm.
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}

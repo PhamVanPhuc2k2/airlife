@@ -283,6 +283,34 @@ func (q *Queries) ListFeaturedMedia(ctx context.Context, limit int32) ([]ListFea
 	return items, nil
 }
 
+const listLineupMonths = `-- name: ListLineupMonths :many
+SELECT DISTINCT lineup_month::date AS month
+FROM media
+WHERE lineup_month IS NOT NULL AND status = 'published'
+ORDER BY month DESC
+`
+
+// Các tháng có line-up phim (mới nhất trước), cho bộ chọn tháng ở trang Mới tải.
+func (q *Queries) ListLineupMonths(ctx context.Context) ([]time.Time, error) {
+	rows, err := q.db.Query(ctx, listLineupMonths)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []time.Time{}
+	for rows.Next() {
+		var month time.Time
+		if err := rows.Scan(&month); err != nil {
+			return nil, err
+		}
+		items = append(items, month)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listMediaNew = `-- name: ListMediaNew :many
 SELECT m.id, m.slug, m.kind, m.category_slug, m.title, m.group_label, m.genre_label,
        m.youtube_id, m.thumbnail_url, m.duration_seconds, m.episode_count, m.view_count,

@@ -160,3 +160,61 @@ func (q *Queries) UpsertMedia(ctx context.Context, arg UpsertMediaParams) error 
 	)
 	return err
 }
+
+const upsertNews = `-- name: UpsertNews :exec
+INSERT INTO news (slug, category_slug, title, excerpt, body_html, cover_url, author, published_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+ON CONFLICT (slug) DO UPDATE
+SET category_slug = EXCLUDED.category_slug, title = EXCLUDED.title, excerpt = EXCLUDED.excerpt,
+    body_html = EXCLUDED.body_html, cover_url = EXCLUDED.cover_url, author = EXCLUDED.author,
+    published_at = EXCLUDED.published_at, updated_at = now()
+`
+
+type UpsertNewsParams struct {
+	Slug         string
+	CategorySlug string
+	Title        string
+	Excerpt      string
+	BodyHtml     string
+	CoverUrl     string
+	Author       string
+	PublishedAt  time.Time
+}
+
+func (q *Queries) UpsertNews(ctx context.Context, arg UpsertNewsParams) error {
+	_, err := q.db.Exec(ctx, upsertNews,
+		arg.Slug,
+		arg.CategorySlug,
+		arg.Title,
+		arg.Excerpt,
+		arg.BodyHtml,
+		arg.CoverUrl,
+		arg.Author,
+		arg.PublishedAt,
+	)
+	return err
+}
+
+const upsertNewsCategory = `-- name: UpsertNewsCategory :exec
+INSERT INTO news_categories (slug, name, description, sort_order)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (slug) DO UPDATE
+SET name = EXCLUDED.name, description = EXCLUDED.description, sort_order = EXCLUDED.sort_order
+`
+
+type UpsertNewsCategoryParams struct {
+	Slug        string
+	Name        string
+	Description string
+	SortOrder   int16
+}
+
+func (q *Queries) UpsertNewsCategory(ctx context.Context, arg UpsertNewsCategoryParams) error {
+	_, err := q.db.Exec(ctx, upsertNewsCategory,
+		arg.Slug,
+		arg.Name,
+		arg.Description,
+		arg.SortOrder,
+	)
+	return err
+}

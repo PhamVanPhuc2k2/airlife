@@ -98,3 +98,10 @@ SELECT id FROM media WHERE slug = $1 AND status = 'published';
 -- Cộng lượt xem đã gom trong Redis vào database (worker gọi định kỳ).
 -- name: AddMediaViews :exec
 UPDATE media SET view_count = view_count + sqlc.arg('views') WHERE id = sqlc.arg('id');
+
+-- Các tháng có line-up phim (mới nhất trước), cho bộ chọn tháng ở trang Mới tải.
+-- name: ListLineupMonths :many
+SELECT DISTINCT lineup_month::date AS month
+FROM media
+WHERE lineup_month IS NOT NULL AND status = 'published'
+ORDER BY month DESC;

@@ -23,6 +23,7 @@
     "zustand": "5.0.16"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "0.5.20",
     "@tanstack/react-query-devtools": "5.105.0",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
@@ -39,5 +40,10 @@
   },
   "allowScripts": {
     "unrs-resolver": false
+  },
+  "overrides": {
+    "@tailwindcss/typography": {
+      "postcss-selector-parser": "6.1.5"
+    }
   }
 }

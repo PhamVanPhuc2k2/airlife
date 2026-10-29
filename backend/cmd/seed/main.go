@@ -22,6 +22,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/database"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/logger"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/sanitize"
 )
 
 // Chỉ thị go:embed bên dưới nhúng file vào binary lúc build: chạy seed ở đâu cũng có dữ liệu, không cần
@@ -68,6 +69,19 @@ type seedData struct {
 		Lineup          bool     `json:"lineup"`
 		PublishedDays   float64  `json:"published_days_ago"`
 	} `json:"media"`
+	NewsCategories []struct {
+		Slug        string `json:"slug"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	} `json:"news_categories"`
+	News []struct {
+		Slug        string    `json:"slug"`
+		Category    string    `json:"category"`
+		Title       string    `json:"title"`
+		Excerpt     string    `json:"excerpt"`
+		BodyHTML    string    `json:"body_html"`
+		PublishedAt time.Time `json:"published_at"`
+	} `json:"news"`
 }
 
 func main() {
@@ -163,10 +177,31 @@ func run() error {
 		}
 	}
 
+	for i, c := range data.NewsCategories {
+		if err := q.UpsertNewsCategory(ctx, db.UpsertNewsCategoryParams{
+			Slug: c.Slug, Name: c.Name, Description: c.Description, SortOrder: int16(i), //nolint:gosec // vài phần tử
+		}); err != nil {
+			return fmt.Errorf("chuyên mục tin %s: %w", c.Slug, err)
+		}
+	}
+	for _, n := range data.News {
+		if err := q.UpsertNews(ctx, db.UpsertNewsParams{
+			Slug: n.Slug, CategorySlug: n.Category, Title: n.Title, Excerpt: n.Excerpt,
+			// Lọc HTML trước khi ghi, kể cả dữ liệu mẫu: mọi đường ghi thân bài đều qua sanitize.
+			BodyHtml:    sanitize.ArticleHTML(n.BodyHTML),
+			CoverUrl:    "https://picsum.photos/seed/airlife-news-" + n.Slug + "/1200/640",
+			Author:      "Airlife",
+			PublishedAt: n.PublishedAt,
+		}); err != nil {
+			return fmt.Errorf("tin %s: %w", n.Slug, err)
+		}
+	}
+
 	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
 	log.Info("đã nạp dữ liệu mẫu",
-		"categories", len(data.Categories), "channels", len(data.Channels), "media", len(data.Media))
+		"categories", len(data.Categories), "channels", len(data.Channels), "media", len(data.Media),
+		"news", len(data.News))
 	return nil
 }
