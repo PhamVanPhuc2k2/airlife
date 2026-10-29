@@ -85,3 +85,17 @@ type NewsCategory struct {
 	Description string
 	SortOrder   int16
 }
+
+type User struct {
+	ID              uuid.UUID
+	Email           string
+	PasswordHash    string
+	DisplayName     string
+	AvatarUrl       *string
+	Role            string
+	Status          string
+	EmailVerifiedAt *time.Time
+	LastLoginAt     *time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}

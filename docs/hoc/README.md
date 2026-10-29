@@ -154,12 +154,33 @@ tức theo chuyên mục, trang bài viết, trang Mới tải với line-up phi
 | [3.06](03-tin-tuc-va-line-up/06-trang-tin-tuc.md) | Trang Tin tức và trang bài viết |
 | [3.07](03-tin-tuc-va-line-up/07-trang-moi-tai-line-up.md) | Trang Mới tải và line-up phim theo tháng |
 
+### Phần 04: Đăng nhập và tài khoản
+
+Làm trước Kênh/Bình luận vì các phần đó cần biết ai đang dùng. Băm mật khẩu argon2id, access token JWT
++ refresh token xoay vòng trong Redis, cookie HttpOnly, chặn dò mật khẩu, chống CSRF, tự làm mới phiên
+ở frontend, trang đăng nhập/đăng ký, trang Bạn. Hàng đợi job có thử lại, gửi mail ở worker (Mailpit khi
+dev), xác minh email, quên/đặt lại mật khẩu.
+
+| Bài | Nội dung |
+|---|---|
+| [4.01](04-dang-nhap-tai-khoan/01-tong-quan-va-schema.md) | Tổng quan đăng nhập, cấu hình và bảng `users` |
+| [4.02](04-dang-nhap-tai-khoan/02-bam-mat-khau.md) | Băm mật khẩu bằng argon2id, đọc JSON an toàn |
+| [4.03](04-dang-nhap-tai-khoan/03-access-va-refresh-token.md) | Access token JWT và refresh token xoay vòng |
+| [4.04](04-dang-nhap-tai-khoan/04-dang-ky-dang-nhap.md) | Đăng ký, đăng nhập, chặn dò mật khẩu |
+| [4.05](04-dang-nhap-tai-khoan/05-cookie-middleware-csrf.md) | Cookie, middleware xác thực, chống CSRF, thử toàn bộ API |
+| [4.06](04-dang-nhap-tai-khoan/06-frontend-phien-dang-nhap.md) | Frontend: gửi cookie, tự làm mới phiên, `useMe` |
+| [4.07](04-dang-nhap-tai-khoan/07-trang-dang-nhap-dang-ky.md) | Trang đăng nhập và đăng ký |
+| [4.08](04-dang-nhap-tai-khoan/08-menu-tai-khoan-trang-ban.md) | Menu tài khoản, trang Bạn, `proxy.ts` |
+| [4.09](04-dang-nhap-tai-khoan/09-mailpit-va-hang-doi-job.md) | Mailpit và hàng đợi job (thử lại, dead-letter) |
+| [4.10](04-dang-nhap-tai-khoan/10-gui-mail-o-worker.md) | Gửi mail ở worker: SMTP, mẫu email, consumer |
+| [4.11](04-dang-nhap-tai-khoan/11-xac-minh-email-quen-mat-khau.md) | Xác minh email và quên mật khẩu (backend) |
+| [4.12](04-dang-nhap-tai-khoan/12-frontend-xac-minh-dat-lai.md) | Frontend: xác minh email, quên và đặt lại mật khẩu; nghiệm thu Phần 04 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 04 kenh-va-binh-luan | Kênh, theo dõi, bình luận |
-| 05 dang-nhap-tai-khoan | Đăng ký, đăng nhập, JWT, phiên trên Redis, email qua Resend |
+| 05 kenh-va-binh-luan | Kênh, theo dõi, bình luận |
 | 06 ban-va-suu-tap | Trang Bạn, Sưu tập, tiếp tục xem |
 | 07 ban-hang | Sản phẩm, biến thể, giỏ hàng, đơn hàng |
 | 08 ve-va-tour | Lịch khởi hành, hạng dịch vụ, giữ chỗ bằng lock Redis |

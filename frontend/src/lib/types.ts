@@ -82,3 +82,14 @@ export type NewsPage = {
   items: NewsCard[];
   next_cursor?: string;
 };
+
+// Tài khoản đang đăng nhập (GET /auth/me). Khớp backend/internal/auth/service.go: User
+export type User = {
+  id: string;
+  email: string;
+  display_name: string;
+  avatar_url: string | null;
+  role: "user" | "creator" | "business" | "editor" | "admin";
+  email_verified: boolean;
+  created_at: string;
+};

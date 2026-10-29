@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/netip"
 	"runtime/debug"
+	"slices"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -127,6 +128,34 @@ func recoverer(log *slog.Logger) func(http.Handler) http.Handler {
 				)
 				response.Error(w, r, log, apperr.Internal(nil))
 			}()
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// sameOrigin chống CSRF cho request làm thay đổi dữ liệu (POST, PUT, PATCH, DELETE).
+//
+// CSRF: khách đang đăng nhập Airlife, mở một trang web xấu; trang đó lén gửi form POST tới API
+// Airlife. Trình duyệt tự gửi kèm cookie đăng nhập, API tưởng chính khách thao tác.
+// Cookie SameSite=Lax đã chặn phần lớn trường hợp; lớp này chặn tiếp: trình duyệt luôn gửi
+// header Origin (trang gốc của request) với request POST, và trang web xấu không giả được header
+// này. Origin không nằm trong danh sách domain của mình → từ chối.
+//
+// Không có Origin (curl, server Next.js gọi từ trong mạng Docker) thì cho qua: không phải trình
+// duyệt nên không có cookie của khách để lợi dụng.
+func sameOrigin(allowed []string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.Method {
+			case http.MethodGet, http.MethodHead, http.MethodOptions:
+				next.ServeHTTP(w, r)
+				return
+			}
+			if origin := r.Header.Get("Origin"); origin != "" && !slices.Contains(allowed, origin) {
+				response.Error(w, r, slog.Default(),
+					apperr.Forbidden("origin_not_allowed", "Yêu cầu bị từ chối"))
+				return
+			}
 			next.ServeHTTP(w, r)
 		})
 	}

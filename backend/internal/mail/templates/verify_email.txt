@@ -1,0 +1,8 @@
+Chào {{.name}},
+
+Cảm ơn bạn đã đăng ký Airlife. Mở liên kết dưới đây để xác minh email (hiệu lực 24 giờ):
+
+{{.link}}
+
+Nếu bạn không đăng ký tài khoản này, hãy bỏ qua email.
+Airlife – Đời sống hàng không

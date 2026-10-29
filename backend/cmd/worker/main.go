@@ -1,8 +1,5 @@
-// Command worker chạy các job nền nhận từ RabbitMQ: gửi email, kiểm tra video YouTube,
-// flush lượt xem từ Redis về PostgreSQL…
-//
-// Bản khởi đầu chỉ mở kết nối và chờ tín hiệu tắt. Consumer đầu tiên (gửi email)
-// được thêm ở phần đăng nhập. File này lớn dần qua các phần của khoá học.
+// Command worker chạy các việc nền: nhận job từ RabbitMQ (gửi email…) và các việc định kỳ
+// (gom lượt xem từ Redis về PostgreSQL…). File này lớn dần qua các phần của khoá học.
 package main
 
 import (
@@ -12,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -19,10 +17,12 @@ import (
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/database"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/logger"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/mailer"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 )
 
@@ -64,20 +64,36 @@ func run() error {
 
 	log.Info("worker đang chạy", "env", cfg.App.Env)
 
-	// Job nền chạy trong goroutine riêng. Khi run() kết thúc (tắt worker, hoặc mất RabbitMQ),
-	// defer dưới đây huỷ vòng lặp rồi CHỜ nó xong. defer chạy theo thứ tự ngược, nên defer này
-	// (khai báo sau cùng) chạy TRƯỚC các defer đóng PostgreSQL, Redis ở trên: lần gom cuối
-	// vẫn còn kết nối để dùng.
+	// Gửi mail: dev gửi vào Mailpit (MAIL_SMTP_ADDR do docker-compose.yml đặt)
+	if cfg.Mail.SMTPAddr == "" {
+		return errors.New("thiếu biến môi trường MAIL_SMTP_ADDR")
+	}
+	smtp, err := mailer.NewSMTP(cfg.Mail.SMTPAddr, cfg.Mail.From)
+	if err != nil {
+		return err
+	}
+	if err := queue.DeclareJobQueue(mq, mail.Queue); err != nil {
+		return err
+	}
+
+	// Các việc nền chạy trong goroutine riêng, dùng chung loopCtx. Khi run() kết thúc (tắt worker,
+	// mất RabbitMQ, hay một việc nền lỗi), defer dưới đây huỷ loopCtx rồi CHỜ mọi việc dừng hẳn.
+	// defer chạy theo thứ tự ngược, nên defer này (khai báo sau cùng) chạy TRƯỚC các defer đóng
+	// PostgreSQL, Redis ở trên: lần gom lượt xem cuối vẫn còn kết nối để dùng.
 	mediaSvc := media.NewService(media.NewRepository(db.New(pool)), rdb)
 	loopCtx, stopLoop := context.WithCancel(ctx)
-	loopDone := make(chan struct{})
-	go func() {
-		defer close(loopDone)
-		flushViewsLoop(loopCtx, log, mediaSvc)
-	}()
+	var wg sync.WaitGroup
+	jobErr := make(chan error, 1)
+	wg.Go(func() { flushViewsLoop(loopCtx, log, mediaSvc) })
+	wg.Go(func() {
+		// prefetch 5: mỗi lúc xử lý tối đa 5 thư chưa xong
+		if err := queue.Consume(loopCtx, mq, mail.Queue, 5, log, mail.Handle(smtp)); err != nil {
+			jobErr <- fmt.Errorf("nhận job gửi mail: %w", err)
+		}
+	})
 	defer func() {
 		stopLoop()
-		<-loopDone
+		wg.Wait()
 	}()
 
 	// Mất kết nối RabbitMQ thì thoát với lỗi để Docker khởi động lại worker
@@ -87,6 +103,8 @@ func run() error {
 	case <-ctx.Done():
 		log.Info("worker đã tắt")
 		return nil
+	case err := <-jobErr:
+		return err
 	case amqpErr := <-closed:
 		// Phải kiểm tra nil riêng: trả thẳng một *amqp.Error nil qua kiểu error
 		// sẽ ra error KHÁC nil (interface chứa con trỏ nil).

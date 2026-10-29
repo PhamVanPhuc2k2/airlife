@@ -111,6 +111,7 @@ const LINE_ICONS = {
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,
+  logout: <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11" />,
 } satisfies Record<string, ReactElement>;
 
 type LineIconName = keyof typeof LINE_ICONS;

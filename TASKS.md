@@ -147,7 +147,7 @@ backend/
 
 ### 2.2 Database (PostgreSQL)
 Bảng dựa trên `data/content.json` của mockup:
-- [ ] `users`, `user_profiles`, `user_sessions` / refresh token
+- [x] `users` (email `citext` UNIQUE, mật khẩu argon2id, vai trò, trạng thái, `email_verified_at`). Phiên/refresh token lưu Redis (không cần bảng `user_sessions`)
 - [ ] `channels` (✓ bảng: loại kênh, `verified`, `followers_count`); còn `channel_followers` (Phần 04)
 - [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
 - [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); còn `media_products` (Phần 07)
@@ -164,11 +164,11 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] Seed (`cmd/seed`, `make seed`) từ `skyline/data/content.json` đã đổi brand: 4 chuyên mục, 7 kênh, 21 media. Chưa có `youtube_id` thật (chờ khách gửi link)
 
 ### 2.3 Xác thực & phân quyền
-- [ ] Đăng ký/đăng nhập email + mật khẩu (bcrypt/argon2), xác minh email; có Turnstile ở form đăng ký, quên mật khẩu
+- [ ] Đăng ký/đăng nhập email + mật khẩu: ✓ argon2id (OWASP m=19MiB,t=2,p=1), ✓ chặn dò mật khẩu theo email (5/15 phút) và IP (20/15 phút), ✓ không lộ email nào có tài khoản, ✓ giới hạn đăng ký 10/giờ/IP, ✓ xác minh email (token một lần, 24 giờ, bấm nút mới xác minh, gửi lại tối đa 3 thư/giờ); còn Turnstile ở form đăng ký, quên mật khẩu
 - [ ] Đăng nhập Google/Facebook (OAuth2), tùy chọn OTP số điện thoại
-- [ ] JWT access token ngắn hạn + refresh token lưu Redis, cookie `httpOnly`
-- [ ] Quên mật khẩu / đặt lại mật khẩu
-- [ ] Vai trò: `guest`, `user`, `creator` (chủ kênh), `business` (doanh nghiệp bán hàng), `editor`, `admin`
+- [x] JWT access token 15 phút (HS256, ghim thuật toán) + refresh token 30 ngày lưu Redis (chỉ lưu bản băm), xoay vòng mỗi lần dùng, phát hiện tái sử dụng → thu hồi cả phiên (có ân hạn 10s cho hai tab). Cookie `HttpOnly`, `SameSite=Lax`, refresh chỉ gửi ở `/api/v1/auth`; chống CSRF bằng kiểm tra `Origin`
+- [x] Quên mật khẩu / đặt lại mật khẩu: luôn trả 204 (không lộ email), token một lần 30 phút, giới hạn 3 thư/giờ/email và 10 yêu cầu/giờ/IP, đặt lại xong đăng xuất mọi thiết bị
+- [ ] Vai trò: ✓ cột `role` (`user`, `creator`, `business`, `editor`, `admin`) trong access token và `/auth/me`; còn middleware kiểm tra vai trò cho từng API (khi có API cần, vd. CMS)
 
 ### 2.4 API module
 - [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); còn cột bình luận (Phần 04), khối kinh doanh (Phần 07), tiện ích (Phần 10)
@@ -203,8 +203,8 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Lock phân tán khi giữ chỗ vé/tour
 
 ### 2.6 RabbitMQ & worker
-- [ ] Khai báo exchange/queue, dead-letter queue, retry có backoff
-- [ ] Job: gửi email qua Resend (xác minh, đơn hàng, quên mật khẩu); template email có logo Airlife
+- [x] Hàng đợi job (`pkg/queue`): mỗi loại job có queue chính, `.retry` (chờ 30s rồi tự quay lại), `.dead` (lỗi quá 5 lần); publisher confirms; consumer ack thủ công, prefetch
+- [ ] Job gửi email (`internal/mail`, queue `email.send`): ✓ mẫu xác minh email, đặt lại mật khẩu (HTML + chữ thường); ✓ dev gửi qua SMTP vào **Mailpit** (thay MailHog đã ngừng phát triển từ 2020); còn gửi qua Resend ở production, mẫu đơn hàng (Phần 07), logo ảnh trong thư
 - [ ] Job: kiểm tra định kỳ video YouTube còn hoạt động (bị xóa, chuyển riêng tư, chặn nhúng) → ẩn và báo admin
 - [ ] Job: xử lý webhook thanh toán → cập nhật đơn → gửi thông báo
 - [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
@@ -237,7 +237,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Biến môi trường (✓ `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`, `API_INTERNAL_URL`), `next.config` cho domain ảnh (✓ `i.ytimg.com`, `picsum.photos` cho dữ liệu mẫu; còn custom domain R2)
 
 ### 3.2 Store Zustand
-- [ ] `useAuthStore`: user hiện tại, trạng thái đăng nhập
+- [x] Người đang đăng nhập: dùng TanStack Query (`useMe`, key `["auth","me"]`) thay cho `useAuthStore`, vì đây là dữ liệu server; trạng thái "chưa biết" lúc hydrate
 - [ ] `usePlayerStore`: ✓ phát/dừng, tắt tiếng, tua ±10s, tiến độ thật từ YouTube, slot trang xem, controller; còn âm lượng, hàng đợi
 - [ ] `useCartStore`: giỏ hàng (đồng bộ với server khi đăng nhập, `persist` khi là khách)
 - [ ] `useUIStore`: ✓ menu dọc thu gọn / ngăn kéo; còn drawer giỏ hàng, modal
@@ -272,14 +272,14 @@ Bảng dựa trên `data/content.json` của mockup:
 | `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
 | `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; còn bình luận (Phần 04), chia sẻ/lưu |
 | `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
-| `ban.html` | `/ban` | Cần đăng nhập |
+| `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ; còn chuyến bay, đơn hàng, tiếp tục xem, kênh theo dõi |
 | `suu-tap.html` | `/suu-tap` | Cần đăng nhập |
 | `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý; còn sản phẩm gắn video, bình luận |
 | `san-pham.html?id=` | `/san-pham/[slug]` | Vé/tour có chọn ngày, số khách |
 | `kenh.html?id=` | `/kenh/[slug]` | Kênh creator/doanh nghiệp |
 | `lien-he.html` | `/lien-he` | Form liên hệ |
 | `tim-kiem.html?q=` | `/tim-kiem` | Kết quả gộp nhiều loại |
-| (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | Auth |
+| (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | ✓ `/dang-nhap`, `/dang-ky`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh-email` (react-hook-form + zod, lỗi theo từng ô, chống open redirect) |
 | (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang/[id]` | Checkout |
 
 - [ ] Làm lần lượt từng trang trên, mỗi trang: UI pixel-perfect theo mockup → nối API bằng TanStack Query → loading/error/empty state → responsive
@@ -313,7 +313,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Bản đồ Flightradar (Mapbox/Leaflet + dữ liệu vị trí)
 - [ ] Đăng nhập Google / Facebook
 - [ ] YouTube Data API v3 (API key, theo dõi quota 10.000 đơn vị/ngày; cache metadata trong DB)
-- [ ] Analytics (GA4 / Umami), Sentry cho cả frontend và backend
+- [ ] Analytics (GA4 / Umami), Sentry cho cả frontend và backend (**bắt buộc trước khi lên production**)
 
 ---
 
@@ -323,7 +323,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Nginx: chứng chỉ Cloudflare Origin, chỉ nhận request từ dải IP Cloudflare, lấy IP thật của khách qua `CF-Connecting-IP`, gzip/brotli, proxy `/api`
 - [ ] Môi trường staging + production, secrets không commit
 - [ ] Backup PostgreSQL hằng ngày, kiểm tra khôi phục
-- [ ] Giám sát: Prometheus + Grafana (hoặc tương đương), cảnh báo queue RabbitMQ bị dồn
+- [ ] Giám sát (**đã chốt 29/10/2026**): CHƯA làm metrics lúc dev. Trước khi lên production: Sentry (bắt lỗi) + Uptime Kuma (gọi `/readyz` mỗi phút, báo khi sập). Prometheus + Grafana (metrics: request/giây, độ trễ p95, tỉ lệ lỗi, độ dài hàng đợi RabbitMQ, kết nối DB) để khi có traffic thật hoặc cần điều tra chậm
 - [ ] Ảnh phục vụ qua custom domain R2 (Cloudflare CDN sẵn), đặt cache header dài cho file
 - [ ] Nhập dữ liệu thật (line-up phim, tin tức cũ của skyline.vn nếu cần giữ)
 - [ ] Trỏ domain, go-live checklist

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Icon } from "@/components/icons/Icon";
 import { useUIStore } from "@/stores/ui-store";
 
+import { AccountMenu } from "./AccountMenu";
+
 export function Header() {
   const toggleNav = useUIStore((s) => s.toggleNav);
 
@@ -62,9 +64,7 @@ export function Header() {
         <Link href="/gio-hang" className="icon-btn" aria-label="Giỏ hàng">
           <Icon name="cart" className="size-[22px]" />
         </Link>
-        <Link href="/dang-nhap" className="icon-btn" aria-label="Đăng nhập">
-          <Icon name="user" className="size-[22px]" />
-        </Link>
+        <AccountMenu />
       </div>
     </header>
   );

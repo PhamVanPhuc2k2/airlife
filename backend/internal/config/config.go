@@ -28,10 +28,14 @@ type Config struct {
 	Postgres Postgres `mapstructure:",squash"`
 	Redis    Redis    `mapstructure:",squash"`
 	RabbitMQ RabbitMQ `mapstructure:",squash"`
+	Auth     Auth     `mapstructure:",squash"`
+	Mail     Mail     `mapstructure:",squash"`
 }
 
 type App struct {
 	Env string `mapstructure:"APP_ENV"` // development | staging | production
+	// Địa chỉ trang web (frontend) để ghép link trong email: <PublicURL>/xac-minh-email?token=…
+	PublicURL string `mapstructure:"APP_PUBLIC_URL"`
 }
 
 type Log struct {
@@ -66,6 +70,24 @@ type RabbitMQ struct {
 	URL string `mapstructure:"RABBITMQ_URL"`
 }
 
+// Mail: worker gửi email. Dev gửi qua SMTP vào Mailpit; production dùng Resend (thêm sau).
+type Mail struct {
+	SMTPAddr string `mapstructure:"MAIL_SMTP_ADDR"` // host:port, vd. mailpit:1025
+	From     string `mapstructure:"MAIL_FROM"`
+}
+
+type Auth struct {
+	// Khoá ký access token (JWT HS256). Lộ khoá này = ai cũng tự tạo được token đăng nhập
+	// thành bất kỳ ai. Production: chuỗi ngẫu nhiên ≥ 32 ký tự (openssl rand -base64 48),
+	// đặt bằng biến môi trường, không commit.
+	JWTSecret  string        `mapstructure:"AUTH_JWT_SECRET"`
+	AccessTTL  time.Duration `mapstructure:"AUTH_ACCESS_TTL"`
+	RefreshTTL time.Duration `mapstructure:"AUTH_REFRESH_TTL"`
+	// Domain của cookie đăng nhập. Rỗng = chỉ host hiện tại (dev: localhost).
+	// Production: ".airlife.vn" để cả airlife.vn và api.airlife.vn cùng thấy cookie.
+	CookieDomain string `mapstructure:"AUTH_COOKIE_DOMAIN"`
+}
+
 func (c Config) IsProduction() bool { return c.App.Env == "production" }
 
 // Load đọc cấu hình. Thiếu biến bắt buộc thì trả lỗi để main dừng ngay lúc khởi động,
@@ -97,6 +119,7 @@ func Load() (Config, error) {
 
 func setDefaults(v *viper.Viper) {
 	v.SetDefault("APP_ENV", "development")
+	v.SetDefault("APP_PUBLIC_URL", "http://localhost:3000")
 	v.SetDefault("LOG_LEVEL", "info")
 	v.SetDefault("LOG_FORMAT", "text")
 
@@ -115,14 +138,23 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("REDIS_DB", 0)
 
 	v.SetDefault("RABBITMQ_URL", "") // bắt buộc
+
+	v.SetDefault("AUTH_JWT_SECRET", "") // bắt buộc, ≥ 32 ký tự
+	v.SetDefault("AUTH_ACCESS_TTL", "15m")
+	v.SetDefault("AUTH_REFRESH_TTL", "720h") // 30 ngày
+	v.SetDefault("AUTH_COOKIE_DOMAIN", "")
+
+	v.SetDefault("MAIL_SMTP_ADDR", "") // chỉ worker cần; worker kiểm tra lúc khởi động
+	v.SetDefault("MAIL_FROM", "Airlife <no-reply@airlife.local>")
 }
 
 func (c Config) validate() error {
 	var missing []string
 	required := map[string]string{
-		"POSTGRES_URL": c.Postgres.URL,
-		"REDIS_ADDR":   c.Redis.Addr,
-		"RABBITMQ_URL": c.RabbitMQ.URL,
+		"POSTGRES_URL":    c.Postgres.URL,
+		"REDIS_ADDR":      c.Redis.Addr,
+		"RABBITMQ_URL":    c.RabbitMQ.URL,
+		"AUTH_JWT_SECRET": c.Auth.JWTSecret,
 	}
 	for key, val := range required {
 		if strings.TrimSpace(val) == "" {
@@ -132,6 +164,10 @@ func (c Config) validate() error {
 	if len(missing) > 0 {
 		slices.Sort(missing) // map duyệt ngẫu nhiên; sắp xếp để thông báo lỗi luôn giống nhau
 		return fmt.Errorf("thiếu biến môi trường bắt buộc: %s", strings.Join(missing, ", "))
+	}
+
+	if len(c.Auth.JWTSecret) < 32 {
+		return errors.New("AUTH_JWT_SECRET phải dài ít nhất 32 ký tự")
 	}
 
 	switch c.App.Env {

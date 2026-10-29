@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons/Icon";
 import { SIDENAV, TOPNAV, isActive } from "@/config/nav";
 import { SITE } from "@/config/site";
+import { useMe } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { useUIStore } from "@/stores/ui-store";
 
@@ -96,6 +97,7 @@ export function SidebarDrawer() {
 
 function FullNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { me } = useMe();
 
   return (
     <>
@@ -110,16 +112,20 @@ function FullNav({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </NavGroup>
 
-      {/* Mockup có "Kênh đang theo dõi": cần đăng nhập, làm ở phần Kênh (Phần 04) */}
+      {/* Danh sách kênh đang theo dõi làm ở Phần 05 (Kênh) */}
       <NavGroup title="Kênh đang theo dõi">
-        <Link
-          href="/dang-nhap"
-          onClick={onNavigate}
-          className="flex h-11 items-center gap-4 rounded-card-sm px-3 text-sm text-ink-muted transition-colors hover:bg-surface hover:text-ink"
-        >
-          <Icon name="login" />
-          Đăng nhập để xem
-        </Link>
+        {me ? (
+          <p className="px-3 py-2 text-sm text-ink-muted">Bạn chưa theo dõi kênh nào.</p>
+        ) : (
+          <Link
+            href="/dang-nhap"
+            onClick={onNavigate}
+            className="flex h-11 items-center gap-4 rounded-card-sm px-3 text-sm text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+          >
+            <Icon name="login" />
+            Đăng nhập để xem
+          </Link>
+        )}
       </NavGroup>
 
       <NavGroup title="Chuyên mục">

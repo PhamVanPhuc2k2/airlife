@@ -1,6 +1,6 @@
 # Bài 3.07: Trang Mới tải và line-up phim theo tháng
 
-> [← Bài trước](06-trang-tin-tuc.md) · [Mục lục](../README.md)
+> [← Bài trước](06-trang-tin-tuc.md) · [Mục lục](../README.md) · [Phần 04 →](../04-dang-nhap-tai-khoan/01-tong-quan-va-schema.md)
 
 ## Mục tiêu
 

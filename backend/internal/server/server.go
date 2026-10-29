@@ -17,13 +17,16 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/auth"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/category"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
 )
 
@@ -69,6 +72,7 @@ func (s *Server) Handler() (http.Handler, error) {
 	// Huỷ context của request quá lâu (truy vấn DB treo…) và trả 504.
 	// http.Server ở cmd/api đặt WriteTimeout dài hơn mức này một chút để kịp gửi 504.
 	r.Use(middleware.Timeout(s.deps.Config.HTTP.WriteTimeout))
+	r.Use(sameOrigin(s.deps.Config.HTTP.CORSOrigins))
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, r, s.deps.Log, apperr.NotFound("route_not_found", "Không tìm thấy đường dẫn"))
@@ -91,14 +95,53 @@ func (s *Server) Handler() (http.Handler, error) {
 	mediaH := media.NewHandler(mediaSvc, s.deps.Log, clientIP)
 
 	homeH := home.NewHandler(home.NewService(mediaSvc, s.deps.Redis), s.deps.Log)
+
+	authCfg := s.deps.Config.Auth
+	tokens := auth.NewTokenIssuer(authCfg.JWTSecret, authCfg.AccessTTL)
+	// Hàng đợi gửi mail: khai báo queue (đã có thì thôi) và mở publisher
+	if err := queue.DeclareJobQueue(s.deps.RabbitMQ, mail.Queue); err != nil {
+		return nil, err
+	}
+	publisher, err := queue.NewPublisher(s.deps.RabbitMQ)
+	if err != nil {
+		return nil, err
+	}
+	authSvc, err := auth.NewService(q, s.deps.Redis, tokens, auth.NewSessions(s.deps.Redis, authCfg.RefreshTTL),
+		publisher, s.deps.Config.App.PublicURL)
+	if err != nil {
+		return nil, err
+	}
+	authH := auth.NewHandler(authSvc, s.deps.Log, auth.CookieConfig{
+		Domain:     authCfg.CookieDomain,
+		Secure:     s.deps.Config.App.Env != "development", // dev chạy http://localhost
+		AccessTTL:  authCfg.AccessTTL,
+		RefreshTTL: authCfg.RefreshTTL,
+	}, clientIP)
+	requireAuth := auth.RequireAuth(s.deps.Log)
 	newsH := news.NewHandler(news.NewService(q, s.deps.Redis), s.deps.Log)
 
 	r.Route("/api/v1", func(r chi.Router) {
+		// Mọi API đều biết ai đang gọi (nếu có đăng nhập); API nào bắt buộc đăng nhập thì thêm
+		// requireAuth.
+		r.Use(auth.Authenticate(tokens))
+
 		r.Get("/ping", func(w http.ResponseWriter, _ *http.Request) {
 			response.OK(w, map[string]string{"message": "pong"})
 		})
 
 		r.Get("/home", homeH.Get)
+
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/register", authH.Register)
+			r.Post("/login", authH.Login)
+			r.Post("/refresh", authH.Refresh)
+			r.Post("/logout", authH.Logout)
+			r.With(requireAuth).Get("/me", authH.Me)
+			r.Post("/verify-email", authH.VerifyEmail)
+			r.With(requireAuth).Post("/verify-email/resend", authH.ResendVerifyEmail)
+			r.Post("/forgot-password", authH.ForgotPassword)
+			r.Post("/reset-password", authH.ResetPassword)
+		})
 
 		r.Get("/categories", categoryH.List)
 		r.Get("/categories/{slug}", categoryH.Get)

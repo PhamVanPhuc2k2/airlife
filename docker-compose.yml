@@ -32,12 +32,16 @@ x-backend: &backend
     REDIS_ADDR: redis:6379
     REDIS_PASSWORD: ${REDIS_PASSWORD:-airlife}
     RABBITMQ_URL: amqp://${RABBITMQ_USER:-airlife}:${RABBITMQ_PASSWORD:-airlife}@rabbitmq:5672/
+    # Dev: worker gửi mail vào Mailpit (bắt hết thư, xem ở http://localhost:8025), không gửi thật
+    MAIL_SMTP_ADDR: mailpit:1025
   depends_on:
     postgres:
       condition: service_healthy
     redis:
       condition: service_healthy
     rabbitmq:
+      condition: service_healthy
+    mailpit:
       condition: service_healthy
 
 services:
@@ -109,6 +113,17 @@ services:
     volumes:
       - ./backend:/src
     command: ["generate"]
+
+  # Hộp thư giả cho dev: nhận MỌI email worker gửi qua SMTP (cổng 1025) và hiện trên giao diện
+  # web, không gửi tới người nhận thật. Mailpit thay thế MailHog (MailHog ngừng phát triển từ 2020).
+  mailpit:
+    image: axllent/mailpit:v1.32.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025" # hộp thư: http://localhost:8025
+    environment:
+      MP_MAX_MESSAGES: 500 # giữ 500 thư gần nhất
+    # Image có sẵn healthcheck (/mailpit readyz)
 
   postgres:
     image: postgres:18.6-alpine
