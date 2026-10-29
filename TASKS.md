@@ -227,8 +227,8 @@ Bảng dựa trên `data/content.json` của mockup:
 
 ### 3.1 Khởi tạo
 - [x] Dựng Next.js 16.4.3 bằng tay (không dùng `create-next-app` vì nó cài Tailwind v4): React 19.3.1, TypeScript 5.9.3, ESLint 9 + `eslint-config-next`, `tailwindcss@3.4.17`, `postcss`, `autoprefixer`. Chạy trong Docker (`frontend/Dockerfile` target `dev`/`runner`, service `frontend` ở cổng 3000)
-- [ ] Cài `zustand`, `@tanstack/react-query`, `@tanstack/react-query-devtools`
-- [ ] Cài Radix UI primitives (dropdown-menu, dialog, tabs, popover, tooltip, slider, toast) và `@marsidev/react-turnstile`
+- [ ] Cài ✓ `zustand@5.0.16`; còn `@tanstack/react-query`, `@tanstack/react-query-devtools` (cài khi gọi API đầu tiên)
+- [ ] Cài Radix UI primitives: ✓ dialog (ngăn kéo menu); còn dropdown-menu, tabs, popover, tooltip, slider, toast, `@marsidev/react-turnstile` (cài ở bài dùng tới). Menu chuyên mục xổ bằng CSS hover/focus-within như mockup, không cần Radix
 - [x] Prettier + `prettier-plugin-tailwindcss`
 - [x] `tailwind.config.ts`: theme Airlife từ `skyline/scss/_variables.scss` (thang màu brand tím / accent cam 50–950 đã kiểm tra tương phản WCAG, surface, ink, overlay, runway; radius card 16/10; shadow sm/md/lg/brand; gradient brand/accent/hero/glow; screens xs 400 + mặc định; spacing header/topnav/sidebar/tabbar/player)
 - [x] Font qua `next/font/google` (Be Vietnam Pro, subset vietnamese, tự host)
@@ -238,19 +238,20 @@ Bảng dựa trên `data/content.json` của mockup:
 
 ### 3.2 Store Zustand
 - [ ] `useAuthStore`: user hiện tại, trạng thái đăng nhập
-- [ ] `usePlayerStore`: media đang phát, play/pause, tua, âm lượng, hàng đợi, mini player giữa các trang
+- [ ] `usePlayerStore`: ✓ bản khởi đầu (đang phát, phát/dừng, tắt tiếng, đóng); còn tua, âm lượng, hàng đợi, thời gian thật từ YouTube (Phần 02)
 - [ ] `useCartStore`: giỏ hàng (đồng bộ với server khi đăng nhập, `persist` khi là khách)
-- [ ] `useUIStore`: sidebar thu gọn/mở, drawer giỏ hàng, modal, theme
+- [ ] `useUIStore`: ✓ menu dọc thu gọn / ngăn kéo; còn drawer giỏ hàng, modal
 
 ### 3.3 Layout dùng chung (từ `skyline/js/layout.js`)
-- [ ] Header: logo Airlife, ô tìm kiếm, nút upload, chuông thông báo, giỏ hàng, avatar
-- [ ] Menu dọc (kiểu YouTube): Home · Xem · Nghe · Mới tải · Bạn · Sưu tập; chế độ thu gọn 76px
-- [ ] Menu ngang chuyên mục có dropdown tiểu mục: Tiện ích · Tin tức · Kinh doanh · Ý kiến · Tour bay
-- [ ] Thanh tab mobile
-- [ ] Footer (nền tối, thông tin công ty, link MXH: Facebook, YouTube, LinkedIn, Cinando)
-- [ ] Mini player cố định đáy, thanh Player kiểu đường băng (máy bay chạy theo tiến độ), đổi màu sang gradient Airlife
+- [x] Header: logo Airlife (wordmark), ô tìm kiếm (form GET, chạy không cần JS), nút Đăng bán, VN/EN (EN chờ i18n), chuông, giỏ hàng, nút tài khoản (avatar khi có đăng nhập)
+- [x] Menu dọc (kiểu YouTube): Home · Xem · Nghe · Mới tải · Bạn · Sưu tập; 3 dạng: thanh icon 76px, menu đầy đủ 232px, ngăn kéo (Radix Dialog) cho màn < 1280px. "Kênh đang theo dõi" chờ đăng nhập (Phần 04)
+- [x] Menu ngang chuyên mục có dropdown tiểu mục (CSS hover + focus-within, dùng được bằng bàn phím): Tiện ích · Tin tức · Kinh doanh · Ý kiến · Tour bay
+- [x] Thanh tab mobile
+- [ ] Footer: ✓ nền tối, logo trắng, cột chuyên mục/giải trí/liên hệ; còn link MXH (chờ URL Facebook, YouTube, LinkedIn, Cinando) và thông tin pháp nhân Airlife (chờ khách)
+- [x] Mini player cố định đáy, thanh Player kiểu đường băng (máy bay ở đầu thanh), tạm dừng giữ nguyên vị trí; điện thoại thu thành vạch mảnh trên thanh tab
 - [ ] Iframe YouTube đặt trong layout gốc để video/âm thanh không tải lại khi chuyển trang
 - [ ] Drawer giỏ hàng
+- [x] Trang 404 trong khung chung; link "Bỏ qua menu" cho người dùng bàn phím
 
 ### 3.4 Component dùng chung
 - [ ] Bọc Radix UI bằng Tailwind theo theme Airlife: DropdownMenu (menu chuyên mục), Dialog/Drawer (modal, giỏ hàng), Tabs, Popover, Tooltip, Slider (âm lượng, tua), Toast

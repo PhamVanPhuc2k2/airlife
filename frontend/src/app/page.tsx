@@ -1,4 +1,6 @@
-// Trang tạm: kiểm tra logo, font và theme Tailwind. Bài layout sẽ thay bằng trang chủ thật.
+import { DemoPlayButton } from "@/components/dev/DemoPlayButton";
+
+// Trang tạm: kiểm tra logo, font, theme Tailwind và layout. Phần 02 thay bằng trang chủ thật.
 const swatches = [
   { name: "brand-600", className: "bg-brand-600 text-white" },
   { name: "brand-300", className: "bg-brand-300 text-ink" },
@@ -47,6 +49,7 @@ export default function HomePage() {
         <button className="rounded-card-sm bg-accent-700 px-5 py-2.5 font-semibold text-white transition hover:bg-accent-800">
           Mua ngay
         </button>
+        <DemoPlayButton />
       </div>
 
       <div className="rounded-card bg-overlay p-6">

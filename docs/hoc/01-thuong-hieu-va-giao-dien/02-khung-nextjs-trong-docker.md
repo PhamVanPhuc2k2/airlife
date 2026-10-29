@@ -351,7 +351,8 @@ make npm c="install --save-exact --save-dev typescript@5.9.3 @types/node@24.19.2
 **`--save-exact`** ghi `"next": "16.4.3"` thay vì `"^16.4.3"`. Dấu `^` cho phép tự lên 16.5, 16.6
 khi cài lại; dự án muốn **chủ động** nâng phiên bản (đọc changelog, kiểm tra) chứ không để tự trôi.
 
-Kết quả `package.json`:
+Kết quả `package.json` (bản **hiện tại** của repo: `zustand`, `@radix-ui/react-dialog` và `allowScripts`
+thuộc bài 1.05, 1.06; ở bài này file của bạn chưa có các dòng đó):
 
 ```json
 {
@@ -371,9 +372,11 @@ Kết quả `package.json`:
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "1.3.1",
     "next": "16.4.3",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "zustand": "5.0.16"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
@@ -387,6 +390,9 @@ Kết quả `package.json`:
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "3.4.17",
     "typescript": "5.9.3"
+  },
+  "allowScripts": {
+    "unrs-resolver": false
   }
 }
 ```

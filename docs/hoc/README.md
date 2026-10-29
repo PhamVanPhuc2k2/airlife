@@ -103,7 +103,7 @@ thống trong Docker; `/readyz` báo đủ ba dịch vụ; `make migrate`, `make
 | [0.11](00-nen-mong/11-lint-vuln-makefile.md) | golangci-lint, govulncheck, Makefile |
 | [0.12](00-nen-mong/12-migration-dau-tien.md) | Migration đầu tiên: tìm kiếm tiếng Việt không dấu |
 
-### Phần 01: Thương hiệu và giao diện (đang viết)
+### Phần 01: Thương hiệu và giao diện
 
 Logo Airlife, khung Next.js chạy trong Docker, theme Tailwind, layout chung (header, menu, footer, mini player).
 
@@ -112,6 +112,11 @@ Logo Airlife, khung Next.js chạy trong Docker, theme Tailwind, layout chung (h
 | [1.01](01-thuong-hieu-va-giao-dien/01-logo-va-favicon.md) | Logo Airlife và favicon |
 | [1.02](01-thuong-hieu-va-giao-dien/02-khung-nextjs-trong-docker.md) | Khung Next.js chạy trong Docker |
 | [1.03](01-thuong-hieu-va-giao-dien/03-theme-tailwind-va-font.md) | Theme Tailwind và font Be Vietnam Pro |
+| [1.04](01-thuong-hieu-va-giao-dien/04-icon-va-cau-hinh-menu.md) | Icon và cấu hình menu |
+| [1.05](01-thuong-hieu-va-giao-dien/05-header-va-menu-ngang.md) | Header và menu ngang, store Zustand đầu tiên |
+| [1.06](01-thuong-hieu-va-giao-dien/06-menu-doc-tab-footer.md) | Menu dọc ba dạng (Radix Dialog), thanh tab, footer |
+| [1.07](01-thuong-hieu-va-giao-dien/07-mini-player.md) | Mini player và thanh Player đường băng |
+| [1.08](01-thuong-hieu-va-giao-dien/08-ghep-khung-appshell.md) | Ghép khung `AppShell`, trang 404, nghiệm thu layout |
 
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 

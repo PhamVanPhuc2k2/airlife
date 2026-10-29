@@ -1,6 +1,6 @@
 # Bài 1.03: Theme Tailwind và font Be Vietnam Pro
 
-> [← Bài trước](02-khung-nextjs-trong-docker.md) · [Mục lục](../README.md)
+> [← Bài trước](02-khung-nextjs-trong-docker.md) · [Mục lục](../README.md) · [Bài sau →](04-icon-va-cau-hinh-menu.md)
 
 ## Mục tiêu
 
@@ -175,6 +175,13 @@ const config: Config = {
       transitionTimingFunction: {
         brand: "cubic-bezier(0.2, 0.8, 0.2, 1)",
       },
+      // Thanh Player chạy minh hoạ khi chưa nối YouTube (Phần 02 thay bằng thời gian thật)
+      keyframes: {
+        runway: { to: { width: "100%" } },
+      },
+      animation: {
+        runway: "runway 90s linear forwards",
+      },
     },
   },
   plugins: [],
@@ -221,6 +228,73 @@ export default config;
     @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-bg;
   }
 }
+
+@layer components {
+  /* Nút tròn chỉ có icon (☰, chuông, giỏ hàng…). Nút phải có aria-label vì không có chữ. */
+  .icon-btn {
+    @apply relative inline-flex size-10 shrink-0 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink;
+  }
+
+  /* Thanh Player kiểu đường băng (bộ thiết kế Player): vạch đứt hai bên, đầu thanh là máy bay.
+     Viết bằng CSS thay vì class Tailwind vì có ::before/::after với gradient lặp, viết inline
+     thành một chuỗi class rất dài, khó đọc. */
+  .runway {
+    @apply relative py-[9px];
+  }
+  .runway::before,
+  .runway::after {
+    content: "";
+    @apply absolute inset-x-1.5 h-0.5 transition-[background] duration-300;
+    background: repeating-linear-gradient(
+      90deg,
+      theme("colors.runway.dash") 0 14px,
+      transparent 14px 26px
+    );
+  }
+  .runway::before {
+    @apply top-0.5;
+  }
+  .runway::after {
+    @apply bottom-0.5;
+  }
+  .runway__track {
+    @apply relative block h-2.5 rounded-full bg-runway-track;
+  }
+  .runway__fill {
+    @apply relative block h-full min-w-2.5 rounded-full bg-runway-dash transition-[background] duration-300;
+  }
+  .runway__plane {
+    @apply absolute -right-3 top-1/2 size-[26px] -translate-y-1/2 text-runway-dash;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.5));
+  }
+  /* Đang phát: vạch, thanh và máy bay sáng trắng */
+  .runway.is-running::before,
+  .runway.is-running::after {
+    background: repeating-linear-gradient(90deg, #fff 0 14px, transparent 14px 26px);
+  }
+  .runway.is-running .runway__fill {
+    @apply bg-white;
+  }
+  .runway.is-running .runway__plane {
+    @apply text-white;
+  }
+  /* Biến thể cho mini player trên điện thoại (< 768px): thanh thu thành vạch mảnh 3px nằm sát
+     mép trên của mini player, bỏ vạch đứt hai bên. Màn rộng giữ nguyên thanh đầy đủ. */
+  .runway--compact {
+    @apply max-md:absolute max-md:inset-x-0 max-md:top-0 max-md:p-0;
+  }
+  .runway--compact::before,
+  .runway--compact::after {
+    @apply max-md:hidden;
+  }
+  .runway--compact .runway__track,
+  .runway--compact .runway__fill {
+    @apply max-md:h-[3px] max-md:rounded-none;
+  }
+  .runway--compact .runway__plane {
+    @apply max-md:size-[18px];
+  }
+}
 ```
 
 - **`@tailwind base/components/utilities`**: chỗ Tailwind chèn CSS sinh ra.
@@ -232,6 +306,8 @@ export default config;
 ```tsx
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
+
+import { AppShell } from "@/components/layout/AppShell";
 
 import "./globals.css";
 
@@ -263,7 +339,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi" className={beVietnamPro.variable}>
-      <body>{children}</body>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
@@ -283,7 +361,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 Trang này chỉ để nhìn theme: logo, font tiếng Việt, các màu, nút. Bài layout sẽ thay.
 
 ```tsx
-// Trang tạm: kiểm tra logo, font và theme Tailwind. Bài layout sẽ thay bằng trang chủ thật.
+import { DemoPlayButton } from "@/components/dev/DemoPlayButton";
+
+// Trang tạm: kiểm tra logo, font, theme Tailwind và layout. Phần 02 thay bằng trang chủ thật.
 const swatches = [
   { name: "brand-600", className: "bg-brand-600 text-white" },
   { name: "brand-300", className: "bg-brand-300 text-ink" },
@@ -332,6 +412,7 @@ export default function HomePage() {
         <button className="rounded-card-sm bg-accent-700 px-5 py-2.5 font-semibold text-white transition hover:bg-accent-800">
           Mua ngay
         </button>
+        <DemoPlayButton />
       </div>
 
       <div className="rounded-card bg-overlay p-6">

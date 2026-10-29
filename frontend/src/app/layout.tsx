@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 
+import { AppShell } from "@/components/layout/AppShell";
+
 import "./globals.css";
 
 // next/font tải font lúc build và tự host cùng site: trình duyệt không phải gọi sang
@@ -31,7 +33,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi" className={beVietnamPro.variable}>
-      <body>{children}</body>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

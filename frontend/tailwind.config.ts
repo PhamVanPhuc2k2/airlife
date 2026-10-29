@@ -117,6 +117,13 @@ const config: Config = {
       transitionTimingFunction: {
         brand: "cubic-bezier(0.2, 0.8, 0.2, 1)",
       },
+      // Thanh Player chạy minh hoạ khi chưa nối YouTube (Phần 02 thay bằng thời gian thật)
+      keyframes: {
+        runway: { to: { width: "100%" } },
+      },
+      animation: {
+        runway: "runway 90s linear forwards",
+      },
     },
   },
   plugins: [],
