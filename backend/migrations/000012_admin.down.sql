@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS audit_log;
+ALTER TABLE payments DROP COLUMN IF EXISTS refund_note, DROP COLUMN IF EXISTS refunded_by, DROP COLUMN IF EXISTS refunded_at;

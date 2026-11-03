@@ -21,6 +21,16 @@ type Airport struct {
 	Timezone string
 }
 
+type AuditLog struct {
+	ID         int64
+	ActorID    *uuid.UUID
+	Action     string
+	TargetType string
+	TargetID   string
+	Detail     []byte
+	CreatedAt  time.Time
+}
+
 type Booking struct {
 	ID             uuid.UUID
 	Code           string
@@ -282,6 +292,9 @@ type Payment struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	PaidAt         *time.Time
+	RefundedAt     *time.Time
+	RefundedBy     *uuid.UUID
+	RefundNote     *string
 }
 
 type PaymentEvent struct {

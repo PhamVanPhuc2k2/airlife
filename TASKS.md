@@ -169,7 +169,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Đăng nhập Google/Facebook (OAuth2), tùy chọn OTP số điện thoại
 - [x] JWT access token 15 phút (HS256, ghim thuật toán) + refresh token 30 ngày lưu Redis (chỉ lưu bản băm), xoay vòng mỗi lần dùng, phát hiện tái sử dụng → thu hồi cả phiên (có ân hạn 10s cho hai tab). Cookie `HttpOnly`, `SameSite=Lax`, refresh chỉ gửi ở `/api/v1/auth`; chống CSRF bằng kiểm tra `Origin`
 - [x] Quên mật khẩu / đặt lại mật khẩu: luôn trả 204 (không lộ email), token một lần 30 phút, giới hạn 3 thư/giờ/email và 10 yêu cầu/giờ/IP, đặt lại xong đăng xuất mọi thiết bị
-- [ ] Vai trò: ✓ cột `role` (`user`, `creator`, `business`, `editor`, `admin`) trong access token và `/auth/me`; còn middleware kiểm tra vai trò cho từng API (khi có API cần, vd. CMS)
+- [x] Vai trò: cột `role` (`user`, `creator`, `business`, `editor`, `admin`); `admin.RequireRole` đọc vai trò từ DB mỗi request (thu hồi quyền tức thì); editor = nội dung/kiểm duyệt, admin = thêm đơn/tiền/người dùng (Phần 12)
 
 ### 2.4 API module
 - [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); ✓ khối kinh doanh (Phần 07); ✓ khối Tiện ích (Phần 10)
@@ -214,10 +214,10 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] ~~Job: đồng bộ dữ liệu chuyến bay / thời tiết định kỳ~~ → thời tiết lấy theo yêu cầu và cache 30 phút (Phần 10); chuyến bay tính từ lịch, chưa có nguồn ngoài cần đồng bộ
 
 ### 2.7 Admin API (CMS)
-- [ ] CRUD toàn bộ nội dung: media, line-up, sản phẩm, kênh, tin tức, khảo sát, chuyến bay, sân bay
-- [ ] Kiểm duyệt bình luận, trải nghiệm, góp ý
-- [ ] Quản lý đơn hàng, người dùng, vai trò
-- [ ] Thống kê cơ bản (lượt xem, doanh thu, đơn hàng)
+- [ ] CRUD nội dung: ✓ khảo sát (Phần 12); còn media, line-up, sản phẩm, kênh, tin tức, chuyến bay, sân bay
+- [x] Kiểm duyệt bình luận, trải nghiệm, góp ý (ẩn/hiện, xử lý góp ý; Phần 12)
+- [x] Quản lý đơn hàng (máy trạng thái, huỷ thì trả kho), hoàn tiền thủ công (ghi chú bắt buộc), người dùng/vai trò/khoá tài khoản; mọi thao tác ghi `audit_log` (Phần 12)
+- [x] Thống kê cơ bản: người dùng, đơn, doanh thu, việc cần làm, thao tác gần đây (Phần 12). Chưa có biểu đồ theo thời gian
 
 ### 2.8 Chất lượng backend
 - [ ] Sinh tài liệu Swagger UI từ OpenAPI

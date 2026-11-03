@@ -53,6 +53,9 @@ export function AccountMenu() {
           <DropdownMenu.Separator className="my-1 h-px bg-ink/[0.07]" />
           <MenuLink href="/ban" icon="user" label="Trang của bạn" />
           <MenuLink href="/suu-tap" icon="library" label="Sưu tập" />
+          {(me.role === "editor" || me.role === "admin") && (
+            <MenuLink href="/admin/tong-quan" icon="radar" label="Quản trị" />
+          )}
           <DropdownMenu.Separator className="my-1 h-px bg-ink/[0.07]" />
           <DropdownMenu.Item
             onSelect={() =>

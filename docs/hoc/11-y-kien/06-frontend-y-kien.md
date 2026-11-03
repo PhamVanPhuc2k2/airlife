@@ -1,6 +1,6 @@
 # Bài 11.06: Frontend trang Ý kiến
 
-> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md)
+> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md) · [Phần 12 →](../12-quan-tri/01-khung-quan-tri.md)
 
 ## Mục tiêu
 

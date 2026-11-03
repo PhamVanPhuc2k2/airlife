@@ -286,9 +286,18 @@ singleflight. Bản đồ bằng Leaflet.
 | [11.05](11-y-kien/05-thu-api.md) | Thử API bằng curl, kể cả bốn nhánh Turnstile |
 | [11.06](11-y-kien/06-frontend-y-kien.md) | Frontend: ba tab, widget Turnstile; nghiệm thu Phần 11 |
 
+### Phần 12: Quản trị (lượt 1, chưa gồm R2/Tiptap)
+
+| Bài | Nội dung |
+|---|---|
+| [12.01](12-quan-tri/01-khung-quan-tri.md) | Khung quản trị: phân quyền đọc từ database, nhật ký, hoàn tiền |
+| [12.02](12-quan-tri/02-kiem-duyet-va-khao-sat.md) | Kiểm duyệt bình luận/trải nghiệm/góp ý, quản lý khảo sát |
+| [12.03](12-quan-tri/03-don-hang-hoan-tien-nguoi-dung.md) | Đơn hàng (máy trạng thái), hoàn tiền, người dùng |
+| [12.04](12-quan-tri/04-frontend-quan-tri.md) | Frontend `/admin`, nghiệm thu |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 12 cms | Trang quản trị, Tiptap, upload ảnh lên R2 |
+| 12b cms | Tiptap, upload ảnh lên R2, CRUD tin tức/media/sản phẩm/kênh/chuyến bay |
 | 13 trien-khai | Docker production, Cloudflare, nginx, CI |

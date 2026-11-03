@@ -17,6 +17,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/admin"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/auth"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/booking"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/cart"
@@ -138,7 +139,8 @@ func (s *Server) Handler() (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	authSvc, err := auth.NewService(q, s.deps.Redis, tokens, auth.NewSessions(s.deps.Redis, authCfg.RefreshTTL),
+	sessions := auth.NewSessions(s.deps.Redis, authCfg.RefreshTTL)
+	authSvc, err := auth.NewService(q, s.deps.Redis, tokens, sessions,
 		publisher, s.deps.Config.App.PublicURL)
 	if err != nil {
 		return nil, err
@@ -156,6 +158,7 @@ func (s *Server) Handler() (http.Handler, error) {
 		s.deps.Config.App.PublicURL, s.deps.Log), s.deps.Log)
 	orderH := order.NewHandler(order.NewService(s.deps.DB, s.deps.Redis, publisher,
 		s.deps.Config.App.PublicURL, s.deps.Log), s.deps.Log)
+	adminH := admin.NewHandler(admin.NewService(s.deps.DB, sessions), s.deps.Log)
 	newsH := news.NewHandler(news.NewService(q, s.deps.Redis), s.deps.Log)
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -200,6 +203,38 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/media/{slug}/products", productH.ByMedia)
 		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
 		r.Get("/products/{slug}/departures", bookingH.Availability)
+
+		// Quản trị (Phần 12). Mọi route phải đăng nhập, rồi kiểm tra vai trò trong DATABASE.
+		r.Route("/admin", func(r chi.Router) {
+			r.Use(requireAuth)
+			// editor + admin: nội dung và kiểm duyệt
+			r.Group(func(r chi.Router) {
+				r.Use(admin.RequireRole(q, s.deps.Log, admin.Staff...))
+				r.Get("/comments", adminH.Comments)
+				r.Patch("/comments/{id}", adminH.SetCommentStatus)
+				r.Get("/experiences", adminH.Experiences)
+				r.Patch("/experiences/{id}", adminH.SetExperienceStatus)
+				r.Get("/feedbacks", adminH.Feedbacks)
+				r.Patch("/feedbacks/{id}", adminH.SetFeedbackStatus)
+				r.Get("/surveys", adminH.Surveys)
+				r.Post("/surveys", adminH.CreateSurvey)
+				r.Patch("/surveys/{id}", adminH.UpdateSurvey)
+				r.Delete("/surveys/{id}", adminH.DeleteSurvey)
+			})
+			// chỉ admin: tiền, đơn hàng, người dùng, số liệu
+			r.Group(func(r chi.Router) {
+				r.Use(admin.RequireRole(q, s.deps.Log, admin.Admins...))
+				r.Get("/stats", adminH.Stats)
+				r.Get("/audit", adminH.Audit)
+				r.Get("/orders", adminH.Orders)
+				r.Get("/orders/{code}", adminH.Order)
+				r.Post("/orders/{code}/status", adminH.TransitionOrder)
+				r.Get("/refunds", adminH.Refunds)
+				r.Post("/refunds/{code}/done", adminH.MarkRefunded)
+				r.Get("/users", adminH.Users)
+				r.Patch("/users/{id}", adminH.UpdateUser)
+			})
+		})
 
 		// Ý kiến (Phần 11)
 		r.Get("/experiences", opinionH.Experiences)
