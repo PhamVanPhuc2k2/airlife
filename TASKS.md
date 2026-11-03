@@ -157,7 +157,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [x] `flights` (lịch bay hàng ngày), `airports`, `user_flights`, `wifi_plans` (Phần 10); trạng thái và vị trí tính từ giờ, không lưu
-- [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
+- [x] `experiences` + `experience_likes`, `surveys`, `survey_options`, `survey_votes` (khoá chính `(survey_id, user_id)` + khoá ngoại ghép), `feedbacks` (Phần 11). Trải nghiệm chưa có ảnh (chờ R2, Phần 12)
 - [ ] ✓ `watch_history` (tiến độ xem, "Tiếp tục xem"), `saved_media`, `playlists` + `playlist_items` (riêng tư, tối đa 50 playlist × 200 mục) (Phần 06); ✓ `favorites` (Phần 07)
 - [ ] `notifications`
 - [ ] Bảng dịch cho nội dung song ngữ (cột `title_vi/title_en` hoặc bảng `*_translations`), chốt một cách
@@ -183,12 +183,12 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] **Comments**: viết, trả lời 1 cấp, thích, xoá (chủ bình luận hoặc editor/admin), sắp xếp Hay/Mới, bình luận nổi bật. Chống spam: bắt buộc xác minh email + rate limit 10 bình luận/5 phút/người (Redis). Chưa dùng Turnstile cho bình luận: chỉ thêm nếu vẫn bị spam
 - [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
 - [x] **Utilities** (Phần 10): ✓ bảng chuyến bay + tìm kiếm (`/flights?q=`), trạng thái/tiến độ/vị trí tính từ lịch bay mẫu, Flightradar (Leaflet + OpenStreetMap, đường bay cung tròn lớn), thời tiết sân bay (Open-Meteo, cache Redis 30 phút + bản cũ 24 giờ, singleflight), chuyến bay của tôi (`/me/flights`, thẻ lên máy bay), gói Wi-Fi, phòng chờ & fast-track (sản phẩm gắn nhãn `dich-vu-san-bay`). Chưa: nguồn chuyến bay thật (AviationStack/FlightAware), mua gói Wi-Fi trên web, ô bản đồ riêng cho production (OSM giới hạn lượng dùng)
-- [ ] **Opinions**: trải nghiệm, khảo sát (bình chọn 1 lần/user), góp ý (có Turnstile)
+- [x] **Opinions** (Phần 11): trải nghiệm (đăng, thích, xoá mềm; bắt buộc xác minh email, 5 bài/giờ/người), khảo sát (một người một phiếu, không đổi phiếu, kết quả hiện sau khi bình chọn), góp ý (khách vãng lai gửi được, Turnstile + 5/giờ/IP). Chưa: bình luận dưới trải nghiệm, ảnh trải nghiệm, kiểm duyệt (Phần 12)
 - [ ] **Me (Bạn)**: ✓ hồ sơ, số liệu (`/me/stats`), tiếp tục xem (`/me/continue`), kênh theo dõi, trạng thái một media (`/me/media/{slug}`) (Phần 06); chuyến bay sắp tới (Phần 10), đơn hàng (Phần 07)
 - [ ] **Collection (Sưu tập)**: ✓ playlist (tạo, đổi tên, xoá, thêm/bớt mục), đã lưu, đã xem + ghi tiến độ từ trình phát (Phần 06); còn yêu thích sản phẩm/tour (Phần 07), phát tự động hết playlist (hàng đợi phát trong player store)
 - [ ] **Search**: tìm chung media/sản phẩm/kênh/tin tức, gợi ý từ khóa
 - [ ] **Contact**: gửi liên hệ (có Turnstile)
-- [ ] Middleware Go xác minh token Turnstile (gọi `siteverify` của Cloudflare) cho các endpoint form công khai
+- [ ] ✓ Middleware Go xác minh token Turnstile (`pkg/turnstile` + `requireTurnstile`, token ở header `X-Turnstile-Token`, lỗi mạng thì từ chối, production bắt buộc khoá thật); đã gắn cho `/feedback`, còn Liên hệ, đăng ký, quên mật khẩu
 - [ ] Lọc HTML bằng `bluemonday` (✓ `pkg/sanitize.ArticleHTML` cho bài viết, dùng cả trong seed); còn policy cho mô tả sản phẩm/tour (Phần 07–08) và nối vào editor CMS (Phần 12)
 - [ ] **Upload file**: Go tạo presigned PUT URL lên Cloudflare R2 (`aws-sdk-go-v2`, endpoint R2), client upload thẳng lên R2; giới hạn loại file và dung lượng; video & âm thanh không upload (dùng YouTube)
 - [ ] Cấu hình R2: bucket dev/prod, CORS cho domain web, custom domain public (vd. `cdn.airlife.vn`), lưu key file trong DB thay vì URL đầy đủ
@@ -311,7 +311,7 @@ Bảng dựa trên `data/content.json` của mockup:
 ## Giai đoạn 4: Tích hợp bên thứ ba
 - [ ] Cổng thanh toán (VNPay / MoMo / ZaloPay): tạo tài khoản sandbox rồi viết adapter (cổng giả lập đã chạy đủ luồng, Phần 09)
 - [ ] Resend: xác minh domain gửi (SPF, DKIM, DMARC trên Cloudflare DNS), địa chỉ gửi vd. `no-reply@airlife.vn`
-- [ ] Cloudflare Turnstile: tạo site key/secret key cho dev và prod
+- [ ] Cloudflare Turnstile: dev đã chạy bằng khoá thử công khai của Cloudflare (Phần 11); còn tạo site key/secret key THẬT cho staging và prod (API không khởi động ở production nếu thiếu)
 - [ ] Dữ liệu chuyến bay thật (FlightAware / AviationStack / API hãng bay đối tác): hiện dùng lịch bay mẫu (Phần 10)
 - [x] Thời tiết: Open-Meteo (miễn phí, không khoá; gói trả phí khi kinh doanh) (Phần 10)
 - [x] Bản đồ Flightradar: Leaflet + OpenStreetMap (Phần 10); production cần nhà cung cấp ô bản đồ riêng

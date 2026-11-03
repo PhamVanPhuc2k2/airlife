@@ -400,3 +400,32 @@ export type WifiPlan = {
   price: number;
   popular: boolean;
 };
+
+// Ý kiến (Phần 11) ----------------------------------------------------------------------------
+
+export type Experience = {
+  id: string;
+  author: { id: string; display_name: string; avatar_url: string | null };
+  route: string;
+  rating: number;
+  body: string;
+  like_count: number;
+  created_at: string;
+  liked_by_me: boolean;
+  mine: boolean;
+};
+
+export type ExperiencePage = { items: Experience[]; next_cursor?: string };
+
+export type SurveyOption = { id: string; label: string; votes: number; percent: number };
+
+export type Survey = {
+  id: string;
+  question: string;
+  open: boolean;
+  total_votes: number;
+  options: SurveyOption[];
+  my_option: string | null;
+};
+
+export type FeedbackTopic = "content" | "shop" | "tour" | "utility" | "website" | "other";

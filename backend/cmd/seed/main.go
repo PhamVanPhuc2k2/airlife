@@ -129,6 +129,20 @@ type seedData struct {
 		Likes    int32   `json:"likes"`
 		HoursAgo float64 `json:"hours_ago"`
 	} `json:"comments"`
+	Experiences []struct {
+		Key      string  `json:"key"`
+		User     string  `json:"user"`
+		Route    string  `json:"route"`
+		Rating   int16   `json:"rating"`
+		Body     string  `json:"body"`
+		Likes    int32   `json:"likes"`
+		HoursAgo float64 `json:"hours_ago"`
+	} `json:"experiences"`
+	Surveys []struct {
+		Key      string   `json:"key"`
+		Question string   `json:"question"`
+		Options  []string `json:"options"`
+	} `json:"surveys"`
 	Flights []struct {
 		Code            string `json:"code"`
 		Airline         string `json:"airline"`
@@ -272,6 +286,9 @@ func run() error {
 		return err
 	}
 	if err := seedComments(ctx, q, data, now); err != nil {
+		return err
+	}
+	if err := seedOpinions(ctx, q, data, now); err != nil {
 		return err
 	}
 	for _, f := range data.Flights {
@@ -438,6 +455,39 @@ func seedComments(ctx context.Context, q *db.Queries, data seedData, now time.Ti
 				CreatedAt: now.Add(-time.Duration(c.HoursAgo * float64(time.Hour))),
 			}); err != nil {
 				return fmt.Errorf("bình luận %s: %w", c.Key, err)
+			}
+		}
+	}
+	return nil
+}
+
+// seedOpinions nạp trải nghiệm và khảo sát mẫu (Phần 11). Khảo sát chưa có phiếu nào: phiếu thật
+// do người dùng bình chọn, không bịa số cho đẹp.
+func seedOpinions(ctx context.Context, q *db.Queries, data seedData, now time.Time) error {
+	for _, e := range data.Experiences {
+		userID, err := q.GetUserIDByEmail(ctx, "seed-"+e.User+"@airlife.local")
+		if err != nil {
+			return fmt.Errorf("trải nghiệm %s: người dùng %s: %w", e.Key, e.User, err)
+		}
+		if err := q.UpsertSeedExperience(ctx, db.UpsertSeedExperienceParams{
+			ID: uuid.NewSHA1(seedNamespace, []byte("experience:"+e.Key)), UserID: userID, Route: e.Route,
+			Rating: e.Rating, Body: e.Body, LikeCount: e.Likes,
+			CreatedAt: now.Add(-time.Duration(e.HoursAgo * float64(time.Hour))),
+		}); err != nil {
+			return fmt.Errorf("trải nghiệm %s: %w", e.Key, err)
+		}
+	}
+	for i, sv := range data.Surveys {
+		sid := uuid.NewSHA1(seedNamespace, []byte("survey:"+sv.Key))
+		if err := q.UpsertSeedSurvey(ctx, db.UpsertSeedSurveyParams{ID: sid, Question: sv.Question, Position: int32(i)}); err != nil {
+			return fmt.Errorf("khảo sát %s: %w", sv.Key, err)
+		}
+		for j, label := range sv.Options {
+			if err := q.UpsertSeedSurveyOption(ctx, db.UpsertSeedSurveyOptionParams{
+				ID: uuid.NewSHA1(seedNamespace, []byte(fmt.Sprintf("survey:%s:%d", sv.Key, j))), SurveyID: sid,
+				Label: label, Position: int32(j),
+			}); err != nil {
+				return fmt.Errorf("khảo sát %s: %w", sv.Key, err)
 			}
 		}
 	}

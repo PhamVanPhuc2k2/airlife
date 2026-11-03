@@ -4,6 +4,7 @@ import { api, qs } from "./api";
 import type {
   BookingPage,
   CommentPage,
+  ExperiencePage,
   Flight,
   LibraryPage,
   MediaPage,
@@ -11,6 +12,7 @@ import type {
   NewsPage,
   OrderPage,
   ProductPage,
+  Survey,
   WeatherReport,
   WifiPlan,
 } from "./types";
@@ -170,5 +172,23 @@ export function wifiPlansOptions() {
     queryKey: ["wifi-plans"],
     queryFn: ({ signal }) => api<WifiPlan[]>("/wifi-plans", { signal }),
     staleTime: 10 * 60_000,
+  });
+}
+
+// Ý kiến (Phần 11). Lấy ở trình duyệt vì kèm "tôi đã thích / đã chọn" của người đang xem.
+export function experiencesOptions() {
+  return infiniteQueryOptions({
+    queryKey: ["experiences"],
+    queryFn: ({ pageParam, signal }) =>
+      api<ExperiencePage>(`/experiences?${qs({ cursor: pageParam })}`, { signal }),
+    initialPageParam: "",
+    getNextPageParam: (last) => last.next_cursor || undefined,
+  });
+}
+
+export function surveysOptions() {
+  return queryOptions({
+    queryKey: ["surveys"],
+    queryFn: ({ signal }) => api<Survey[]>("/surveys", { signal }),
   });
 }

@@ -123,3 +123,6 @@ ON CONFLICT (code) DO UPDATE
 SET airline = EXCLUDED.airline, origin = EXCLUDED.origin, destination = EXCLUDED.destination,
     dep_local = EXCLUDED.dep_local, duration_minutes = EXCLUDED.duration_minutes,
     delay_minutes = EXCLUDED.delay_minutes, gate = EXCLUDED.gate;
+
+-- name: GetUserIDByEmail :one
+SELECT id FROM users WHERE email = $1;

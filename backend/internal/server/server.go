@@ -31,6 +31,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/opinion"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/order"
 	paymentsvc "github.com/PhamVanPhuc2k2/airlife/backend/internal/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
@@ -39,6 +40,7 @@ import (
 	paypkg "github.com/PhamVanPhuc2k2/airlife/backend/pkg/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/turnstile"
 	pkgweather "github.com/PhamVanPhuc2k2/airlife/backend/pkg/weather"
 )
 
@@ -79,7 +81,8 @@ func (s *Server) Handler() (http.Handler, error) {
 		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		// Idempotency-Key: chống đặt hàng trùng (Phần 07). Header lạ phải khai báo ở đây, không thì
 		// trình duyệt chặn request ngay ở bước preflight (OPTIONS).
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Accept-Language", "Idempotency-Key"},
+		// X-Turnstile-Token: token chống bot của form công khai (Phần 11)
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Accept-Language", "Idempotency-Key", "X-Turnstile-Token"},
 		AllowCredentials: true, // cần để trình duyệt gửi cookie refresh token
 		MaxAge:           300,
 	}))
@@ -120,6 +123,9 @@ func (s *Server) Handler() (http.Handler, error) {
 	flightH := flight.NewHandler(flightSvc, s.deps.Log)
 	weatherH := weathersvc.NewHandler(weathersvc.NewService(flightSvc,
 		pkgweather.NewClient(s.deps.Config.Weather.BaseURL), s.deps.Redis, s.deps.Log), s.deps.Log)
+	opinionH := opinion.NewHandler(opinion.NewService(s.deps.DB, s.deps.Redis), s.deps.Log, clientIP)
+	captcha := s.deps.Config.Captcha
+	turnstileMW := requireTurnstile(turnstile.NewVerifier(captcha.TurnstileSecret, captcha.TurnstileVerifyURL), s.deps.Log)
 	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, productSvc, flightSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
@@ -194,6 +200,16 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Get("/media/{slug}/products", productH.ByMedia)
 		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
 		r.Get("/products/{slug}/departures", bookingH.Availability)
+
+		// Ý kiến (Phần 11)
+		r.Get("/experiences", opinionH.Experiences)
+		r.With(requireAuth).Post("/experiences", opinionH.CreateExperience)
+		r.With(requireAuth).Post("/experiences/{id}/like", opinionH.Like)
+		r.With(requireAuth).Delete("/experiences/{id}/like", opinionH.Unlike)
+		r.With(requireAuth).Delete("/experiences/{id}", opinionH.DeleteExperience)
+		r.Get("/surveys", opinionH.Surveys)
+		r.With(requireAuth).Post("/surveys/{id}/vote", opinionH.Vote)
+		r.With(turnstileMW).Post("/feedback", opinionH.Feedback)
 
 		// Tiện ích (Phần 10)
 		r.Get("/flights", flightH.Board)

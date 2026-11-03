@@ -133,10 +133,39 @@ type DepartureSeat struct {
 	Taken       int32
 }
 
+type Experience struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Route     string
+	Rating    int16
+	Body      string
+	LikeCount int32
+	Status    string
+	CreatedAt time.Time
+}
+
+type ExperienceLike struct {
+	ExperienceID uuid.UUID
+	UserID       uuid.UUID
+	CreatedAt    time.Time
+}
+
 type Favorite struct {
 	UserID    uuid.UUID
 	ProductID uuid.UUID
 	CreatedAt time.Time
+}
+
+type Feedback struct {
+	ID         uuid.UUID
+	UserID     *uuid.UUID
+	Topic      string
+	Rating     int16
+	Body       string
+	FlightCode *string
+	Email      *string
+	Status     string
+	CreatedAt  time.Time
 }
 
 type Flight struct {
@@ -327,6 +356,28 @@ type ProductVariant struct {
 type SavedMedium struct {
 	UserID    uuid.UUID
 	MediaID   uuid.UUID
+	CreatedAt time.Time
+}
+
+type Survey struct {
+	ID        uuid.UUID
+	Question  string
+	Status    string
+	Position  int32
+	CreatedAt time.Time
+}
+
+type SurveyOption struct {
+	ID       uuid.UUID
+	SurveyID uuid.UUID
+	Label    string
+	Position int32
+}
+
+type SurveyVote struct {
+	SurveyID  uuid.UUID
+	UserID    uuid.UUID
+	OptionID  uuid.UUID
 	CreatedAt time.Time
 }
 

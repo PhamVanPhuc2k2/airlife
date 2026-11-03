@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/turnstile"
 )
 
 type ctxKey int
@@ -157,6 +159,26 @@ func sameOrigin(allowed []string) func(http.Handler) http.Handler {
 				return
 			}
 			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// requireTurnstile chặn request không kèm token Turnstile hợp lệ. Token nằm trong header
+// X-Turnstile-Token (không để trong body để mọi form dùng chung một middleware).
+// Không hỏi được Cloudflare thì từ chối (503) thay vì cho qua: lỗ hổng "Cloudflare sập là bot
+// vào hết" nguy hiểm hơn việc form tạm thời không gửi được.
+func requireTurnstile(v *turnstile.Verifier, log *slog.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			err := v.Verify(r.Context(), r.Header.Get("X-Turnstile-Token"), ClientIP(r.Context()))
+			switch {
+			case err == nil:
+				next.ServeHTTP(w, r)
+			case errors.Is(err, turnstile.ErrRejected):
+				response.Error(w, r, log, apperr.Invalid("captcha_failed", "Xác minh chống spam chưa thành công, vui lòng thử lại"))
+			default:
+				response.Error(w, r, log, apperr.Unavailable("captcha_unavailable", "Không xác minh được lúc này, vui lòng thử lại sau").WithErr(err))
+			}
 		})
 	}
 }

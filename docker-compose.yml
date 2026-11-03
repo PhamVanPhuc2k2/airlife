@@ -74,6 +74,8 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8080}
       # Địa chỉ API mà SERVER Next.js (trong container này) gọi tới: tên service trong mạng Docker
       API_INTERNAL_URL: http://api:8080
+      # Khoá công khai của widget Turnstile. Mặc định là khoá THỬ của Cloudflare (luôn cho qua), chỉ dev.
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
       NEXT_PUBLIC_SITE_URL: http://localhost:${FRONTEND_PORT:-3000}
       npm_config_cache: /tmp/.npm # user theo UID có thể không có thư mục home
       npm_config_update_notifier: "false" # tắt thông báo "npm có bản mới" làm rối log

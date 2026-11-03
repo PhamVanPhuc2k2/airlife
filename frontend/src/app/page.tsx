@@ -1,4 +1,5 @@
 import { HotComments } from "@/components/comment/HotComments";
+import { HomeSurvey } from "@/components/opinion/SurveyList";
 import { UtilityPanel } from "@/components/flight/UtilityPanel";
 import { FeaturedHero } from "@/components/media/FeaturedHero";
 import { MediaCard } from "@/components/media/MediaCard";
@@ -57,6 +58,8 @@ export default async function HomePage() {
         </Panel>
         <UtilityPanel flights={home.flights} />
       </section>
+
+      <HomeSurvey />
     </div>
   );
 }

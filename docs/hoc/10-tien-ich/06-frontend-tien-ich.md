@@ -1,6 +1,6 @@
 # Bài 10.06: Frontend tiện ích: Flightradar, ra tàu bay, thời tiết, Wi-Fi; nghiệm thu Phần 10
 
-> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md)
+> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md) · [Phần 11 →](../11-y-kien/01-du-lieu-y-kien.md)
 
 ## Mục tiêu
 

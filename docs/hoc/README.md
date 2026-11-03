@@ -275,10 +275,20 @@ singleflight. Bản đồ bằng Leaflet.
 | [10.05](10-tien-ich/05-thu-api.md) | Thử API tiện ích bằng curl |
 | [10.06](10-tien-ich/06-frontend-tien-ich.md) | Frontend: Flightradar, ra tàu bay, thời tiết, Wi-Fi; nghiệm thu Phần 10 |
 
+### Phần 11: Ý kiến
+
+| Bài | Nội dung |
+|---|---|
+| [11.01](11-y-kien/01-du-lieu-y-kien.md) | Dữ liệu: trải nghiệm, khảo sát (khoá chính + khoá ngoại ghép), góp ý, seed |
+| [11.02](11-y-kien/02-trai-nghiem.md) | Trải nghiệm: đăng, thích, xoá, chống spam |
+| [11.03](11-y-kien/03-khao-sat.md) | Khảo sát: một người một phiếu, phần trăm |
+| [11.04](11-y-kien/04-goi-y-va-turnstile.md) | Góp ý và Cloudflare Turnstile (client, middleware, cấu hình, CORS) |
+| [11.05](11-y-kien/05-thu-api.md) | Thử API bằng curl, kể cả bốn nhánh Turnstile |
+| [11.06](11-y-kien/06-frontend-y-kien.md) | Frontend: ba tab, widget Turnstile; nghiệm thu Phần 11 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 11 y-kien | Trải nghiệm, khảo sát, góp ý, Turnstile |
 | 12 cms | Trang quản trị, Tiptap, upload ảnh lên R2 |
 | 13 trien-khai | Docker production, Cloudflare, nginx, CI |

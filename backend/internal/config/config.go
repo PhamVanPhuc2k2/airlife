@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/turnstile"
 )
 
 type Config struct {
@@ -32,6 +34,7 @@ type Config struct {
 	Mail     Mail     `mapstructure:",squash"`
 	Payment  Payment  `mapstructure:",squash"`
 	Weather  Weather  `mapstructure:",squash"`
+	Captcha  Captcha  `mapstructure:",squash"`
 }
 
 type App struct {
@@ -82,6 +85,15 @@ type Mail struct {
 type Weather struct {
 	// Mặc định Open-Meteo miễn phí, không cần khoá API. Đổi sang bản trả phí khi chạy kinh doanh.
 	BaseURL string `mapstructure:"WEATHER_BASE_URL"`
+}
+
+// Captcha: Cloudflare Turnstile cho các form công khai (Phần 11).
+type Captcha struct {
+	// Khoá bí mật. Dev dùng khoá thử công khai của Cloudflare (luôn cho qua); production phải là
+	// khoá thật tạo ở dash.cloudflare.com → Turnstile, đặt bằng biến môi trường.
+	TurnstileSecret string `mapstructure:"TURNSTILE_SECRET"`
+	// Địa chỉ siteverify; chỉ đổi khi muốn thử tình huống lỗi.
+	TurnstileVerifyURL string `mapstructure:"TURNSTILE_VERIFY_URL"`
 }
 
 // Payment: cổng thanh toán online (Phần 09).
@@ -165,6 +177,8 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("AUTH_COOKIE_DOMAIN", "")
 
 	v.SetDefault("WEATHER_BASE_URL", "https://api.open-meteo.com")
+	v.SetDefault("TURNSTILE_SECRET", turnstile.TestSecretPass)
+	v.SetDefault("TURNSTILE_VERIFY_URL", turnstile.DefaultVerifyURL)
 	v.SetDefault("PAYMENT_PROVIDER", "fake")
 	v.SetDefault("PAYMENT_WEBHOOK_SECRET", "") // bắt buộc, ≥ 32 ký tự
 	v.SetDefault("PAYMENT_NOTIFY_URL", "http://localhost:8080/api/v1/webhooks/payment/fake")
@@ -194,6 +208,11 @@ func (c Config) validate() error {
 
 	if len(c.Auth.JWTSecret) < 32 {
 		return errors.New("AUTH_JWT_SECRET phải dài ít nhất 32 ký tự")
+	}
+
+	// Khoá thử của Cloudflare cho mọi token qua: ở production thì form nào cũng bị bot spam tự do
+	if c.IsProduction() && (c.Captcha.TurnstileSecret == "" || strings.HasPrefix(c.Captcha.TurnstileSecret, "1x0000")) {
+		return errors.New("TURNSTILE_SECRET production phải là khoá thật, không dùng khoá thử của Cloudflare")
 	}
 
 	if len(c.Payment.WebhookSecret) < 32 {

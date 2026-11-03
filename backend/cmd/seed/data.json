@@ -1649,5 +1649,75 @@
       "delay_minutes": 0,
       "gate": "4"
     }
+  ],
+  "experiences": [
+    {
+      "key": "e1",
+      "user": "u3",
+      "route": "SGN → FRA",
+      "rating": 5,
+      "body": "Chuyến bay đêm 12 tiếng nhẹ nhàng hơn mình nghĩ. Đặt sẵn suất ăn chay, xem 2 phim, nghe podcast ngủ ngon rồi sáng ra đã thấy Frankfurt.",
+      "likes": 214,
+      "hours_ago": 3
+    },
+    {
+      "key": "e2",
+      "user": "u2",
+      "route": "HAN → PQC",
+      "rating": 4,
+      "body": "Mua hộp đặc sản ngay trên máy bay để làm quà, hạ cánh có người đưa tận cửa ra. Chỉ tiếc Wi-Fi hơi chậm lúc giờ cao điểm.",
+      "likes": 96,
+      "hours_ago": 24
+    },
+    {
+      "key": "e3",
+      "user": "u7",
+      "route": "SGN → KIX",
+      "rating": 5,
+      "body": "Đi tour lá đỏ của Airlife Tour, mọi thứ trọn gói từ vé bay đến visa. Hướng dẫn viên chu đáo, lịch trình không bị gấp.",
+      "likes": 341,
+      "hours_ago": 48
+    },
+    {
+      "key": "e4",
+      "user": "u4",
+      "route": "DAD → SGN",
+      "rating": 3,
+      "body": "Chuyến bay trễ 40 phút, nhưng app báo trước nên mình kịp vào phòng chờ. Mong có thêm thông báo cửa ra qua tin nhắn.",
+      "likes": 58,
+      "hours_ago": 96
+    }
+  ],
+  "surveys": [
+    {
+      "key": "s1",
+      "question": "Bạn muốn xem nội dung nào nhiều hơn trên chuyến bay?",
+      "options": [
+        "Phim chiếu rạp mới",
+        "Series ngắn dưới 30 phút",
+        "Podcast & sách nói",
+        "Nội dung du lịch điểm đến"
+      ]
+    },
+    {
+      "key": "s2",
+      "question": "Bạn thường mua gì khi đang bay?",
+      "options": [
+        "Quà đặc sản",
+        "Hàng miễn thuế",
+        "Vé bay chặng tiếp theo",
+        "Chưa từng mua"
+      ]
+    },
+    {
+      "key": "s3",
+      "question": "Tiện ích nào bạn cần nhất khi ra sân bay?",
+      "options": [
+        "Theo dõi chuyến bay trực tiếp",
+        "Fast-track an ninh",
+        "Phòng chờ",
+        "Đưa đón sân bay"
+      ]
+    }
   ]
 }
