@@ -22,16 +22,18 @@ const Queue = "email.send"
 
 // Mẫu email có sẵn. Mỗi mẫu có <tên>.html và <tên>.txt trong templates/.
 const (
-	TemplateVerifyEmail   = "verify_email"
-	TemplateResetPassword = "reset_password"
-	TemplateOrderCreated  = "order_created"
+	TemplateVerifyEmail      = "verify_email"
+	TemplateResetPassword    = "reset_password"
+	TemplateOrderCreated     = "order_created"
+	TemplateBookingConfirmed = "booking_confirmed"
 )
 
 // gosec G101 báo nhầm map này là "mật khẩu ghi cứng" vì có chữ "mật khẩu" trong tiêu đề email.
 var subjects = map[string]string{ //nolint:gosec // xem comment trên
-	TemplateVerifyEmail:   "Xác minh email tài khoản Airlife",
-	TemplateResetPassword: "Đặt lại mật khẩu Airlife",
-	TemplateOrderCreated:  "Airlife đã nhận đơn hàng của bạn",
+	TemplateVerifyEmail:      "Xác minh email tài khoản Airlife",
+	TemplateResetPassword:    "Đặt lại mật khẩu Airlife",
+	TemplateOrderCreated:     "Airlife đã nhận đơn hàng của bạn",
+	TemplateBookingConfirmed: "Đặt chỗ của bạn đã được xác nhận",
 }
 
 // Job: nội dung đẩy vào hàng đợi. Chỉ chứa tên mẫu và dữ liệu, không chứa HTML: đổi giao diện

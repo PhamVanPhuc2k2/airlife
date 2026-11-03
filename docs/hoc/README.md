@@ -244,11 +244,26 @@ ngày khởi hành, worker trả chỗ khi hết hạn, trang giữ chỗ có đ
 | [8.05](08-ve-va-tour/05-frontend-chon-chuyen.md) | Frontend: chọn ngày, hạng, số khách |
 | [8.06](08-ve-va-tour/06-trang-giu-cho-va-nghiem-thu.md) | Trang giữ chỗ: đếm ngược, hành khách; nghiệm thu Phần 08 |
 
+### Phần 09: Thanh toán online
+
+Thanh toán online cho đơn đặt vé, tour (hàng hoá giữ COD). Cổng thanh toán nằm sau một interface, làm
+trước bằng cổng giả lập diễn đúng luồng thật: phiên thanh toán, webhook ký HMAC chống giả mạo và phát lại,
+xử lý idempotent, đối soát khi mất webhook, và các tình huống xấu (sai số tiền, trả trùng, trả chậm sau khi
+hết hạn, trả sau khi huỷ) kết thúc bằng "cần hoàn tiền" thay vì nuốt tiền.
+
+| Bài | Nội dung |
+|---|---|
+| [9.01](09-thanh-toan/01-nguyen-tac-va-schema.md) | Nguyên tắc thanh toán online và schema |
+| [9.02](09-thanh-toan/02-cong-thanh-toan-va-chu-ky.md) | Cổng thanh toán sau một interface, chữ ký webhook, cổng giả lập |
+| [9.03](09-thanh-toan/03-xu-ly-thanh-toan.md) | Tạo phiên thanh toán và xử lý kết quả (webhook, đối soát) |
+| [9.04](09-thanh-toan/04-noi-day-va-doi-soat.md) | Endpoint webhook, cấu hình, worker đối soát |
+| [9.05](09-thanh-toan/05-thu-api.md) | Thử toàn bộ luồng thanh toán bằng curl |
+| [9.06](09-thanh-toan/06-frontend-thanh-toan.md) | Frontend: nút Thanh toán, chờ webhook, trang cổng giả lập; nghiệm thu Phần 09 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 09 thanh-toan | Cổng thanh toán, webhook |
 | 10 tien-ich | Chuyến bay, thời tiết, Flightradar |
 | 11 y-kien | Trải nghiệm, khảo sát, góp ý, Turnstile |
 | 12 cms | Trang quản trị, Tiptap, upload ảnh lên R2 |

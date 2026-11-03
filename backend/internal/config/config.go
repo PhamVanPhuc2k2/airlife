@@ -30,6 +30,7 @@ type Config struct {
 	RabbitMQ RabbitMQ `mapstructure:",squash"`
 	Auth     Auth     `mapstructure:",squash"`
 	Mail     Mail     `mapstructure:",squash"`
+	Payment  Payment  `mapstructure:",squash"`
 }
 
 type App struct {
@@ -74,6 +75,18 @@ type RabbitMQ struct {
 type Mail struct {
 	SMTPAddr string `mapstructure:"MAIL_SMTP_ADDR"` // host:port, vd. mailpit:1025
 	From     string `mapstructure:"MAIL_FROM"`
+}
+
+// Payment: cổng thanh toán online (Phần 09).
+type Payment struct {
+	// fake: cổng giả lập, chỉ dev. Cổng thật (vnpay, momo, zalopay) thêm khi có tài khoản.
+	Provider string `mapstructure:"PAYMENT_PROVIDER"`
+	// Khoá ký webhook, chung giữa ta và cổng. Lộ khoá = ai cũng tự "báo đã trả tiền" được.
+	// Production: chuỗi ngẫu nhiên ≥ 32 ký tự, đặt bằng biến môi trường, không commit.
+	WebhookSecret string `mapstructure:"PAYMENT_WEBHOOK_SECRET"`
+	// Địa chỉ webhook của API mà cổng GIẢ LẬP gọi tới (cổng thật dùng địa chỉ cấu hình ở trang
+	// quản trị của họ). Trong Docker, API gọi chính nó qua localhost.
+	NotifyURL string `mapstructure:"PAYMENT_NOTIFY_URL"`
 }
 
 type Auth struct {
@@ -144,6 +157,10 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("AUTH_REFRESH_TTL", "720h") // 30 ngày
 	v.SetDefault("AUTH_COOKIE_DOMAIN", "")
 
+	v.SetDefault("PAYMENT_PROVIDER", "fake")
+	v.SetDefault("PAYMENT_WEBHOOK_SECRET", "") // bắt buộc, ≥ 32 ký tự
+	v.SetDefault("PAYMENT_NOTIFY_URL", "http://localhost:8080/api/v1/webhooks/payment/fake")
+
 	v.SetDefault("MAIL_SMTP_ADDR", "") // chỉ worker cần; worker kiểm tra lúc khởi động
 	v.SetDefault("MAIL_FROM", "Airlife <no-reply@airlife.local>")
 }
@@ -151,10 +168,11 @@ func setDefaults(v *viper.Viper) {
 func (c Config) validate() error {
 	var missing []string
 	required := map[string]string{
-		"POSTGRES_URL":    c.Postgres.URL,
-		"REDIS_ADDR":      c.Redis.Addr,
-		"RABBITMQ_URL":    c.RabbitMQ.URL,
-		"AUTH_JWT_SECRET": c.Auth.JWTSecret,
+		"POSTGRES_URL":           c.Postgres.URL,
+		"REDIS_ADDR":             c.Redis.Addr,
+		"RABBITMQ_URL":           c.RabbitMQ.URL,
+		"AUTH_JWT_SECRET":        c.Auth.JWTSecret,
+		"PAYMENT_WEBHOOK_SECRET": c.Payment.WebhookSecret,
 	}
 	for key, val := range required {
 		if strings.TrimSpace(val) == "" {
@@ -168,6 +186,19 @@ func (c Config) validate() error {
 
 	if len(c.Auth.JWTSecret) < 32 {
 		return errors.New("AUTH_JWT_SECRET phải dài ít nhất 32 ký tự")
+	}
+
+	if len(c.Payment.WebhookSecret) < 32 {
+		return errors.New("PAYMENT_WEBHOOK_SECRET phải dài ít nhất 32 ký tự")
+	}
+	switch c.Payment.Provider {
+	case "fake":
+		// Cổng giả lập tự báo "đã trả tiền" cho bất kỳ ai gọi: tuyệt đối không chạy trên production
+		if c.IsProduction() {
+			return errors.New("PAYMENT_PROVIDER=fake không được dùng ở production")
+		}
+	default:
+		return fmt.Errorf("PAYMENT_PROVIDER không hợp lệ: %q (hiện chỉ có fake)", c.Payment.Provider)
 	}
 
 	switch c.App.Env {

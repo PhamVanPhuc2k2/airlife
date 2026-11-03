@@ -31,8 +31,10 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/news"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/order"
+	paymentsvc "github.com/PhamVanPhuc2k2/airlife/backend/internal/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
+	paypkg "github.com/PhamVanPhuc2k2/airlife/backend/pkg/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
 )
@@ -135,6 +137,10 @@ func (s *Server) Handler() (http.Handler, error) {
 		RefreshTTL: authCfg.RefreshTTL,
 	}, clientIP)
 	requireAuth := auth.RequireAuth(s.deps.Log)
+	payCfg := s.deps.Config.Payment
+	fakeGW := paypkg.NewFake(s.deps.Redis, payCfg.WebhookSecret, s.deps.Config.App.PublicURL, payCfg.NotifyURL)
+	paymentH := paymentsvc.NewHandler(paymentsvc.NewService(s.deps.DB, fakeGW, publisher,
+		s.deps.Config.App.PublicURL, s.deps.Log), s.deps.Log)
 	orderH := order.NewHandler(order.NewService(s.deps.DB, s.deps.Redis, publisher,
 		s.deps.Config.App.PublicURL, s.deps.Log), s.deps.Log)
 	newsH := news.NewHandler(news.NewService(q, s.deps.Redis), s.deps.Log)
@@ -182,6 +188,15 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
 		r.Get("/products/{slug}/departures", bookingH.Availability)
 
+		// Cổng thanh toán gọi vào đây (không đăng nhập; xác thực bằng chữ ký HMAC)
+		r.Post("/webhooks/payment/{provider}", paymentH.Webhook)
+		// Trang của cổng giả lập: chỉ dev (config chặn fake ở production)
+		if !s.deps.Config.IsProduction() {
+			fakeH := paymentsvc.NewFakeHandler(fakeGW, s.deps.Log)
+			r.Get("/dev/fake-gateway/{txn}", fakeH.Session)
+			r.Post("/dev/fake-gateway/{txn}", fakeH.Complete)
+		}
+
 		// Thư viện cá nhân (trang Bạn, Sưu tập): mọi route đều cần đăng nhập
 		r.Route("/me", func(r chi.Router) {
 			r.Use(requireAuth)
@@ -227,6 +242,7 @@ func (s *Server) Handler() (http.Handler, error) {
 			r.Get("/bookings/{code}", bookingH.Get)
 			r.Put("/bookings/{code}/details", bookingH.SetDetails)
 			r.Post("/bookings/{code}/cancel", bookingH.Cancel)
+			r.Post("/bookings/{code}/pay", paymentH.Start)
 		})
 
 		r.Get("/media/{slug}/comments", commentH.List("media"))

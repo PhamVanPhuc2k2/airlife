@@ -83,6 +83,7 @@ airlife/
 - [x] Cố định phiên bản: `.nvmrc` + `"engines"` trong `package.json`, `--save-exact` cho mọi gói npm; dòng `go` và `toolchain` trong `go.mod`; commit lockfile (`package-lock.json`, `go.sum`)
 - [x] Docker image ghi rõ phiên bản patch (`node:24.22.1-alpine3.23`, `golang:1.27.3-alpine3.23`, `postgres:18.6-alpine`, `redis:8.10.3-alpine`, `rabbitmq:4.4.0-management-alpine`, `migrate/migrate:v4.20.1`), không dùng tag `latest`
 - [ ] CI chạy `npm audit --audit-level=high` và `govulncheck ./...`; build fail nếu có lỗ hổng mức high/critical
+- [ ] Theo dõi: `npm audit` (cả dev) báo 16 lỗ hổng **moderate** từ 03/11/2026, cùng một nguyên nhân: `minimatch` < 11.0.1 (DoS khi khớp glob, GHSA-g3hv-75wg-m249) trong chuỗi ESLint. Chỉ ở công cụ lint (`npm audit --omit=dev`: 0), `@eslint/config-array` mới nhất vẫn dùng minimatch 10 nên chưa có bản vá; ép `overrides` lên minimatch 11 làm hỏng ESLint (đổi API). Không dùng `npm audit fix --force` (cài ESLint 4). Kiểm tra lại mỗi tuần/khi nâng ESLint
 - [ ] Bật Dependabot hoặc Renovate để tự tạo PR khi có bản vá mới
 - [ ] Đăng ký theo dõi thông báo bảo mật: nodejs.org security, Next.js GitHub advisories, golang-announce, PostgreSQL security
 - [ ] Quy định: bản vá mức critical/high phải cập nhật và deploy trong 48 giờ
@@ -152,7 +153,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] `categories` (xem, nghe, kinh-doanh, tour-bay) + `category_filters` (chip lọc). Tin tức có bảng riêng ở Phần 03
 - [ ] `media` (✓ video/audio, `youtube_id` có CHECK 11 ký tự, `tags[]` cho chip lọc, thời lượng hoặc số tập, `view_count`, `featured`, `lineup_month`, `status`, index tìm kiếm không dấu); ✓ `media_products` (Phần 07)
 - [ ] ✓ `products` (`kind` goods/booking, chuyên mục + chip lọc, giá "từ", giá cũ, rating, đã bán, cách nhận hàng) + `product_variants` (MỘT thuộc tính: nhãn, giá, tồn kho; chốt với khách 29/10/2026) (Phần 07); ✓ `product_fares` (hạng dịch vụ, giá trẻ em), `departures` + `departure_seats` (sức chứa/đã lấy, CHECK không bán quá), `bookings` + `booking_passengers` (Phần 08)
-- [ ] ✓ `cart_items` (không cần bảng `carts`: mỗi người một giỏ), `orders` (mã AL-…, idempotency key, CHECK theo cách nhận hàng), `order_items` (snapshot tên/giá) (Phần 07); còn `payments` (Phần 09)
+- [ ] ✓ `cart_items` (không cần bảng `carts`: mỗi người một giỏ), `orders` (mã AL-…, idempotency key, CHECK theo cách nhận hàng), `order_items` (snapshot tên/giá) (Phần 07); ✓ `payments` (khoản thanh toán, một khoản thành công/đơn), `payment_events` (chặn xử lý webhook trùng) (Phần 09)
 - [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
 - [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
@@ -177,7 +178,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
 - [ ] **Products**: ✓ danh sách (chuyên mục, chip, kênh; mới nhất / bán chạy; phân trang con trỏ), chi tiết (biến thể, video có sản phẩm, gợi ý), sản phẩm trong video, yêu thích (Phần 07); ✓ lịch khởi hành, số chỗ (`/products/{slug}/departures`), giữ chỗ 20 phút, hành khách, huỷ (Phần 08); còn em bé dưới 2 tuổi, giá theo mùa/ngày cao điểm; đánh giá sản phẩm thật (hiện rating là số mẫu)
 - [x] **Cart & Orders**: giỏ (khách: preview, gộp khi đăng nhập bằng GREATEST), đặt hàng COD (trừ kho có điều kiện, idempotency key, bắt xác minh email, 10 đơn/giờ), lịch sử, huỷ đơn chờ xác nhận (trả kho) (Phần 07). Chuyển trạng thái confirmed/delivering/completed ở trang quản trị (Phần 12)
-- [ ] **Payment**: tích hợp cổng VNPay/MoMo/ZaloPay, webhook IPN, đối soát
+- [ ] **Payment**: ✓ interface `pkg/payment.Gateway`, cổng giả lập (dev), webhook ký HMAC-SHA256 + chống replay 5 phút, xử lý idempotent, đối soát worker (2 phút/lần), đánh dấu `refund_required` (Phần 09); chỉ áp dụng cho vé/tour. Còn adapter VNPay/MoMo/ZaloPay thật (cần tài khoản sandbox), thanh toán online cho hàng hoá, hoàn tiền tự động, trang quản trị xem `refund_required` (Phần 12)
 - [x] **Channels**: chi tiết kênh, nội dung của kênh (`/media?channel=`), theo dõi/bỏ theo dõi (transaction, bấm 2 lần chỉ tính 1), `/me/following`
 - [x] **Comments**: viết, trả lời 1 cấp, thích, xoá (chủ bình luận hoặc editor/admin), sắp xếp Hay/Mới, bình luận nổi bật. Chống spam: bắt buộc xác minh email + rate limit 10 bình luận/5 phút/người (Redis). Chưa dùng Turnstile cho bình luận: chỉ thêm nếu vẫn bị spam
 - [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
@@ -207,7 +208,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Job gửi email (`internal/mail`, queue `email.send`): ✓ mẫu xác minh email, đặt lại mật khẩu (HTML + chữ thường); ✓ dev gửi qua SMTP vào **Mailpit** (thay MailHog đã ngừng phát triển từ 2020); ✓ mẫu xác nhận đơn hàng (Phần 07); còn gửi qua Resend ở production, logo ảnh trong thư
 - [ ] Job: kiểm tra định kỳ video YouTube còn hoạt động (bị xóa, chuyển riêng tư, chặn nhúng) → ẩn và báo admin
 - [x] Job: hết hạn đơn giữ chỗ quá 20 phút và trả chỗ, 30 giây/lần (worker, Phần 08)
-- [ ] Job: xử lý webhook thanh toán → cập nhật đơn → gửi thông báo
+- [x] Job: đối soát thanh toán `pending` quá 3 phút bằng cách hỏi cổng, 2 phút/lần (worker, Phần 09); webhook xử lý ngay trong API, email xác nhận qua RabbitMQ
 - [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
 - [ ] Job: gửi notification khi kênh theo dõi có nội dung mới
 - [ ] Job: đồng bộ dữ liệu chuyến bay / thời tiết định kỳ
@@ -282,7 +283,8 @@ Bảng dựa trên `data/content.json` của mockup:
 | `tim-kiem.html?q=` | `/tim-kiem` | Kết quả gộp nhiều loại |
 | (mới) | `/dang-nhap`, `/dang-ky`, `/quen-mat-khau` | ✓ `/dang-nhap`, `/dang-ky`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh-email` (react-hook-form + zod, lỗi theo từng ô, chống open redirect) |
 | (mới) | `/gio-hang`, `/thanh-toan`, `/don-hang`, `/don-hang/[code]` | ✓ Giỏ, thanh toán COD, đơn hàng (Phần 07); thanh toán online Phần 09 |
-| (mới) | `/dat-cho`, `/dat-cho/[code]` | ✓ Đơn đặt vé, tour: đếm ngược giữ chỗ, hành khách, huỷ (Phần 08); thanh toán Phần 09 |
+| (mới) | `/dat-cho`, `/dat-cho/[code]` | ✓ Đơn đặt vé, tour: đếm ngược giữ chỗ, hành khách, huỷ (Phần 08), thanh toán online + chờ webhook (Phần 09) |
+| (mới, chỉ dev) | `/thanh-toan-gia-lap/[txn]` | ✓ Trang cổng thanh toán giả lập (Phần 09) |
 
 - [ ] Làm lần lượt từng trang trên, mỗi trang: UI pixel-perfect theo mockup → nối API bằng TanStack Query → loading/error/empty state → responsive
 - [ ] Player: ✓ YouTube IFrame Player API, mini player điều khiển bằng icon Player Airlife (phát/dừng, tua 10s, tắt tiếng, thanh đường băng theo thời gian thật), ✓ gửi lượt xem khi bắt đầu phát; còn nhớ tiến độ xem (cần đăng nhập)
@@ -307,7 +309,7 @@ Bảng dựa trên `data/content.json` của mockup:
 ---
 
 ## Giai đoạn 4: Tích hợp bên thứ ba
-- [ ] Cổng thanh toán (VNPay / MoMo / ZaloPay)
+- [ ] Cổng thanh toán (VNPay / MoMo / ZaloPay): tạo tài khoản sandbox rồi viết adapter (cổng giả lập đã chạy đủ luồng, Phần 09)
 - [ ] Resend: xác minh domain gửi (SPF, DKIM, DMARC trên Cloudflare DNS), địa chỉ gửi vd. `no-reply@airlife.vn`
 - [ ] Cloudflare Turnstile: tạo site key/secret key cho dev và prod
 - [ ] Dữ liệu chuyến bay (FlightAware / AviationStack / API hãng bay đối tác)

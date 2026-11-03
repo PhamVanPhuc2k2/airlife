@@ -23,6 +23,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
+	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/money"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/pagination"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/refcode"
 )
@@ -384,7 +385,7 @@ func (s *Service) sendCreatedEmail(ctx context.Context, to, name string, o Order
 	for _, it := range o.Items {
 		items = append(items, map[string]any{
 			"name": it.ProductName, "label": it.VariantLabel, "quantity": it.Quantity,
-			"line_total": FormatVND(it.LineTotal),
+			"line_total": money.FormatVND(it.LineTotal),
 		})
 	}
 	return s.mail.Publish(ctx, mail.Queue, mail.Job{
@@ -392,7 +393,7 @@ func (s *Service) sendCreatedEmail(ctx context.Context, to, name string, o Order
 		To:       to,
 		Data: map[string]any{
 			"name": name, "code": o.Code, "delivery": DeliveryLabel[o.DeliveryMethod], "items": items,
-			"shipping": FormatVND(o.ShippingFee), "total": FormatVND(o.Total),
+			"shipping": money.FormatVND(o.ShippingFee), "total": money.FormatVND(o.Total),
 			"link": s.publicURL + "/don-hang/" + o.Code,
 		},
 	})
@@ -469,17 +470,4 @@ func nilIfEmpty(s string) *string {
 		return nil
 	}
 	return &s
-}
-
-// FormatVND: 389000 → "389.000₫"
-func FormatVND(n int64) string {
-	s := fmt.Sprintf("%d", n)
-	var b strings.Builder
-	for i, r := range s {
-		if i > 0 && (len(s)-i)%3 == 0 {
-			b.WriteByte('.')
-		}
-		b.WriteRune(r)
-	}
-	return b.String() + "₫"
 }

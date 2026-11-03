@@ -123,25 +123,33 @@ type Product struct {
 	ImageURL string `json:"image_url"`
 }
 
+// PaymentInfo: khoản thanh toán mới nhất của đơn (trang đặt chỗ hiện kết quả).
+type PaymentInfo struct {
+	Status string `json:"status"` // pending | succeeded | failed | expired
+	// Đã nhận tiền mà không giao được dịch vụ: Airlife sẽ hoàn tiền (xem internal/payment)
+	RefundRequired bool `json:"refund_required"`
+}
+
 type Booking struct {
 	Code      string    `json:"code"`
 	Status    string    `json:"status"`
 	ExpiresAt time.Time `json:"expires_at"`
 	// Số giây giữ chỗ còn lại, tính ở SERVER: đồng hồ máy khách có thể lệch vài phút, đếm ngược
 	// theo expires_at với giờ máy khách sẽ sai. Trình duyệt đếm ngược từ con số này.
-	ExpiresIn  int64       `json:"expires_in"`
-	Product    Product     `json:"product"`
-	FareLabel  string      `json:"fare_label"`
-	DepartDate string      `json:"depart_date"`
-	ReturnDate *string     `json:"return_date"`
-	Adults     int16       `json:"adults"`
-	Children   int16       `json:"children"`
-	AdultPrice int64       `json:"adult_price"`
-	ChildPrice int64       `json:"child_price"`
-	Total      int64       `json:"total"`
-	Contact    *Contact    `json:"contact"`
-	Passengers []Passenger `json:"passengers"`
-	CreatedAt  time.Time   `json:"created_at"`
+	ExpiresIn  int64        `json:"expires_in"`
+	Product    Product      `json:"product"`
+	FareLabel  string       `json:"fare_label"`
+	DepartDate string       `json:"depart_date"`
+	ReturnDate *string      `json:"return_date"`
+	Adults     int16        `json:"adults"`
+	Children   int16        `json:"children"`
+	AdultPrice int64        `json:"adult_price"`
+	ChildPrice int64        `json:"child_price"`
+	Total      int64        `json:"total"`
+	Contact    *Contact     `json:"contact"`
+	Passengers []Passenger  `json:"passengers"`
+	Payment    *PaymentInfo `json:"payment"` // null: chưa từng thanh toán
+	CreatedAt  time.Time    `json:"created_at"`
 }
 
 type Summary struct {
@@ -409,6 +417,11 @@ func (s *Service) Get(ctx context.Context, userID uuid.UUID, code string) (Booki
 	}
 	if r.ContactName != nil {
 		b.Contact = &Contact{Name: *r.ContactName, Phone: deref(r.ContactPhone), Email: deref(r.ContactEmail)}
+	}
+	if pay, err := s.q.GetLatestPayment(ctx, r.ID); err == nil {
+		b.Payment = &PaymentInfo{Status: pay.Status, RefundRequired: pay.RefundRequired}
+	} else if !errors.Is(err, pgx.ErrNoRows) {
+		return Booking{}, err
 	}
 	ps, err := s.q.ListBookingPassengers(ctx, r.ID)
 	if err != nil {

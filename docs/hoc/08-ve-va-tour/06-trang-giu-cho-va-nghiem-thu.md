@@ -1,6 +1,6 @@
 # Bài 8.06: Trang giữ chỗ: đếm ngược, hành khách; nghiệm thu Phần 08
 
-> [← Bài trước](05-frontend-chon-chuyen.md) · [Mục lục](../README.md)
+> [← Bài trước](05-frontend-chon-chuyen.md) · [Mục lục](../README.md) · [Phần 09 →](../09-thanh-toan/01-nguyen-tac-va-schema.md)
 
 ## Mục tiêu
 
@@ -596,7 +596,7 @@ Dọn dữ liệu thử như bài 8.04, rồi:
 git add . && git commit -m "Đặt vé, tour: chọn chuyến, giữ chỗ, hành khách"
 ```
 
-Đến đây xong Phần 08. Phần 09 thêm thanh toán online để đơn "Chờ thanh toán" thành "Đã xác nhận".
+Đến đây xong Phần 08. Tiếp theo: [Phần 09 →](../09-thanh-toan/01-nguyen-tac-va-schema.md) thêm thanh toán online để đơn "Chờ thanh toán" thành "Đã xác nhận".
 
 ## Hay gặp lỗi
 

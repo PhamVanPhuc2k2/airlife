@@ -20,10 +20,12 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
+	paymentsvc "github.com/PhamVanPhuc2k2/airlife/backend/internal/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/database"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/logger"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/mailer"
+	paypkg "github.com/PhamVanPhuc2k2/airlife/backend/pkg/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 )
 
@@ -82,11 +84,21 @@ func run() error {
 	// defer chạy theo thứ tự ngược, nên defer này (khai báo sau cùng) chạy TRƯỚC các defer đóng
 	// PostgreSQL, Redis ở trên: lần gom lượt xem cuối vẫn còn kết nối để dùng.
 	mediaSvc := media.NewService(media.NewRepository(db.New(pool)), rdb)
+	// Đối soát thanh toán cần gọi được cổng và đẩy email xác nhận. Dựng TRƯỚC khi tạo loopCtx: trả
+	// lỗi sớm sau khi đã có context huỷ được là rò context (govet lostcancel).
+	publisher, err := queue.NewPublisher(mq)
+	if err != nil {
+		return err
+	}
+	gw := paypkg.NewFake(rdb, cfg.Payment.WebhookSecret, cfg.App.PublicURL, cfg.Payment.NotifyURL)
+	paySvc := paymentsvc.NewService(pool, gw, publisher, cfg.App.PublicURL, log)
+
 	loopCtx, stopLoop := context.WithCancel(ctx)
 	var wg sync.WaitGroup
 	jobErr := make(chan error, 1)
 	wg.Go(func() { flushViewsLoop(loopCtx, log, mediaSvc) })
 	wg.Go(func() { expireBookingsLoop(loopCtx, log, booking.NewService(pool)) })
+	wg.Go(func() { reconcilePaymentsLoop(loopCtx, log, paySvc) })
 	wg.Go(func() {
 		// prefetch 5: mỗi lúc xử lý tối đa 5 thư chưa xong
 		if err := queue.Consume(loopCtx, mq, mail.Queue, 5, log, mail.Handle(smtp)); err != nil {
@@ -163,6 +175,29 @@ func expireBookingsLoop(ctx context.Context, log *slog.Logger, svc *booking.Serv
 			}
 			if n > 0 {
 				log.InfoContext(ctx, "đã trả ghế đơn giữ chỗ quá hạn", "dong_ghe", n)
+			}
+		}
+	}
+}
+
+// reconcilePaymentsLoop: 2 phút một lần, hỏi cổng về các khoản thanh toán "chờ" quá 3 phút mà chưa
+// thấy webhook (mất webhook, API tắt lúc cổng gọi). Webhook là đường chính; đây là lưới an toàn,
+// để khách đã trả tiền không bị kẹt ở "Chờ thanh toán" tới khi hết hạn giữ chỗ.
+func reconcilePaymentsLoop(ctx context.Context, log *slog.Logger, svc *paymentsvc.Service) {
+	ticker := time.NewTicker(2 * time.Minute)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			n, err := svc.Reconcile(ctx)
+			if err != nil {
+				log.ErrorContext(ctx, "đối soát thanh toán lỗi", "err", err)
+				continue
+			}
+			if n > 0 {
+				log.InfoContext(ctx, "đối soát thanh toán: đã áp kết quả", "khoan", n)
 			}
 		}
 	}

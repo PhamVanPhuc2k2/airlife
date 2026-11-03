@@ -315,6 +315,12 @@ export type Booking = {
   total: number;
   contact: { name: string; phone: string; email: string } | null;
   passengers: { kind: "adult" | "child"; full_name: string; birth_date: string }[];
+  // Khoản thanh toán đại diện cho đơn; null: chưa từng thanh toán
+  payment: {
+    status: "pending" | "succeeded" | "failed" | "expired";
+    // Đã nhận tiền mà không giao được dịch vụ: Airlife sẽ hoàn tiền
+    refund_required: boolean;
+  } | null;
   created_at: string;
 };
 

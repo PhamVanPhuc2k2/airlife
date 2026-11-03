@@ -215,6 +215,29 @@ type OrderItem struct {
 	Position     int16
 }
 
+type Payment struct {
+	ID             uuid.UUID
+	Code           string
+	UserID         uuid.UUID
+	BookingID      uuid.UUID
+	Provider       string
+	ProviderTxn    *string
+	Amount         int64
+	Status         string
+	FailureReason  *string
+	RefundRequired bool
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	PaidAt         *time.Time
+}
+
+type PaymentEvent struct {
+	Provider   string
+	EventID    string
+	PaymentID  uuid.UUID
+	ReceivedAt time.Time
+}
+
 type Playlist struct {
 	ID        uuid.UUID
 	UserID    uuid.UUID

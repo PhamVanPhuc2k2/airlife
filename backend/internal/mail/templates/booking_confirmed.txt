@@ -1,0 +1,12 @@
+Chào {{.name}},
+
+Airlife đã nhận thanh toán và xác nhận đặt chỗ {{.code}}.
+
+Dịch vụ: {{.product}}
+Hạng: {{.fare}}
+Khởi hành: {{.date}}
+Đã thanh toán: {{.total}}
+
+Xem đặt chỗ: {{.link}}
+
+Airlife – Đời sống hàng không
