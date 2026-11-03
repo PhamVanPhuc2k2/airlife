@@ -113,3 +113,13 @@ RETURNING id;
 INSERT INTO departure_seats (departure_id, fare_id, capacity)
 VALUES ($1, $2, $3)
 ON CONFLICT (departure_id, fare_id) DO NOTHING;
+
+-- Lịch bay mẫu (Phần 10)
+-- name: UpsertFlight :exec
+INSERT INTO flights (code, airline, origin, destination, dep_local, duration_minutes, delay_minutes, gate)
+VALUES (sqlc.arg('code'), sqlc.arg('airline'), sqlc.arg('origin'), sqlc.arg('destination'),
+        sqlc.arg('dep_local')::text::time, sqlc.arg('duration_minutes'), sqlc.arg('delay_minutes'), sqlc.arg('gate'))
+ON CONFLICT (code) DO UPDATE
+SET airline = EXCLUDED.airline, origin = EXCLUDED.origin, destination = EXCLUDED.destination,
+    dep_local = EXCLUDED.dep_local, duration_minutes = EXCLUDED.duration_minutes,
+    delay_minutes = EXCLUDED.delay_minutes, gate = EXCLUDED.gate;

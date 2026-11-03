@@ -1457,5 +1457,197 @@
         "count": 25
       }
     }
+  ],
+  "flights": [
+    {
+      "code": "VN 220",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "HAN",
+      "dep_local": "08:00",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "12"
+    },
+    {
+      "code": "VJ 133",
+      "airline": "VietJet Air",
+      "origin": "HAN",
+      "destination": "SGN",
+      "dep_local": "08:35",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "8"
+    },
+    {
+      "code": "QH 1521",
+      "airline": "Bamboo Airways",
+      "origin": "SGN",
+      "destination": "DAD",
+      "dep_local": "09:10",
+      "duration_minutes": 80,
+      "delay_minutes": 0,
+      "gate": "6"
+    },
+    {
+      "code": "VN 1821",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "PQC",
+      "dep_local": "09:40",
+      "duration_minutes": 65,
+      "delay_minutes": 0,
+      "gate": "3"
+    },
+    {
+      "code": "VN 300",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "NRT",
+      "dep_local": "00:05",
+      "duration_minutes": 345,
+      "delay_minutes": 0,
+      "gate": "14"
+    },
+    {
+      "code": "VJ 885",
+      "airline": "VietJet Air",
+      "origin": "HAN",
+      "destination": "ICN",
+      "dep_local": "10:20",
+      "duration_minutes": 250,
+      "delay_minutes": 25,
+      "gate": "5"
+    },
+    {
+      "code": "VN 611",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "BKK",
+      "dep_local": "07:15",
+      "duration_minutes": 90,
+      "delay_minutes": 0,
+      "gate": "10"
+    },
+    {
+      "code": "QH 9871",
+      "airline": "Bamboo Airways",
+      "origin": "DAD",
+      "destination": "SIN",
+      "dep_local": "11:00",
+      "duration_minutes": 125,
+      "delay_minutes": 0,
+      "gate": "2"
+    },
+    {
+      "code": "VN 244",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "HAN",
+      "dep_local": "12:00",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "11"
+    },
+    {
+      "code": "VJ 321",
+      "airline": "VietJet Air",
+      "origin": "SGN",
+      "destination": "HAN",
+      "dep_local": "16:30",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "9"
+    },
+    {
+      "code": "VN 7125",
+      "airline": "Vietnam Airlines",
+      "origin": "DAD",
+      "destination": "HAN",
+      "dep_local": "19:10",
+      "duration_minutes": 80,
+      "delay_minutes": 10,
+      "gate": "4"
+    },
+    {
+      "code": "VN 228",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "HAN",
+      "dep_local": "20:00",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "13"
+    },
+    {
+      "code": "VJ 150",
+      "airline": "VietJet Air",
+      "origin": "HAN",
+      "destination": "DAD",
+      "dep_local": "21:30",
+      "duration_minutes": 80,
+      "delay_minutes": 0,
+      "gate": "7"
+    },
+    {
+      "code": "VN 7202",
+      "airline": "Vietnam Airlines",
+      "origin": "HAN",
+      "destination": "SGN",
+      "dep_local": "23:45",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "1"
+    },
+    {
+      "code": "VN 416",
+      "airline": "Vietnam Airlines",
+      "origin": "SGN",
+      "destination": "ICN",
+      "dep_local": "23:30",
+      "duration_minutes": 320,
+      "delay_minutes": 0,
+      "gate": "15"
+    },
+    {
+      "code": "VJ 822",
+      "airline": "VietJet Air",
+      "origin": "HAN",
+      "destination": "NRT",
+      "dep_local": "00:30",
+      "duration_minutes": 300,
+      "delay_minutes": 0,
+      "gate": "6"
+    },
+    {
+      "code": "VN 650",
+      "airline": "Vietnam Airlines",
+      "origin": "HAN",
+      "destination": "BKK",
+      "dep_local": "02:10",
+      "duration_minutes": 130,
+      "delay_minutes": 0,
+      "gate": "2"
+    },
+    {
+      "code": "QH 9500",
+      "airline": "Bamboo Airways",
+      "origin": "PQC",
+      "destination": "SGN",
+      "dep_local": "05:30",
+      "duration_minutes": 65,
+      "delay_minutes": 0,
+      "gate": "1"
+    },
+    {
+      "code": "VJ 700",
+      "airline": "VietJet Air",
+      "origin": "SGN",
+      "destination": "SIN",
+      "dep_local": "14:20",
+      "duration_minutes": 120,
+      "delay_minutes": 0,
+      "gate": "4"
+    }
   ]
 }

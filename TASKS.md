@@ -156,7 +156,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] ✓ `cart_items` (không cần bảng `carts`: mỗi người một giỏ), `orders` (mã AL-…, idempotency key, CHECK theo cách nhận hàng), `order_items` (snapshot tên/giá) (Phần 07); ✓ `payments` (khoản thanh toán, một khoản thành công/đơn), `payment_events` (chặn xử lý webhook trùng) (Phần 09)
 - [x] `comments` (media **hoặc** bài viết, trả lời 1 cấp, `like_count`/`reply_count`, xoá mềm `status`) + `comment_likes` (Phần 05)
 - [x] `news_categories` + `news` (Khám phá, Sự kiện, Mẹo bay, Line-up phim, Kinh doanh; `body_html` đã lọc, `status` draft/published/hidden)
-- [ ] `flights`, `airports` (cho Tiện ích: ra tàu bay, Flightradar, thời tiết điểm đến)
+- [x] `flights` (lịch bay hàng ngày), `airports`, `user_flights`, `wifi_plans` (Phần 10); trạng thái và vị trí tính từ giờ, không lưu
 - [ ] `experiences` (chia sẻ trải nghiệm chuyến bay), `surveys`, `survey_options`, `survey_votes`, `feedbacks` (góp ý)
 - [ ] ✓ `watch_history` (tiến độ xem, "Tiếp tục xem"), `saved_media`, `playlists` + `playlist_items` (riêng tư, tối đa 50 playlist × 200 mục) (Phần 06); ✓ `favorites` (Phần 07)
 - [ ] `notifications`
@@ -172,7 +172,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Vai trò: ✓ cột `role` (`user`, `creator`, `business`, `editor`, `admin`) trong access token và `/auth/me`; còn middleware kiểm tra vai trò cho từng API (khi có API cần, vd. CMS)
 
 ### 2.4 API module
-- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); ✓ khối kinh doanh (Phần 07); còn tiện ích (Phần 10)
+- [ ] **Home**: ✓ `GET /home` (nổi bật, 3 ô trái, hàng 4 thẻ xem nhiều, nghe nhiều; cache Redis 60s); ✓ cột bình luận nổi bật (tab Hay/Nhiều, Phần 05); ✓ khối kinh doanh (Phần 07); ✓ khối Tiện ích (Phần 10)
 - [x] **Categories**: danh sách, chi tiết kèm chip lọc (cache Redis 10 phút)
 - [ ] **Media**: ✓ danh sách (lọc chuyên mục/chip/line-up, sắp mới/xem nhiều, phân trang con trỏ), chi tiết, gợi ý liên quan, lượt xem (Redis + worker, mỗi IP 1 lượt/30 phút); còn lưu tiến độ xem (cần đăng nhập)
 - [ ] **Line-up**: phim theo tháng (giữ từ site cũ)
@@ -182,9 +182,9 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] **Channels**: chi tiết kênh, nội dung của kênh (`/media?channel=`), theo dõi/bỏ theo dõi (transaction, bấm 2 lần chỉ tính 1), `/me/following`
 - [x] **Comments**: viết, trả lời 1 cấp, thích, xoá (chủ bình luận hoặc editor/admin), sắp xếp Hay/Mới, bình luận nổi bật. Chống spam: bắt buộc xác minh email + rate limit 10 bình luận/5 phút/người (Redis). Chưa dùng Turnstile cho bình luận: chỉ thêm nếu vẫn bị spam
 - [x] **News**: chuyên mục, danh sách theo chuyên mục (phân trang con trỏ), chi tiết, bài liên quan; `/lineup/months` cho line-up phim
-- [ ] **Utilities**: chuyến bay (ra tàu bay, trạng thái, tiến độ), Flightradar (proxy API bên thứ ba), thời tiết điểm đến (proxy + cache), Wi-Fi, phòng chờ & fast-track
+- [x] **Utilities** (Phần 10): ✓ bảng chuyến bay + tìm kiếm (`/flights?q=`), trạng thái/tiến độ/vị trí tính từ lịch bay mẫu, Flightradar (Leaflet + OpenStreetMap, đường bay cung tròn lớn), thời tiết sân bay (Open-Meteo, cache Redis 30 phút + bản cũ 24 giờ, singleflight), chuyến bay của tôi (`/me/flights`, thẻ lên máy bay), gói Wi-Fi, phòng chờ & fast-track (sản phẩm gắn nhãn `dich-vu-san-bay`). Chưa: nguồn chuyến bay thật (AviationStack/FlightAware), mua gói Wi-Fi trên web, ô bản đồ riêng cho production (OSM giới hạn lượng dùng)
 - [ ] **Opinions**: trải nghiệm, khảo sát (bình chọn 1 lần/user), góp ý (có Turnstile)
-- [ ] **Me (Bạn)**: ✓ hồ sơ, số liệu (`/me/stats`), tiếp tục xem (`/me/continue`), kênh theo dõi, trạng thái một media (`/me/media/{slug}`) (Phần 06); còn chuyến bay sắp tới (Phần 10), đơn hàng (Phần 07)
+- [ ] **Me (Bạn)**: ✓ hồ sơ, số liệu (`/me/stats`), tiếp tục xem (`/me/continue`), kênh theo dõi, trạng thái một media (`/me/media/{slug}`) (Phần 06); chuyến bay sắp tới (Phần 10), đơn hàng (Phần 07)
 - [ ] **Collection (Sưu tập)**: ✓ playlist (tạo, đổi tên, xoá, thêm/bớt mục), đã lưu, đã xem + ghi tiến độ từ trình phát (Phần 06); còn yêu thích sản phẩm/tour (Phần 07), phát tự động hết playlist (hàng đợi phát trong player store)
 - [ ] **Search**: tìm chung media/sản phẩm/kênh/tin tức, gợi ý từ khóa
 - [ ] **Contact**: gửi liên hệ (có Turnstile)
@@ -211,7 +211,7 @@ Bảng dựa trên `data/content.json` của mockup:
 - [x] Job: đối soát thanh toán `pending` quá 3 phút bằng cách hỏi cổng, 2 phút/lần (worker, Phần 09); webhook xử lý ngay trong API, email xác nhận qua RabbitMQ
 - [x] Job: flush counter lượt xem Redis → DB (worker, 30 giây một lần, gom lần cuối khi tắt)
 - [ ] Job: gửi notification khi kênh theo dõi có nội dung mới
-- [ ] Job: đồng bộ dữ liệu chuyến bay / thời tiết định kỳ
+- [x] ~~Job: đồng bộ dữ liệu chuyến bay / thời tiết định kỳ~~ → thời tiết lấy theo yêu cầu và cache 30 phút (Phần 10); chuyến bay tính từ lịch, chưa có nguồn ngoài cần đồng bộ
 
 ### 2.7 Admin API (CMS)
 - [ ] CRUD toàn bộ nội dung: media, line-up, sản phẩm, kênh, tin tức, khảo sát, chuyến bay, sân bay
@@ -269,12 +269,12 @@ Bảng dựa trên `data/content.json` của mockup:
 | `index.html` | `/` | ✓ Bố cục home theo bản vẽ tay, cột bình luận nổi bật, khối Kinh doanh (còn tiện ích) |
 | `chuyen-muc.html?c=xem\|nghe` | `/xem`, `/nghe` | ✓ Chip lọc, sắp xếp, cuộn tải thêm |
 | `chuyen-muc.html?c=kinh-doanh\|tour-bay` | `/kinh-doanh`, `/tour-bay` | ✓ Chip lọc `?f=`, Mới nhất / Bán chạy (Phần 07) |
-| `tien-ich.html?tab=` | `/tien-ich/[tab]` | Ra tàu bay, Flightradar, thời tiết, Wi-Fi, phòng chờ |
+| `tien-ich.html?tab=` | `/tien-ich/[tab]` | ✓ Ra tàu bay (thẻ lên máy bay, thêm chuyến), Flightradar (bản đồ + bảng, tìm kiếm), thời tiết, Wi-Fi, phòng chờ (Phần 10) |
 | `y-kien.html?tab=` | `/y-kien/[tab]` | Trải nghiệm, khảo sát, góp ý |
 | `tin-tuc.html?f=` | `/tin-tuc` | ✓ Bài nổi bật, chip chuyên mục, cuộn tải thêm |
 | `bai-viet.html?id=` | `/tin-tuc/[slug]` | ✓ Thân bài (`prose`), Đọc thêm, Open Graph `article`; ✓ bình luận; còn chia sẻ/lưu |
 | `moi-tai.html` | `/moi-tai` | ✓ Tab Tất cả / Video / Nghe / Line-up phim tháng (chọn tháng) |
-| `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ, số liệu, tiếp tục xem, kênh theo dõi; còn chuyến bay (Phần 10), đơn hàng (Phần 07) |
+| `ban.html` | `/ban` | ✓ Cần đăng nhập (`proxy.ts`), thẻ hồ sơ, số liệu, tiếp tục xem, kênh theo dõi; chuyến bay sắp tới (Phần 10), đơn hàng, vé/tour |
 | `suu-tap.html` | `/suu-tap`, `/suu-tap/playlist/[id]` | ✓ Tab Playlist, Đã lưu, Yêu thích, Đã xem; trang playlist |
 | `xem.html?id=` | `/xem/[slug]`, `/nghe/[slug]` | ✓ Player YouTube (video & nghe), thông tin, gợi ý, theo dõi kênh, bình luận, Lưu, thêm vào playlist, xem tiếp từ chỗ dừng; còn sản phẩm gắn video |
 | `san-pham.html?id=` | `/san-pham/[slug]` | ✓ Hàng hoá: bộ ảnh, biến thể, số lượng, giỏ, yêu thích, JSON-LD (Phần 07); ✓ vé/tour: chọn ngày, hạng, số khách, giữ chỗ (Phần 08) |
@@ -312,9 +312,9 @@ Bảng dựa trên `data/content.json` của mockup:
 - [ ] Cổng thanh toán (VNPay / MoMo / ZaloPay): tạo tài khoản sandbox rồi viết adapter (cổng giả lập đã chạy đủ luồng, Phần 09)
 - [ ] Resend: xác minh domain gửi (SPF, DKIM, DMARC trên Cloudflare DNS), địa chỉ gửi vd. `no-reply@airlife.vn`
 - [ ] Cloudflare Turnstile: tạo site key/secret key cho dev và prod
-- [ ] Dữ liệu chuyến bay (FlightAware / AviationStack / API hãng bay đối tác)
-- [ ] Thời tiết (OpenWeather)
-- [ ] Bản đồ Flightradar (Mapbox/Leaflet + dữ liệu vị trí)
+- [ ] Dữ liệu chuyến bay thật (FlightAware / AviationStack / API hãng bay đối tác): hiện dùng lịch bay mẫu (Phần 10)
+- [x] Thời tiết: Open-Meteo (miễn phí, không khoá; gói trả phí khi kinh doanh) (Phần 10)
+- [x] Bản đồ Flightradar: Leaflet + OpenStreetMap (Phần 10); production cần nhà cung cấp ô bản đồ riêng
 - [ ] Đăng nhập Google / Facebook
 - [ ] YouTube Data API v3 (API key, theo dõi quota 10.000 đơn vị/ngày; cache metadata trong DB)
 - [ ] Analytics (GA4 / Umami), Sentry cho cả frontend và backend (**bắt buộc trước khi lên production**)

@@ -128,6 +128,51 @@ const LINE_ICONS = {
   minus: <path d="M5 12h14" />,
   caret: <path d="m7 10 5 5 5-5" />,
   chevron: <path d="m9 6 6 6-6 6" />,
+  plane: (
+    <>
+      <path d="M10.5 21 12 18l1.5 3M12 18V4a1.5 1.5 0 0 0-3 0v5L3 13v2l6-2v5" />
+      <path d="M12 4a1.5 1.5 0 0 1 3 0v5l6 4v2l-6-2" />
+    </>
+  ),
+  wifi: (
+    <>
+      <path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0" />
+      <circle cx="12" cy="19.5" r="1" />
+    </>
+  ),
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </>
+  ),
+  cloud: <path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z" />,
+  rain: (
+    <>
+      <path d="M7 15a4 4 0 0 1-.5-8A6 6 0 0 1 18 6a4.5 4.5 0 0 1-.5 9z" />
+      <path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3" />
+    </>
+  ),
+  storm: (
+    <>
+      <path d="M7 15a4 4 0 0 1-.5-8A6 6 0 0 1 18 6a4.5 4.5 0 0 1-.5 9z" />
+      <path d="m12 14-2 4h3l-1 4" />
+    </>
+  ),
+  fog: <path d="M4 8h16M6 12h12M4 16h16M8 20h8" />,
+  snow: (
+    <>
+      <path d="M7 15a4 4 0 0 1-.5-8A6 6 0 0 1 18 6a4.5 4.5 0 0 1-.5 9z" />
+      <path d="M8 19h.01M12 19h.01M16 19h.01M10 21h.01M14 21h.01" />
+    </>
+  ),
+  luggage: (
+    <>
+      <rect x="6" y="7" width="12" height="13" rx="2" />
+      <path d="M9 7V4h6v3M9 11v6M15 11v6M8 20v1M16 20v1" />
+    </>
+  ),
+  gate: <path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M9 21v-6h6v6" />,
   login: <path d="M10 4H6v16h4M14 8l4 4-4 4M18 12H7" />,
   logout: <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11" />,
 } satisfies Record<string, ReactElement>;

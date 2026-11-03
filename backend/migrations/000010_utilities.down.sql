@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS wifi_plans;
+DROP TABLE IF EXISTS user_flights;
+DROP TABLE IF EXISTS flights;
+DROP TABLE IF EXISTS airports;

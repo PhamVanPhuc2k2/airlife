@@ -139,6 +139,42 @@ func (q *Queries) UpsertDepartureSeats(ctx context.Context, arg UpsertDepartureS
 	return err
 }
 
+const upsertFlight = `-- name: UpsertFlight :exec
+INSERT INTO flights (code, airline, origin, destination, dep_local, duration_minutes, delay_minutes, gate)
+VALUES ($1, $2, $3, $4,
+        $5::text::time, $6, $7, $8)
+ON CONFLICT (code) DO UPDATE
+SET airline = EXCLUDED.airline, origin = EXCLUDED.origin, destination = EXCLUDED.destination,
+    dep_local = EXCLUDED.dep_local, duration_minutes = EXCLUDED.duration_minutes,
+    delay_minutes = EXCLUDED.delay_minutes, gate = EXCLUDED.gate
+`
+
+type UpsertFlightParams struct {
+	Code            string
+	Airline         string
+	Origin          string
+	Destination     string
+	DepLocal        string
+	DurationMinutes int32
+	DelayMinutes    int32
+	Gate            string
+}
+
+// Lịch bay mẫu (Phần 10)
+func (q *Queries) UpsertFlight(ctx context.Context, arg UpsertFlightParams) error {
+	_, err := q.db.Exec(ctx, upsertFlight,
+		arg.Code,
+		arg.Airline,
+		arg.Origin,
+		arg.Destination,
+		arg.DepLocal,
+		arg.DurationMinutes,
+		arg.DelayMinutes,
+		arg.Gate,
+	)
+	return err
+}
+
 const upsertMedia = `-- name: UpsertMedia :exec
 INSERT INTO media (slug, kind, category_slug, channel_id, title, description, group_label,
                    genre_label, tags, youtube_id, thumbnail_url, duration_seconds,

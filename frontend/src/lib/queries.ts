@@ -1,14 +1,18 @@
-import { infiniteQueryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import { api, qs } from "./api";
 import type {
   BookingPage,
   CommentPage,
+  Flight,
   LibraryPage,
   MediaPage,
+  MyFlight,
   NewsPage,
   OrderPage,
   ProductPage,
+  WeatherReport,
+  WifiPlan,
 } from "./types";
 
 // Mỗi truy vấn khai báo một lần (key + hàm lấy dữ liệu) bằng infiniteQueryOptions, dùng chung
@@ -130,5 +134,41 @@ export function bookingsOptions() {
       api<BookingPage>(`/me/bookings?${qs({ cursor: pageParam })}`, { signal }),
     initialPageParam: "",
     getNextPageParam: (last) => last.next_cursor || undefined,
+  });
+}
+
+// ---- Tiện ích (Phần 10) ----
+
+// Bảng chuyến bay đổi theo giờ (trạng thái, vị trí máy bay): lấy lại mỗi 30 giây khi tab đang mở
+export function flightsOptions(q = "") {
+  return queryOptions({
+    queryKey: ["flights", q],
+    queryFn: ({ signal }) => api<Flight[]>(`/flights?${qs({ q })}`, { signal }),
+    refetchInterval: 30_000,
+  });
+}
+
+export function myFlightsOptions() {
+  return queryOptions({
+    queryKey: ["me", "flights"],
+    queryFn: ({ signal }) => api<MyFlight[]>("/me/flights", { signal }),
+    refetchInterval: 60_000,
+  });
+}
+
+// Thời tiết server cache 30 phút, không cần hỏi lại thường xuyên
+export function weatherOptions() {
+  return queryOptions({
+    queryKey: ["weather"],
+    queryFn: ({ signal }) => api<WeatherReport>("/weather", { signal }),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function wifiPlansOptions() {
+  return queryOptions({
+    queryKey: ["wifi-plans"],
+    queryFn: ({ signal }) => api<WifiPlan[]>("/wifi-plans", { signal }),
+    staleTime: 10 * 60_000,
   });
 }

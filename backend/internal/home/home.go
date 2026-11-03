@@ -5,7 +5,7 @@
 //	┌ 3 ô bên trái ┐┌──── khối nổi bật ────┐┌ bình luận nổi bật ┐
 //	└──────────────┘└──────────────────────┘└─────────────────────┘
 //	[ hàng 4 thẻ xem nhiều ]
-//	[ Nghe nhiều ] [ Kinh doanh ] [ Tiện ích (Phần 10) ]
+//	[ Nghe nhiều ] [ Kinh doanh ] [ Tiện ích ]
 package home
 
 import (
@@ -17,6 +17,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/flight"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/media"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/cache"
@@ -28,11 +29,12 @@ import (
 const cacheTTL = 60 * time.Second
 
 type Home struct {
-	Featured  *media.Card    `json:"featured"`
-	Latest    []media.Card   `json:"latest"`     // 3 ô bên trái: phim mới
-	Trending  []media.Card   `json:"trending"`   // hàng 4 thẻ: xem nhiều
-	TopListen []media.Card   `json:"top_listen"` // khối "Nghe nhiều"
-	Shop      []product.Card `json:"shop"`       // khối "Kinh doanh": hàng bán chạy
+	Featured  *media.Card     `json:"featured"`
+	Latest    []media.Card    `json:"latest"`     // 3 ô bên trái: phim mới
+	Trending  []media.Card    `json:"trending"`   // hàng 4 thẻ: xem nhiều
+	TopListen []media.Card    `json:"top_listen"` // khối "Nghe nhiều"
+	Shop      []product.Card  `json:"shop"`       // khối "Kinh doanh": hàng bán chạy
+	Flights   []flight.Flight `json:"flights"`    // khối "Tiện ích": chuyến đang bay
 	// Cột "Bình luận nổi bật", hai tab: Hay (nhiều thích), Nhiều (nhiều trả lời)
 	HotComments struct {
 		Top     []comment.HotComment `json:"top"`
@@ -44,11 +46,12 @@ type Service struct {
 	media    *media.Service // dùng service của module khác, không gọi thẳng repository của nó
 	comments *comment.Service
 	products *product.Service
+	flights  *flight.Service
 	rdb      *redis.Client
 }
 
-func NewService(m *media.Service, c *comment.Service, p *product.Service, rdb *redis.Client) *Service {
-	return &Service{media: m, comments: c, products: p, rdb: rdb}
+func NewService(m *media.Service, c *comment.Service, p *product.Service, f *flight.Service, rdb *redis.Client) *Service {
+	return &Service{media: m, comments: c, products: p, flights: f, rdb: rdb}
 }
 
 func (s *Service) Get(ctx context.Context) (Home, error) {
@@ -104,6 +107,9 @@ func (s *Service) load(ctx context.Context) (Home, error) {
 		return h, err
 	}
 	if h.Shop, err = s.products.TopSelling(ctx, "kinh-doanh", 4); err != nil {
+		return h, err
+	}
+	if h.Flights, err = s.flights.Live(ctx, 3); err != nil {
 		return h, err
 	}
 	return h, nil

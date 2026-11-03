@@ -100,6 +100,8 @@ func statusOf(k apperr.Kind) int {
 		return http.StatusConflict
 	case apperr.KindTooMany:
 		return http.StatusTooManyRequests
+	case apperr.KindUnavailable:
+		return http.StatusServiceUnavailable
 	default:
 		return http.StatusInternalServerError
 	}

@@ -8,7 +8,18 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Airport struct {
+	Code     string
+	City     string
+	Name     string
+	Country  string
+	Lat      float64
+	Lon      float64
+	Timezone string
+}
 
 type Booking struct {
 	ID             uuid.UUID
@@ -126,6 +137,19 @@ type Favorite struct {
 	UserID    uuid.UUID
 	ProductID uuid.UUID
 	CreatedAt time.Time
+}
+
+type Flight struct {
+	ID              uuid.UUID
+	Code            string
+	Airline         string
+	Origin          string
+	Destination     string
+	DepLocal        pgtype.Time
+	DurationMinutes int32
+	DelayMinutes    int32
+	Gate            string
+	Cancelled       bool
 }
 
 type MediaProduct struct {
@@ -320,10 +344,29 @@ type User struct {
 	UpdatedAt       time.Time
 }
 
+type UserFlight struct {
+	ID         uuid.UUID
+	UserID     uuid.UUID
+	FlightID   uuid.UUID
+	FlightDate time.Time
+	Seat       string
+	Cabin      string
+	CreatedAt  time.Time
+}
+
 type WatchHistory struct {
 	UserID          uuid.UUID
 	MediaID         uuid.UUID
 	PositionSeconds int32
 	DurationSeconds int32
 	UpdatedAt       time.Time
+}
+
+type WifiPlan struct {
+	ID          int16
+	Name        string
+	Description string
+	Price       int64
+	Popular     bool
+	SortOrder   int16
 }

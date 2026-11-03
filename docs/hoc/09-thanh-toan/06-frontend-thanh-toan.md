@@ -1,6 +1,6 @@
 # Bài 9.06: Frontend: nút Thanh toán, chờ webhook, trang cổng giả lập; nghiệm thu Phần 09
 
-> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md)
+> [← Bài trước](05-thu-api.md) · [Mục lục](../README.md) · [Phần 10 →](../10-tien-ich/01-du-lieu-lich-bay.md)
 
 ## Mục tiêu
 

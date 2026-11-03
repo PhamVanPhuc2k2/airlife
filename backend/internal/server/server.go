@@ -25,6 +25,7 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/comment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/config"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/db"
+	"github.com/PhamVanPhuc2k2/airlife/backend/internal/flight"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/home"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/library"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/mail"
@@ -33,10 +34,12 @@ import (
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/order"
 	paymentsvc "github.com/PhamVanPhuc2k2/airlife/backend/internal/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/internal/product"
+	weathersvc "github.com/PhamVanPhuc2k2/airlife/backend/internal/weather"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/apperr"
 	paypkg "github.com/PhamVanPhuc2k2/airlife/backend/pkg/payment"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/queue"
 	"github.com/PhamVanPhuc2k2/airlife/backend/pkg/response"
+	pkgweather "github.com/PhamVanPhuc2k2/airlife/backend/pkg/weather"
 )
 
 // Deps gom các kết nối hạ tầng mà handler cần. cmd/api tạo một lần rồi truyền vào.
@@ -113,7 +116,11 @@ func (s *Server) Handler() (http.Handler, error) {
 	productH := product.NewHandler(productSvc, s.deps.Log)
 	cartH := cart.NewHandler(cart.NewService(q), s.deps.Log)
 	bookingH := booking.NewHandler(booking.NewService(s.deps.DB), s.deps.Log)
-	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, productSvc, s.deps.Redis), s.deps.Log)
+	flightSvc := flight.NewService(q, s.deps.Redis)
+	flightH := flight.NewHandler(flightSvc, s.deps.Log)
+	weatherH := weathersvc.NewHandler(weathersvc.NewService(flightSvc,
+		pkgweather.NewClient(s.deps.Config.Weather.BaseURL), s.deps.Redis, s.deps.Log), s.deps.Log)
+	homeH := home.NewHandler(home.NewService(mediaSvc, commentSvc, productSvc, flightSvc, s.deps.Redis), s.deps.Log)
 
 	authCfg := s.deps.Config.Auth
 	tokens := auth.NewTokenIssuer(authCfg.JWTSecret, authCfg.AccessTTL)
@@ -188,6 +195,12 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Post("/cart/preview", cartH.Preview) // giỏ của khách chưa đăng nhập
 		r.Get("/products/{slug}/departures", bookingH.Availability)
 
+		// Tiện ích (Phần 10)
+		r.Get("/flights", flightH.Board)
+		r.Get("/airports", flightH.Airports)
+		r.Get("/weather", weatherH.Get)
+		r.Get("/wifi-plans", flightH.WifiPlans)
+
 		// Cổng thanh toán gọi vào đây (không đăng nhập; xác thực bằng chữ ký HMAC)
 		r.Post("/webhooks/payment/{provider}", paymentH.Webhook)
 		// Trang của cổng giả lập: chỉ dev (config chặn fake ở production)
@@ -201,6 +214,9 @@ func (s *Server) Handler() (http.Handler, error) {
 		r.Route("/me", func(r chi.Router) {
 			r.Use(requireAuth)
 			r.Get("/following", channelH.Following)
+			r.Get("/flights", flightH.Mine)
+			r.Post("/flights", flightH.Add)
+			r.Delete("/flights/{id}", flightH.Remove)
 			r.Get("/stats", libraryH.Stats)
 			r.Get("/media/{slug}", libraryH.MediaState)
 

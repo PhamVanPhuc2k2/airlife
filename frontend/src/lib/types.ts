@@ -54,6 +54,7 @@ export type Home = {
   top_listen: MediaCard[];
   hot_comments: { top: HotComment[]; replied: HotComment[] };
   shop: ProductCard[];
+  flights: Flight[];
 };
 
 export type NewsCategory = {
@@ -339,3 +340,63 @@ export type BookingSummary = {
 };
 
 export type BookingPage = { items: BookingSummary[]; next_cursor?: string };
+
+// ---- Tiện ích (Phần 10) ----
+
+export type FlightStatus = "scheduled" | "boarding" | "in_air" | "landed" | "cancelled";
+export type Cabin = "economy" | "premium" | "business" | "first";
+
+export type Airport = {
+  code: string;
+  city: string;
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+};
+
+export type Flight = {
+  code: string;
+  airline: string;
+  from: Airport;
+  to: Airport;
+  gate: string;
+  status: FlightStatus;
+  delay_minutes: number;
+  // Giờ địa phương của từng sân bay, "08:00"; đã tính cả phút trễ
+  dep: string;
+  arr: string;
+  arr_next_day: boolean;
+  boarding: string;
+  dep_at: string;
+  arr_at: string;
+  progress: number;
+  position?: { lat: number; lon: number; heading: number };
+};
+
+export type MyFlight = Flight & { id: string; date: string; seat: string; cabin: Cabin };
+
+export type WeatherCondition = "sun" | "cloud" | "rain" | "storm" | "fog" | "snow";
+
+export type AirportWeather = {
+  code: string;
+  city: string;
+  temp_c: number;
+  feels_like_c: number;
+  humidity: number;
+  wind_kmh: number;
+  condition: WeatherCondition;
+  text: string;
+  is_day: boolean;
+};
+
+export type WeatherReport = { updated_at: string; stale: boolean; airports: AirportWeather[] };
+
+export type WifiPlan = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  popular: boolean;
+};

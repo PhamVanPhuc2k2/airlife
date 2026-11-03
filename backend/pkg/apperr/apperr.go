@@ -21,6 +21,7 @@ const (
 	KindNotFound                 // 404
 	KindConflict                 // 409: trùng (email đã tồn tại…)
 	KindTooMany                  // 429: bị rate limit
+	KindUnavailable              // 503: dịch vụ bên ngoài (thời tiết…) đang lỗi
 )
 
 type Error struct {
@@ -60,6 +61,16 @@ func NotFound(code, msg string) *Error { return &Error{Kind: KindNotFound, Code:
 func Conflict(code, msg string) *Error { return &Error{Kind: KindConflict, Code: code, Message: msg} }
 
 func TooMany(code, msg string) *Error { return &Error{Kind: KindTooMany, Code: code, Message: msg} }
+
+func Unavailable(code, msg string) *Error {
+	return &Error{Kind: KindUnavailable, Code: code, Message: msg}
+}
+
+// WithErr gắn lỗi gốc để ghi log (client không thấy).
+func (e *Error) WithErr(err error) *Error {
+	e.Err = err
+	return e
+}
 
 // Internal bọc lỗi hệ thống. Client chỉ thấy câu chung chung, lỗi gốc nằm trong log.
 func Internal(err error) *Error {

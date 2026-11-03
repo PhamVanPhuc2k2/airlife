@@ -5,13 +5,14 @@ import { ContinueWatching } from "@/components/account/ContinueWatching";
 import { FollowingChannels } from "@/components/account/FollowingChannels";
 import { LibraryStats } from "@/components/account/LibraryStats";
 import { ProfileCard } from "@/components/account/ProfileCard";
+import { UpcomingFlights } from "@/components/flight/MyFlights";
 import { BookingList } from "@/components/booking/BookingList";
 import { OrderList } from "@/components/shop/OrderList";
 
 export const metadata: Metadata = { title: "Bạn", robots: { index: false } };
 
 // Trang Bạn (mockup: renderMe). Mọi khối là dữ liệu riêng của người đang đăng nhập nên lấy ở
-// trình duyệt (có cookie). Mockup còn có chuyến bay sắp tới (Phần 10).
+// trình duyệt (có cookie). Chuyến bay sắp tới nằm trên cùng (thẻ lên máy bay).
 export default function Page() {
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-3 py-6 md:px-6">
@@ -19,6 +20,17 @@ export default function Page() {
         <ProfileCard />
         <LibraryStats />
       </div>
+      <section aria-labelledby="chuyen-bay">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 id="chuyen-bay" className="text-xl font-bold">
+            Chuyến bay sắp tới
+          </h2>
+          <Link href="/tien-ich/ra-tau-bay" className="text-sm font-semibold text-brand-700">
+            Ra tàu bay
+          </Link>
+        </div>
+        <UpcomingFlights />
+      </section>
       <section aria-labelledby="don-hang">
         <div className="mb-4 flex items-center justify-between">
           <h2 id="don-hang" className="text-xl font-bold">

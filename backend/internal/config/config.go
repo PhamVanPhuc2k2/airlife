@@ -31,6 +31,7 @@ type Config struct {
 	Auth     Auth     `mapstructure:",squash"`
 	Mail     Mail     `mapstructure:",squash"`
 	Payment  Payment  `mapstructure:",squash"`
+	Weather  Weather  `mapstructure:",squash"`
 }
 
 type App struct {
@@ -75,6 +76,12 @@ type RabbitMQ struct {
 type Mail struct {
 	SMTPAddr string `mapstructure:"MAIL_SMTP_ADDR"` // host:port, vd. mailpit:1025
 	From     string `mapstructure:"MAIL_FROM"`
+}
+
+// Weather: nguồn thời tiết sân bay (Phần 10).
+type Weather struct {
+	// Mặc định Open-Meteo miễn phí, không cần khoá API. Đổi sang bản trả phí khi chạy kinh doanh.
+	BaseURL string `mapstructure:"WEATHER_BASE_URL"`
 }
 
 // Payment: cổng thanh toán online (Phần 09).
@@ -157,6 +164,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("AUTH_REFRESH_TTL", "720h") // 30 ngày
 	v.SetDefault("AUTH_COOKIE_DOMAIN", "")
 
+	v.SetDefault("WEATHER_BASE_URL", "https://api.open-meteo.com")
 	v.SetDefault("PAYMENT_PROVIDER", "fake")
 	v.SetDefault("PAYMENT_WEBHOOK_SECRET", "") // bắt buộc, ≥ 32 ký tự
 	v.SetDefault("PAYMENT_NOTIFY_URL", "http://localhost:8080/api/v1/webhooks/payment/fake")

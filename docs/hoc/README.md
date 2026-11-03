@@ -260,11 +260,25 @@ hết hạn, trả sau khi huỷ) kết thúc bằng "cần hoàn tiền" thay v
 | [9.05](09-thanh-toan/05-thu-api.md) | Thử toàn bộ luồng thanh toán bằng curl |
 | [9.06](09-thanh-toan/06-frontend-thanh-toan.md) | Frontend: nút Thanh toán, chờ webhook, trang cổng giả lập; nghiệm thu Phần 09 |
 
+### Phần 10: Tiện ích
+
+Chuyến bay, Flightradar, thời tiết, Wi-Fi, phòng chờ. Lịch bay hàng ngày trong database; trạng thái và vị trí máy bay
+được **tính** từ giờ hiện tại (múi giờ từng sân bay, cung tròn lớn). Thời tiết lấy từ Open-Meteo với cache hai lớp và
+singleflight. Bản đồ bằng Leaflet.
+
+| Bài | Nội dung |
+|---|---|
+| [10.01](10-tien-ich/01-du-lieu-lich-bay.md) | Dữ liệu: lịch bay hàng ngày, sân bay, gói Wi-Fi |
+| [10.02](10-tien-ich/02-trang-thai-va-vi-tri.md) | Tính trạng thái chuyến bay và vị trí máy bay từ giờ |
+| [10.03](10-tien-ich/03-api-chuyen-bay.md) | Service và API chuyến bay, chuyến bay của tôi |
+| [10.04](10-tien-ich/04-thoi-tiet.md) | Thời tiết sân bay: gọi dịch vụ bên ngoài, cache hai lớp, singleflight |
+| [10.05](10-tien-ich/05-thu-api.md) | Thử API tiện ích bằng curl |
+| [10.06](10-tien-ich/06-frontend-tien-ich.md) | Frontend: Flightradar, ra tàu bay, thời tiết, Wi-Fi; nghiệm thu Phần 10 |
+
 ### Các phần sẽ viết tiếp (theo TASKS.md)
 
 | Phần | Nội dung |
 |---|---|
-| 10 tien-ich | Chuyến bay, thời tiết, Flightradar |
 | 11 y-kien | Trải nghiệm, khảo sát, góp ý, Turnstile |
 | 12 cms | Trang quản trị, Tiptap, upload ảnh lên R2 |
 | 13 trien-khai | Docker production, Cloudflare, nginx, CI |

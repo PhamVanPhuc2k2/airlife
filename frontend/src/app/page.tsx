@@ -1,4 +1,5 @@
 import { HotComments } from "@/components/comment/HotComments";
+import { UtilityPanel } from "@/components/flight/UtilityPanel";
 import { FeaturedHero } from "@/components/media/FeaturedHero";
 import { MediaCard } from "@/components/media/MediaCard";
 import { MediaTile } from "@/components/media/MediaTile";
@@ -46,7 +47,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Hàng dưới của mockup: Nghe nhiều | Kinh doanh | Tiện ích (Phần 10) */}
+      {/* Hàng dưới của mockup: Nghe nhiều | Kinh doanh | Tiện ích */}
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel title="Nghe nhiều" icon="sound" moreHref="/nghe?sort=popular">
           <RankList items={home.top_listen} />
@@ -54,6 +55,7 @@ export default async function HomePage() {
         <Panel title="Kinh doanh" icon="briefcase" moreHref="/kinh-doanh?sort=bestseller">
           <ProductMiniList items={home.shop} />
         </Panel>
+        <UtilityPanel flights={home.flights} />
       </section>
     </div>
   );

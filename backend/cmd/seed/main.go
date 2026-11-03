@@ -129,6 +129,16 @@ type seedData struct {
 		Likes    int32   `json:"likes"`
 		HoursAgo float64 `json:"hours_ago"`
 	} `json:"comments"`
+	Flights []struct {
+		Code            string `json:"code"`
+		Airline         string `json:"airline"`
+		Origin          string `json:"origin"`
+		Destination     string `json:"destination"`
+		DepLocal        string `json:"dep_local"`
+		DurationMinutes int32  `json:"duration_minutes"`
+		DelayMinutes    int32  `json:"delay_minutes"`
+		Gate            string `json:"gate"`
+	} `json:"flights"`
 }
 
 // seedFare: một hạng dịch vụ của vé, tour, kèm số chỗ mỗi chuyến (Phần 08)
@@ -264,13 +274,21 @@ func run() error {
 	if err := seedComments(ctx, q, data, now); err != nil {
 		return err
 	}
+	for _, f := range data.Flights {
+		if err := q.UpsertFlight(ctx, db.UpsertFlightParams{
+			Code: f.Code, Airline: f.Airline, Origin: f.Origin, Destination: f.Destination,
+			DepLocal: f.DepLocal, DurationMinutes: f.DurationMinutes, DelayMinutes: f.DelayMinutes, Gate: f.Gate,
+		}); err != nil {
+			return fmt.Errorf("chuyến bay %s: %w", f.Code, err)
+		}
+	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
 	log.Info("đã nạp dữ liệu mẫu",
 		"categories", len(data.Categories), "channels", len(data.Channels), "media", len(data.Media),
-		"news", len(data.News), "products", len(data.Products), "users", len(data.Users), "comments", len(data.Comments))
+		"news", len(data.News), "products", len(data.Products), "users", len(data.Users), "comments", len(data.Comments), "flights", len(data.Flights))
 	return nil
 }
 
